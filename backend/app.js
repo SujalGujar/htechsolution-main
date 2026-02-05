@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import sectionRoutes from "./routes/section.routes.js";
 import deliverableRoutes from "./routes/deliverable.routes.js";
 import authRoutes from "./routes/auth.routes.js";  // or authRoutes.js
-
+import userRoutes from "./routes/user.routes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,6 +24,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/sections", sectionRoutes);
 app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users",userRoutes)
 
 // Test route
 app.get("/", (_, res) => {

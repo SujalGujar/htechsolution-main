@@ -130,7 +130,7 @@ const AdminPanelMain = () => {
   console.log(data)
     try{
       const response = await axios.post(
-        "http://localhost:5000/admin-panel",data
+        "http://localhost:5000/api/auth/login",data
       )
       if(response.status == 200){
         
