@@ -29,7 +29,7 @@ export default function Header() {
     { name: "Service", path: "/service" },
     { name: "Gallery", path: "/gallery" },
     { name: "Contact", path: "/contact" },
-    {name:"Adminpanel", path:"admin-panel"}
+    // {name:"Adminpanel", path:"admin-panel"}
   ];
 
   return (
