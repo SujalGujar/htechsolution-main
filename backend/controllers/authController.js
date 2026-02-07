@@ -1,40 +1,91 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Admin from '../models/admin.model.js';
 import dotenv from "dotenv";
+import crypto from "crypto";
+import Admin from "../models/admin.model.js"
+import Customer from "../models/customerDetails.model.js";
+
 dotenv.config();
+
+// 🔐 password generator (this is OK)
+const generateSecurePassword = (length = 12) => {
+  const randomBytes = crypto.randomBytes(Math.ceil(length / 2));
+  return randomBytes.toString("hex").slice(0, length);
+};
 
 export const register = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    // STEP 1️⃣ Destructure request body
+    const {
+      customerName,
+      email,
+      mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
+      brandName,
+      purDate,
+      invoiceNum,
+      warrStartDate,
+      warrEndDate
+    } = req.body;
 
-    // STEP 1: Validate input FIRST (before doing anything else)
-    if (!username || !password || !role) {
+    // STEP 2️⃣ Validation
+    if (
+      !customerName || !email || !mobileNum ||
+      !proName || !proCatogory || !proSrNo ||
+      !proModNum || !brandName || !purDate ||
+      !invoiceNum || !warrStartDate || !warrEndDate
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // STEP 2: Check if username already exists
-    const existingAdmin = await Admin.findOne({ username });
-    if (existingAdmin) {
-      return res.status(400).json({ message: "Username already exists" });
+    // STEP 3️⃣ Duplicate check
+    const existingCustomer = await Customer.findOne({
+      $or: [{ email }, { mobileNum }, { proSrNo }]
+    });
+
+    if (existingCustomer) {
+      return res.status(400).json({ message: "Customer already exists" });
     }
 
-    // STEP 3: Hash password (only after validation passes)
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // STEP 4️⃣ Generate & hash password
+    const plainPassword = generateSecurePassword();
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-    // STEP 4: Create and save new user
-    const newUser = new Admin({ username, password: hashedPassword, role });
-    await newUser.save();
+    // STEP 5️⃣ Create customer
+    // ⚠️ TicketNumber is NOT passed here
+    const newCustomer = await Customer.create({
+      customerName,
+      email,
+      mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
+      brandName,
+      purDate,
+      invoiceNum,
+      warrStartDate,
+      warrEndDate,
+      password: hashedPassword
+    });
 
-    // STEP 5: Send success response
-    res
-      .status(201)
-      .json({ message: `User Registered With username ${username}` });
+    // STEP 6️⃣ Response
+    res.status(201).json({
+      message: "Customer registered successfully",
+      ticketNumber: newCustomer.TicketNumber,
+      password: plainPassword
+    });
+
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 export const login = async (req, res) => {
   try {
