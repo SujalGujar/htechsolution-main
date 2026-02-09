@@ -7,7 +7,12 @@ import Customer from "../models/customerDetails.model.js";
 
 dotenv.config();
 
-// 🔐 password generator (this is OK)
+
+// import bcrypt from "bcryptjs";
+// import crypto from "crypto";
+// import Customer from "../models/customerDetails.model.js";
+
+// 🔐 Password generator
 const generateSecurePassword = (length = 12) => {
   const randomBytes = crypto.randomBytes(Math.ceil(length / 2));
   return randomBytes.toString("hex").slice(0, length);
@@ -15,7 +20,12 @@ const generateSecurePassword = (length = 12) => {
 
 export const register = async (req, res) => {
   try {
-    // STEP 1️⃣ Destructure request body
+    
+    const body = req.body;
+    if (!body) {
+      return res.status(400).json({ message: "Request body missing" });
+    }
+
     const {
       customerName,
       email,
@@ -29,9 +39,9 @@ export const register = async (req, res) => {
       invoiceNum,
       warrStartDate,
       warrEndDate
-    } = req.body;
+    } = body;
 
-    // STEP 2️⃣ Validation
+    // ✅ STEP 4: Validation
     if (
       !customerName || !email || !mobileNum ||
       !proName || !proCatogory || !proSrNo ||
@@ -41,22 +51,18 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // STEP 3️⃣ Duplicate check
-    const existingCustomer = await Customer.findOne({
-      $or: [{ email }, { mobileNum }, { proSrNo }]
-    });
-
-    if (existingCustomer) {
-      return res.status(400).json({ message: "Customer already exists" });
+    // ✅ STEP 5: Duplicate checks (REALISTIC)
+    const existingProduct = await Customer.findOne({ proSrNo });
+    if (existingProduct) {
+      return res.status(400).json({ message: "Product already registered" });
     }
 
-    // STEP 4️⃣ Generate & hash password
+    // ✅ STEP 6: Password generation
     const plainPassword = generateSecurePassword();
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-    // STEP 5️⃣ Create customer
-    // ⚠️ TicketNumber is NOT passed here
-    const newCustomer = await Customer.create({
+    // ✅ STEP 7: Create document using save()
+    const customer = new Customer({
       customerName,
       email,
       mobileNum,
@@ -72,18 +78,21 @@ export const register = async (req, res) => {
       password: hashedPassword
     });
 
-    // STEP 6️⃣ Response
+    await customer.save(); // 🔥 pre("save") runs here
+
+    // ✅ STEP 8: Response
     res.status(201).json({
       message: "Customer registered successfully",
-      ticketNumber: newCustomer.TicketNumber,
+      ticketNumber: customer.TicketNumber,
       password: plainPassword
     });
 
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 
 
