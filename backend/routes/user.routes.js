@@ -24,8 +24,10 @@ import authorizeRoles from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-router.get("/admin",verifyToken,authorizeRoles("admin"), (req, res) => {
-  res.json({ message: "Welcome Admin" });
+ router.get("/admin",verifyToken,authorizeRoles("admin"), async (req, res) => {
+  const allurls = await URL.find();
+
+  res.json({ message: "Welcome Admin", urls: allurls });
 });
 
 router.get("/manager",authorizeRoles("admin","manager"), (req, res) => {

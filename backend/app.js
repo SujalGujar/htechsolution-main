@@ -8,6 +8,8 @@ import deliverableRoutes from "./routes/deliverable.routes.js";
 import authRoutes from "./routes/auth.routes.js";  // or authRoutes.js
 import userRoutes from "./routes/user.routes.js";
 // import customerDetailRoutes from "./routes/customerDetails.routes.js"
+import customerDetailRoutes from "./routes/customerCare.route.js"
+import customerRoutes from "./routes/customer.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -26,6 +28,8 @@ app.use("/sections", sectionRoutes);
 app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users",userRoutes)
+app.use("/api/customerDetails",customerDetailRoutes)
+app.use("/api/customer",customerRoutes)
 // app.use("/api/customerDetails",customerDetailRoutes)
 
 // Test route
