@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import Customer from "../models/customerDetails.model.js";
+import Customer from "../models/productDetails.model.js";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ export const customerDetails = async(req, res) => {
         
         const allCustomers = await Customer.find();
 
-        // ✅ check if data exists in database
+        
         if(!allCustomers || allCustomers.length === 0){
             return res.status(404).json({ message: "No customers found" });
         }

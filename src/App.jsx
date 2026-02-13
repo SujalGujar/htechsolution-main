@@ -138,14 +138,11 @@ import HardwareSolutions from "./Components/Footerlinks/HardWareSolution";
 import WhyHtech from "./Components/Footerlinks/WhyHtech";
 import CustomerStories from "./Components/Footerlinks/CustomerStories";
 
-// ✅ future panels (create these files)
-// import ManagerPanel from "./Components/Panels/ManagerPanel";
-// import CustomerPanel from "./Components/Panels/CustomerPanel";
 
+import CustomerCarePanel from "./Components/customerCarePanel/CustomerCarePanel";
+import CustomerPanelMain from "./Components/customerPanel/CustomerPanelMain";
 const router = createBrowserRouter([
-  // ─────────────────────────────────────
-  // PUBLIC ROUTES (with header + footer)
-  // ─────────────────────────────────────
+
   {
     path: "/",
     element: <Layout />,
@@ -166,9 +163,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ─────────────────────────────────────
-  // PROTECTED ROUTES (no header + footer)
-  // ─────────────────────────────────────
+ 
 
   // ✅ admin only
   {
@@ -185,7 +180,7 @@ const router = createBrowserRouter([
     path: "/manager",
     element: (
       <ProtectedRoutes allowedRoles={["manager"]}>
-        <ManagerPanel />
+        <CustomerCarePanel />
       </ProtectedRoutes>
     ),
   },
@@ -195,7 +190,7 @@ const router = createBrowserRouter([
     path: "/customer",
     element: (
       <ProtectedRoutes allowedRoles={["customer"]}>
-        <CustomerPanel />
+        <CustomerPanelMain />
       </ProtectedRoutes>
     ),
   },

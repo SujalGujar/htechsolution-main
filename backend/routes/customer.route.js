@@ -6,3 +6,5 @@ import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
 
 router.get("/search",verifyToken,authorizeRoles("admin","manager","user"),customerSearchProducts)
+
+export default router;

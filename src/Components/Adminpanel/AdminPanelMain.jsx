@@ -378,17 +378,27 @@ const AdminPanelMain = () => {
   const [active, setActive] = useState("hero-home");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate()
+  // useEffect(() => {
+  //   setIsAuth(localStorage.getItem("loggedInUser"? true : false))
+  // }, []);
   useEffect(() => {
-    setIsAuth(localStorage.getItem("loggedInUser"))
-  }, []);
+  const user = localStorage.getItem("user");
+  setIsAuth(!!user);
+}, []);
 
+
+  // const logout = () => {
+  //   localStorage.removeItem('token')
+  //   localStorage.removeItem("loggedInUser");
+  //   setTimeout(()=>{
+  //     navigate('/login')
+  //   })
+  // };
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem("loggedInUser");
-    setTimeout(()=>{
-      navigate('/')
-    })
-  };
+  localStorage.removeItem("user");
+  window.location.href = "/login";
+};
+
 
   // if (!isAuth) {
   //   return <Login setIsAuth={setIsAuth} />;

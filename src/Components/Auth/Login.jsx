@@ -158,58 +158,165 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    try {
-      // ✅ axios post request
-      // data = { username: "john", password: "1234" }
-      const res = await axiosInstance.post("/auth/login", {
-        username: data.username,
-        password: data.password,
-      });
+  try {
+    const res = await axiosInstance.post("/auth/login", {
+      username: data.username,
+      password: data.password,
+    });
 
-      // ✅ axios puts response data in res.data automatically
-      // res.data = { token: "...", role: "admin", name: "John" }
-      console.log("Login Response:", res.data);
+    console.log("Login Response:", res.data);
 
-      const { token, role, name } = res.data;
+    const { token, role, username } = res.data;
 
-      // ✅ save in context + localStorage
-      login({ token, role, name });
+    // ✅ FIX #1 — Save everything under ONE unified key: "user"
+    //
+    // ❌ OLD CODE (broken):
+    //   localStorage.setItem("token", res.data.token);
+    //   localStorage.setItem("loggedInUser", JSON.stringify({ username, role }));
+    //
+    // WHY IT BROKE:
+    //   axiosInstance.js reads → localStorage.getItem("user")
+    //   But you were saving to "token" and "loggedInUser" — NOT "user"
+    //   So axiosInstance found nothing → sent every request with NO token
+    //   → backend rejected every protected route with 401
+    //   → axiosInstance 401 handler wiped localStorage + redirected to /login
+    //   → infinite redirect loop
+    //
+    // ✅ NEW CODE (fixed):
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        token,      // axiosInstance reads user.token ✅
+        username,   // CustomerCarePanel reads user.username ✅
+        role,       // used for navigation redirect ✅
+      })
+    );
 
-      // ✅ redirect based on role
-      if (role === "admin") {
-        navigate("/admin-layout");
-      } else if (role === "manager") {
-        navigate("/manager");
-      } else {
-        navigate("/customer");
-      }
+    // ✅ Also update your auth context (keep this as you had it)
+    login({ token, role, username });
 
-    } catch (error) {
-      // ✅ axios error handling
-      console.error("Login error:", error);
-
-      // error.response = response from backend
-      // error.response.data = { message: "Invalid credentials" }
-      // error.response.status = 401, 403, 500 etc
-
-      if (error.response) {
-        // ✅ backend returned an error response
-        setError("root", {
-          message: error.response.data.message || "Invalid credentials"
-        });
-      } else if (error.request) {
-        // ✅ request was made but no response (server down)
-        setError("root", {
-          message: "Server not responding. Try again!"
-        });
-      } else {
-        // ✅ something else went wrong
-        setError("root", {
-          message: "Something went wrong!"
-        });
-      }
+    // ✅ Redirect based on role (no change needed)
+    if (role === "admin") {
+      navigate("/admin-layout");
+    } else if (role === "manager") {
+      navigate("/manager");
+    } else {
+      navigate("/customer");
     }
-  };
+
+  } catch (error) {
+    console.error("Login error:", error);
+
+    if (error.response) {
+      setError("root", {
+        message: error.response.data.message || "Invalid credentials",
+      });
+    } else if (error.request) {
+      setError("root", {
+        message: "Server not responding. Try again!",
+      });
+    } else {
+      setError("root", {
+        message: "Something went wrong!",
+      });
+    }
+  }
+};
+
+//   const onSubmit = async (data) => {
+//     try {
+      
+//       const res = await axiosInstance.post("/auth/login", {
+//         username: data.username,
+//         password: data.password,
+//       });
+
+     
+//       console.log("Login Response:", res.data);
+
+//       const { token, role, name } = res.data;
+
+//       // ✅ save in context + localStorage
+//       login({ token, role, name });
+//       localStorage.setItem("token", res.data.token);
+
+// localStorage.setItem(
+//   "loggedInUser",
+//   JSON.stringify({
+//     username: res.data.username,
+//     role: res.data.role
+//   })
+// ); 
+
+//       // ✅ redirect based on role
+//       if (role === "admin") {
+//         navigate("/admin-layout");
+//       } else if (role === "manager") {
+//         navigate("/manager");
+//       } else {
+//         navigate("/customer");
+//       }
+
+//     } catch (error) {
+//       // ✅ axios error handling
+//       console.error("Login error:", error);
+
+      
+
+//       if (error.response) {
+//         // ✅ backend returned an error response
+//         setError("root", {
+//           message: error.response.data.message || "Invalid credentials"
+//         });
+//       } else if (error.request) {
+//         // ✅ request was made but no response (server down)
+//         setError("root", {
+//           message: "Server not responding. Try again!"
+//         });
+//       } else {
+//         // ✅ something else went wrong
+//         setError("root", {
+//           message: "Something went wrong!"
+//         });
+//       }
+//     }
+//   };
+// const onSubmit = async (e) => {
+//   // e.preventDefault();
+
+//   try {
+//     const res = await axiosInstance.post("/auth/login", {
+//       username: e.username,
+//       password: e.password,
+//     });
+
+//     const { token, role, username } = res.data;
+
+//     // ✅ Store everything in ONE key
+//     localStorage.setItem(
+//       "user",
+//       JSON.stringify({
+//         token,
+//         role,
+//         username,
+//       })
+//     );
+
+//     // redirect after login
+    
+//       if (role === "admin") {
+//         navigate("/admin-layout");
+//       } else if (role === "manager") {
+//         navigate("/manager");
+//       } else if(role === "user"){
+//         navigate("/customer");
+//       }
+
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     alert("Invalid credentials");
+//   }
+// };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
