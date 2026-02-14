@@ -28,9 +28,11 @@ const customrDetailSchema = new mongoose.Schema({
         required:true,
     },
     proModNum:{
-        type:String,
+        type:String ,
         required:true,
     },
+    warrStartDate: { type: Date, required: true },
+    warrEndDate: { type: Date, required: true },
     password: { type: String } 
 
     

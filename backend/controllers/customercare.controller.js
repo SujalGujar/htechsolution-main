@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import Customer from "../models/customerDetails.model.js";
-import Product from "backend/models/productDetails.model.js";
+import Product from "../models/productDetails.model.js";
 
 dotenv.config();
 
