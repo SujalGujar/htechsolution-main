@@ -24,11 +24,11 @@ const customrDetailSchema = new mongoose.Schema({
         required:true,
     },
     proSrNo:{
-        type:Number,
+        type:String,
         required:true,
     },
     proModNum:{
-        type:Number,
+        type:String,
         required:true,
     },
     password: { type: String } 

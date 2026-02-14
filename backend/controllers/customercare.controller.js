@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
-import Customer from "../models/productDetails.model.js";
+import Customer from "../models/customerDetails.model.js";
+import Product from "backend/models/productDetails.model.js";
 
 dotenv.config();
 
@@ -36,5 +37,22 @@ export const complains = async(req, res) => {
         res.json({ message: "Complains route working" });
     } catch(error) {
         res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const productHistroy = async(req,res) =>{
+    try{
+        const allProducts = await Product.find();
+        if(!allProducts || allProducts.length === 0){
+            return res.status(404).json({ message: "No customers found" });
+        }
+          res.status(200).json({ 
+            message: "Customer Details", 
+            products: allProducts
+        });
+
+
+    }catch(error){
+        res.stauts(500).json({message:"Internal Server Error"});
     }
 }

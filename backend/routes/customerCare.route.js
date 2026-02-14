@@ -4,7 +4,7 @@ import express from "express"
 import { customerDetails, complains } from "../controllers/customercare.controller.js"
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
-import {registerCustomer} from "../controllers/authController.js"
+import {registerCustomer} from "../controllers/customerRegister/customerRegistration.controller.js"
 const router = express.Router()
 
 // ✅ correct routes
