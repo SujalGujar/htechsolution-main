@@ -162,12 +162,12 @@ const productDetailSchema = new mongoose.Schema(
       unique: true
     },
 
-    // warrStartDate: { type: Date, required: true },
-    // warrEndDate: { type: Date, required: true },
+    warrStartDate: { type: Date, required: true },
+    warrEndDate: { type: Date, required: true },
 
     TicketNumber: { type: String, unique: true },
 
-    // password: { type: String } // if customer login needed
+    // if customer login needed
   },
   { timestamps: true }
 );

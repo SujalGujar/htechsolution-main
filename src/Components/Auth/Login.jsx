@@ -168,31 +168,17 @@ const Login = () => {
 
     const { token, role, username } = res.data;
 
-    // ✅ FIX #1 — Save everything under ONE unified key: "user"
-    //
-    // ❌ OLD CODE (broken):
-    //   localStorage.setItem("token", res.data.token);
-    //   localStorage.setItem("loggedInUser", JSON.stringify({ username, role }));
-    //
-    // WHY IT BROKE:
-    //   axiosInstance.js reads → localStorage.getItem("user")
-    //   But you were saving to "token" and "loggedInUser" — NOT "user"
-    //   So axiosInstance found nothing → sent every request with NO token
-    //   → backend rejected every protected route with 401
-    //   → axiosInstance 401 handler wiped localStorage + redirected to /login
-    //   → infinite redirect loop
-    //
-    // ✅ NEW CODE (fixed):
+    
     localStorage.setItem(
       "user",
       JSON.stringify({
-        token,      // axiosInstance reads user.token ✅
-        username,   // CustomerCarePanel reads user.username ✅
-        role,       // used for navigation redirect ✅
+        token,      
+        username,   
+        role,       
       })
     );
 
-    // ✅ Also update your auth context (keep this as you had it)
+    
     login({ token, role, username });
 
     // ✅ Redirect based on role (no change needed)
@@ -200,8 +186,8 @@ const Login = () => {
       navigate("/admin-layout");
     } else if (role === "manager") {
       navigate("/manager");
-    } else {
-      navigate("/customer");
+    } else if(role === 'user'){
+      navigate("/user");
     }
 
   } catch (error) {

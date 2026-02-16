@@ -121,6 +121,7 @@ const verifyToken = (req, res, next) => {
     // ✅ Always return after sending response
     return res.status(401).json({ message: "Token is not valid" });
   }
+  
 };
 
 export default verifyToken;
