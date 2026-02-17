@@ -415,6 +415,7 @@ import app from "./app.js";
 import connectDB from "./config/db.js";
 import "dotenv/config";
 import dotenv from "dotenv";   
+import cors from "cors";
 
 dotenv.config({ path: "./.env" }); 
 const PORT = 5000;
@@ -435,6 +436,7 @@ const startServer = async () => {
                         
     app.listen(PORT, () => {
       console.log(` Server running on http://localhost:${PORT}`);
+      app.use(cors({ origin: 'https://htechsolution-main-d7ku.vercel.app' }))
     });               
   } catch (error) {
     console.error(" Failed to start server:", error.message);
