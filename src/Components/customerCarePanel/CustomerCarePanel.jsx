@@ -1972,7 +1972,7 @@
 
 import { useEffect, useState } from 'react';
 import CustomerCareHome from './CustomerCareHome';
-import CustomerCareProductHistory from './cutomerCareProductHis';
+import CustomerCareProductHis from './cutomerCareProductHis';
 import CustomerCareComplains from './CutomerCareComplains';
 import { useNavigate } from 'react-router-dom';
 import React from "react";
@@ -2034,7 +2034,7 @@ const CustomerCarePanel = () => {
   const contentMap = {
     home: <CustomerCareHome />,
     customerhistory: <CustomerCareCustomerHistroy />,
-    producthistory: <CustomerCareProductHistory />,
+    producthistory: <CustomerCareProductHis />,
     complains: <CustomerCareComplains />
   };
 
