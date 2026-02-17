@@ -1972,7 +1972,7 @@
 
 import { useEffect, useState } from 'react';
 import CustomerCareHome from './CustomerCareHome';
-import CustomerCareProductHis from './cutomerCareProductHis';
+import CustomerCareProductHis from './CutomerCareProductHis';
 import CustomerCareComplains from './CutomerCareComplains';
 import { useNavigate } from 'react-router-dom';
 import React from "react";
