@@ -2672,13 +2672,49 @@ import axiosInstance from "../../Utils/axiosIntance"; // Make sure this import p
 
 // Hardware categories constant
 const HARDWARE_CATS = [
-  "Networking Equipment",
-  "Server Hardware", 
-  "Storage Devices",
-  "Peripherals",
-  "Cabling",
-  "Racks & Enclosures",
-  "Other"
+  "Networking",
+  "Router",
+  "Network Switch",
+  "Firewall / UTM Device",
+  "Modem",
+  "Access Point / WiFi",
+  "Network Cable / Patch Panel",
+  // Servers & Storage
+  "Server",
+  "NAS / Storage Device",
+  "UPS / Power Supply",
+  "Rack / Cabinet",
+  // Computers
+  "Desktop Computer",
+  "Laptop",
+  "Workstation",
+  "Mini PC",
+  // Peripherals
+  "Monitor / Display",
+  "Keyboard / Mouse",
+  "Printer",
+  "Scanner",
+  "Projector",
+  "Barcode Scanner",
+  // Components
+  "Hard Disk / SSD",
+  "RAM / Memory",
+  "Graphics Card / GPU",
+  "Motherboard",
+  "Processor / CPU",
+  "Power Supply Unit (PSU)",
+  "Cooling Fan / Heatsink",
+  // Security
+  "CCTV Camera",
+  "DVR / NVR",
+  "Biometric Device",
+  "Access Control System",
+  // Communication
+  "IP Phone",
+  "EPABX / PBX System",
+  "Video Conferencing System",
+  // Other
+  "Other Hardware",
 ];
 
 const EMPTY_CUST = {

@@ -205,25 +205,135 @@ import Customer from "../../models/customerDetails.model.js";
 import Admin from "../../models/admin.model.js";
 
 // Function to generate secure password
+// const generateSecurePassword = () => {
+//     const length = 5;
+//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+//     let password = "";
+//     for (let i = 0; i < length; i++) {
+//         const randomIndex = Math.floor(Math.random() * charset.length);
+//         password += charset[randomIndex];
+//     }
+//     return password;
+// };
+
+// export const registerCustomer = async(req, res) => {
+//   try {
+//     const body = req.body;
+    
+//     if (!body) {
+//       return res.status(400).json({  
+//         message: "Request body missing"
+//       });
+//     }
+
+//     const {
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate,
+//       warrEndDate,
+//       ticketNumber  // ✅ From form
+//     } = body;
+
+//     // Validate all required fields including ticketNumber
+//     if (!customerName || !email || !mobileNum ) {
+//       return res.status(400).json({
+//         message: "All fields are required"
+//       });
+//     }
+
+//     // Check if customer already exists by email
+//     const existingCus = await Customer.findOne({ email });
+//     if (existingCus) {
+//       return res.status(400).json({
+//         message: "Customer with this email already exists"
+//       });
+//     }
+
+   
+//     const existingAdmin = await Admin.findOne({ username: customerName });
+//     if (existingAdmin) {
+//       return res.status(400).json({
+//         message: "Username already exists in the system"
+//       });
+//     }
+
+//     // Generate password
+//     const plainPassword = generateSecurePassword();
+//     const hashedPassword = await bcrypt.hash(plainPassword, 10); 
+//     // const encryptPass = encrypt(hashedPassword)// Increased salt rounds for better security
+    
+//     // Create customer record - NOW INCLUDING TICKET NUMBER
+//     const customer = new Customer({
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate: new Date(warrStartDate), // Convert to Date object
+//       warrEndDate: new Date(warrEndDate),     // Convert to Date object
+//       password: plainPassword,  // Store plain password for panel use (consider security implications)
+//       ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
+//     });
+
+//     await customer.save();
+
+//     // Create admin user record with customerName as username
+//     const newAdminUser = new Admin({
+//       username: customerName,  // ✅ Using customerName as username
+//       password: plainPassword,  // Store plain password for panel use (consider security implications)
+//       role: "user"  
+//     });
+
+//     await newAdminUser.save();
+
+//     return res.status(201).json({  
+//       success: true,
+//       message: "Customer registered successfully",
+//       password: plainPassword,  // Send plain password only once
+//       username: customerName    // ✅ Return customerName as username
+//     });
+
+//   } catch (error) {
+//     console.error("Registration error:", error);
+    
+//     // Handle specific MongoDB errors
+//     // if (error.code === 11000) {
+//     //   const field = Object.keys(error.keyPattern)[0];
+//     //   return res.status(400).json({ 
+//     //     message: `${field} already exists. Please use a different ${field}.`
+//     //   });
+//     // }
+    
+//     return res.status(500).json({ 
+//       message: error.message || "Internal server error"
+//     });
+//   }
+// };
+
 const generateSecurePassword = () => {
-    const length = 5;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        password += charset[randomIndex];
-    }
-    return password;
+  const length  = 8;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+  let password  = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  return password;
 };
 
-export const registerCustomer = async(req, res) => {
+export const registerCustomer = async (req, res) => {
   try {
     const body = req.body;
-    
+
     if (!body) {
-      return res.status(400).json({  
-        message: "Request body missing"
-      });
+      return res.status(400).json({ message: "Request body missing" });
     }
 
     const {
@@ -236,45 +346,28 @@ export const registerCustomer = async(req, res) => {
       proModNum,
       warrStartDate,
       warrEndDate,
-      ticketNumber  // ✅ From form
+      ticketNumber,
     } = body;
 
-    // Validate all required fields including ticketNumber
-    if (!customerName || !email || !mobileNum ) {
-      return res.status(400).json({
-        message: "All fields are required"
-      });
+    if (!customerName || !email || !mobileNum) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Check if customer already exists by email
     const existingCus = await Customer.findOne({ email });
     if (existingCus) {
-      return res.status(400).json({
-        message: "Customer with this email already exists"
-      });
+      return res.status(400).json({ message: "Customer with this email already exists" });
     }
 
-    // Check if ticket number already exists
-    // const existingTicket = await Customer.findOne({ ticketNumber });
-    // if (existingTicket) {
-    //   return res.status(400).json({
-    //     message: "Ticket number already exists"
-    //   });
-    // }
-
-    // Check if admin user already exists with this customerName
     const existingAdmin = await Admin.findOne({ username: customerName });
     if (existingAdmin) {
-      return res.status(400).json({
-        message: "Username already exists in the system"
-      });
+      return res.status(400).json({ message: "Username already exists in the system" });
     }
 
-    // Generate password
-    const plainPassword = generateSecurePassword();
-    const hashedPassword = await bcrypt.hash(plainPassword, 10); // Increased salt rounds for better security
-    
-    // Create customer record - NOW INCLUDING TICKET NUMBER
+    // ── Passwords ───────────────────────────────────────────────────────
+    const plainPassword  = generateSecurePassword();              // "aB3#kP9z" — readable
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);  // "$2b$10$..." — for login
+
+    // ── Customer collection ─────────────────────────────────────────────
     const customer = new Customer({
       customerName,
       email,
@@ -283,43 +376,37 @@ export const registerCustomer = async(req, res) => {
       proCatogory,
       proSrNo,
       proModNum,
-      warrStartDate: new Date(warrStartDate), // Convert to Date object
-      warrEndDate: new Date(warrEndDate),     // Convert to Date object
-      password: hashedPassword,
-      ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
+      warrStartDate: new Date(warrStartDate),
+      warrEndDate:   new Date(warrEndDate),
+      ticketNumber,
+      password:      hashedPassword,  // ✅ bcrypt — login uses bcrypt.compare → untouched
+      plainPassword: plainPassword,   // ✅ plain  — CC team reads this in history panel
     });
 
     await customer.save();
 
-    // Create admin user record with customerName as username
+    // ── Admin collection ────────────────────────────────────────────────
     const newAdminUser = new Admin({
-      username: customerName,  // ✅ Using customerName as username
-      password: hashedPassword,
-      role: "user"  
+      username:      customerName,
+      password:      hashedPassword,  // ✅ bcrypt — all existing logins still work
+      // plainPassword: plainPassword,   // ✅ plain  — CC team readable
+      role:          "user",
     });
 
     await newAdminUser.save();
 
-    return res.status(201).json({  
-      success: true,
-      message: "Customer registered successfully",
-      password: plainPassword,  // Send plain password only once
-      username: customerName    // ✅ Return customerName as username
+    // ── Response ────────────────────────────────────────────────────────
+    return res.status(201).json({
+      success:  true,
+      message:  "Customer registered successfully",
+      username: customerName,
+      password: plainPassword,  // plain sent to frontend modal
     });
 
   } catch (error) {
     console.error("Registration error:", error);
-    
-    // Handle specific MongoDB errors
-    // if (error.code === 11000) {
-    //   const field = Object.keys(error.keyPattern)[0];
-    //   return res.status(400).json({ 
-    //     message: `${field} already exists. Please use a different ${field}.`
-    //   });
-    // }
-    
-    return res.status(500).json({ 
-      message: error.message || "Internal server error"
+    return res.status(500).json({
+      message: error.message || "Internal server error",
     });
   }
 };

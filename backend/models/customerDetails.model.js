@@ -93,7 +93,11 @@ const customerDetailsSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    plainPassword: { type: String ,
+        
+    },
+
 }, {
     timestamps: true
 });

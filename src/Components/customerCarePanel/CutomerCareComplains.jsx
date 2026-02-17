@@ -614,7 +614,7 @@ const CustomerCareComplains = () => {
         c.serialNumber?.toLowerCase().includes(q) ||
         c.mobileNumber?.toString().includes(searchTerm) ||
         c.complaintTitle?.toLowerCase().includes(q) ||
-        c.subject?.toLowerCase().includes(q) ||          // extra field names
+        c.subject?.toLowerCase().includes(q) ||          
         c.description?.toLowerCase().includes(q)
       );
     }
@@ -638,9 +638,13 @@ const CustomerCareComplains = () => {
       );
 
       // ✅ Persist to backend
-      await axiosInstance.put(`/customerDetails/cusComplains/${complaintId}`, {
-        status: newStatus,
-      });
+      // await axiosInstance.patch(`/customerDetails/complainStatus/${complaintId}`, {
+      //   status: newStatus,
+      // });
+       await axiosInstance.patch(
+      `/customerDetails/complainStatus/${complaintId}`,
+      { status: newStatus }   // ← body, only sending status field
+    );
 
       showToast('success', `Status updated to "${newStatus}" successfully`);
 

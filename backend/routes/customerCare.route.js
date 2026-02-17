@@ -1,7 +1,7 @@
 import express from "express"
 
 
-import { customerDetails, complains,productHistroy } from "../controllers/customercare.controller.js"
+import { customerDetails, complains,productHistroy,complainStatus} from "../controllers/customercare.controller.js"
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
 import {registerCustomer} from "../controllers/customerRegister/customerRegistration.controller.js"
@@ -15,4 +15,5 @@ router.post("/newcustomer",verifyToken,authorizeRoles("admin","manager"),registe
 router.get("/customer", verifyToken,authorizeRoles("admin","manager"),customerDetails);
 // router.get("/complains",verifyToken,authorizeRoles("admin","manager"), complains);
 router.get("/cusComplains", verifyToken, authorizeRoles("admin", "manager","user"), complains);
+router.patch("/complainStatus/:id", verifyToken, authorizeRoles("admin", "manager"), complainStatus);
 export default router;

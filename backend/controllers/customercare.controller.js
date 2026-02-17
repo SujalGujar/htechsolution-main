@@ -31,7 +31,7 @@ dotenv.config();
 //         res.status(500).json({ message: "Internal server error" });
 //     }
 // }
-export const customerDetails = async(req, res) => {
+const customerDetails = async(req, res) => {
     try {
         const allCustomers = await Customer.find();
          if(!allCustomers || allCustomers.length === 0){
@@ -50,7 +50,7 @@ export const customerDetails = async(req, res) => {
 
 
 
-export const complains = async(req, res) => {
+ const complains = async(req, res) => {
     try {
 
         const allComplains = await complainData.find();
@@ -68,7 +68,7 @@ export const complains = async(req, res) => {
     }
 }
 
-export const productHistroy = async(req,res) =>{
+ const productHistroy = async(req,res) =>{
     try{
         const allProducts = await Product.find();
         if(!allProducts || allProducts.length === 0){
@@ -84,3 +84,27 @@ export const productHistroy = async(req,res) =>{
         res.stauts(500).json({message:"Internal Server Error"});
     }
 }
+
+ const complainStatus = async(req,res)=>{
+    try{
+        const{id} = req.params;
+        const{status} =req.body;
+        if(!status || !["pending", "processing", "completed"].includes(status)){
+            return res.status(400).json({message:"Invalid status value"})
+        }
+        // const complainsByStatus = await complainData.find({status});
+        const updatedComplain = await complainData.findByIdAndUpdate(id, {status}, {new:true});
+        if(!updatedComplain){
+            return res.status(404).json({message:"Complain not found"})
+        }
+        
+        res.status(200).json({
+            message:`Complains with status ${status}`,
+            complains:updatedComplain
+        })
+
+    }catch(error){
+        res.status(500).json({message:"Internal Server Error"});
+    }
+}
+export {customerDetails, complains,productHistroy,complainStatus};
