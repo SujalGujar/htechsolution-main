@@ -1816,6 +1816,1013 @@
 // }
 
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "../ui/table";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "../ui/card";
+// import { Badge } from "../ui/badge";
+// import { Button } from "../ui/button";
+// import { Input } from "../ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "../ui/select";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "../ui/dropdown-menu";
+// import {
+//   CalendarIcon,
+//   ChevronLeftIcon,
+//   ChevronRightIcon,
+//   DownloadIcon,
+//   FilterIcon,
+//   MoreHorizontal,
+//   SearchIcon,
+//   CopyIcon,
+//   EyeIcon,
+//   FileTextIcon,
+// } from "lucide-react";
+// import axiosInstance from "../../Utils/axiosIntance";
+// // import { format } from "date-fns";
+// import { Skeleton } from "../ui/skeleton";
+// import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+// import { Avatar, AvatarFallback } from "../ui/avatar";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "../ui/tooltip";
+
+// const CustomerCareProductHistory = () => {
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [filterCategory, setFilterCategory] = useState("all");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [itemsPerPage] = useState(10);
+//   const [categories, setCategories] = useState([]);
+
+//   // Fetch products from API
+//   useEffect(() => {
+//     fetchProducts();
+//   }, []);
+
+//   const fetchProducts = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axiosInstance.get("/customerDetails/products");
+//       console.log("Full response:", response);
+//       console.log("Response data:", response.data);
+      
+//       // Handle different response structures
+//       let productsArray = [];
+      
+//       if (Array.isArray(response.data)) {
+//         // Direct array response
+//         productsArray = response.data;
+//       } else if (response.data?.data && Array.isArray(response.data.data)) {
+//         // Response wrapped in { data: [...] }
+//         productsArray = response.data.data;
+//       } else if (response.data?.products && Array.isArray(response.data.products)) {
+//         // Response wrapped in { products: [...] }
+//         productsArray = response.data.products;
+//       } else if (response.data?.result && Array.isArray(response.data.result)) {
+//         // Response wrapped in { result: [...] }
+//         productsArray = response.data.result;
+//       } else {
+//         console.error("Unexpected API response structure:", response.data);
+//         productsArray = [];
+//       }
+      
+//       setProducts(productsArray);
+      
+//       // Extract unique categories for filter
+//       if (productsArray.length > 0) {
+//         const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory).filter(Boolean))];
+//         setCategories(uniqueCategories);
+//       }
+      
+//       setError(null);
+//     } catch (err) {
+//       console.error("Error fetching products:", err);
+//       setError(err.response?.data?.message || "Failed to fetch products");
+//       setProducts([]); // Ensure products is an array even on error
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Filter products based on search and category
+//   const filteredProducts = Array.isArray(products) ? products.filter(product => {
+//     const matchesSearch = 
+//       product.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.proModNum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.TicketNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+//     const matchesCategory = filterCategory === "all" || product.proCatogory === filterCategory;
+    
+//     return matchesSearch && matchesCategory;
+//   }) : [];
+
+//   // Pagination
+//   const indexOfLastItem = currentPage * itemsPerPage;
+//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+//   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+//   // Format date
+//   const formatDate = (dateString) => {
+//     if (!dateString) return "N/A";
+//     try {
+//       return format(new Date(dateString), "dd MMM yyyy");
+//     } catch {
+//       return "Invalid Date";
+//     }
+//   };
+
+//   // Get initials for avatar
+//   const getInitials = (name) => {
+//     if (!name) return "PR";
+//     return name
+//       .split(" ")
+//       .map(n => n[0])
+//       .join("")
+//       .toUpperCase()
+//       .substring(0, 2);
+//   };
+
+//   // Handle copy to clipboard
+//   const handleCopy = (text) => {
+//     if (text) {
+//       navigator.clipboard.writeText(text);
+//       // You can add a toast notification here
+//     }
+//   };
+
+//   // Handle export to CSV
+//   const handleExportCSV = () => {
+//     if (filteredProducts.length === 0) return;
+    
+//     const headers = ["Ticket Number", "Product Name", "Category", "Brand", "Model", "Serial Number", "Purchase Date", "Invoice Number", "Registration Date"];
+//     const csvData = filteredProducts.map(p => [
+//       p.TicketNumber || "N/A",
+//       p.proName || "N/A",
+//       p.proCatogory || "N/A",
+//       p.brandName || "N/A",
+//       p.proModNum || "N/A",
+//       p.proSrNo || "N/A",
+//       formatDate(p.purDate),
+//       p.invoiceNum || "N/A",
+//       formatDate(p.createdAt)
+//     ]);
+    
+//     const csvContent = [headers, ...csvData]
+//       .map(row => row.map(cell => `"${cell}"`).join(","))
+//       .join("\n");
+    
+//     const blob = new Blob([csvContent], { type: "text/csv" });
+//     const url = window.URL.createObjectURL(blob);
+//     const a = document.createElement("a");
+//     a.href = url;
+//     a.download = `product-history-${format(new Date(), "yyyy-MM-dd")}.csv`;
+//     a.click();
+//     window.URL.revokeObjectURL(url);
+//   };
+
+//   if (loading) {
+//     return (
+//       <Card className="w-full">
+//         <CardHeader>
+//           <CardTitle>Product History</CardTitle>
+//           <CardDescription>Loading registered products...</CardDescription>
+//         </CardHeader>
+//         <CardContent>
+//           <div className="space-y-4">
+//             {[...Array(5)].map((_, i) => (
+//               <div key={i} className="flex items-center space-x-4">
+//                 <Skeleton className="h-12 w-12 rounded-full" />
+//                 <div className="space-y-2">
+//                   <Skeleton className="h-4 w-[250px]" />
+//                   <Skeleton className="h-4 w-[200px]" />
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Card className="w-full">
+//         <CardHeader>
+//           <CardTitle>Product History</CardTitle>
+//           <CardDescription>Error loading products</CardDescription>
+//         </CardHeader>
+//         <CardContent>
+//           <Alert variant="destructive">
+//             <AlertTitle>Error</AlertTitle>
+//             <AlertDescription>{error}</AlertDescription>
+//           </Alert>
+//           <Button className="mt-4" onClick={fetchProducts}>
+//             Retry
+//           </Button>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   return (
+//     <Card className="w-full">
+//       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+//         <div>
+//           <CardTitle className="text-2xl font-bold">Product History</CardTitle>
+//           <CardDescription>
+//             View all registered products ({filteredProducts.length} total)
+//           </CardDescription>
+//         </div>
+//         <div className="flex items-center space-x-2">
+//           <TooltipProvider>
+//             <Tooltip>
+//               <TooltipTrigger asChild>
+//                 <Button 
+//                   variant="outline" 
+//                   size="icon" 
+//                   onClick={handleExportCSV}
+//                   disabled={filteredProducts.length === 0}
+//                 >
+//                   <DownloadIcon className="h-4 w-4" />
+//                 </Button>
+//               </TooltipTrigger>
+//               <TooltipContent>
+//                 <p>Export to CSV</p>
+//               </TooltipContent>
+//             </Tooltip>
+//           </TooltipProvider>
+          
+//           <Button variant="outline" onClick={fetchProducts}>
+//             Refresh
+//           </Button>
+//         </div>
+//       </CardHeader>
+
+//       <CardContent>
+//         {/* Filters */}
+//         <div className="flex flex-col md:flex-row gap-4 mb-6">
+//           <div className="flex-1 relative">
+//             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//             <Input
+//               placeholder="Search by product name, serial number, ticket number..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className="pl-10"
+//             />
+//           </div>
+          
+//           <Select value={filterCategory} onValueChange={setFilterCategory}>
+//             <SelectTrigger className="w-full md:w-[200px]">
+//               <FilterIcon className="h-4 w-4 mr-2" />
+//               <SelectValue placeholder="Filter by category" />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="all">All Categories</SelectItem>
+//               {categories.map(category => (
+//                 <SelectItem key={category} value={category}>
+//                   {category}
+//                 </SelectItem>
+//               ))}
+//             </SelectContent>
+//           </Select>
+//         </div>
+
+//         {/* Table */}
+//         <div className="rounded-md border">
+//           <Table>
+//             <TableHeader>
+//               <TableRow>
+//                 <TableHead className="w-[100px]">Ticket #</TableHead>
+//                 <TableHead>Product</TableHead>
+//                 <TableHead>Category</TableHead>
+//                 <TableHead>Brand/Model</TableHead>
+//                 <TableHead>Serial Number</TableHead>
+//                 <TableHead>Purchase Date</TableHead>
+//                 <TableHead>Invoice</TableHead>
+//                 <TableHead className="text-right">Actions</TableHead>
+//               </TableRow>
+//             </TableHeader>
+//             <TableBody>
+//               {currentItems.length === 0 ? (
+//                 <TableRow>
+//                   <TableCell colSpan={8} className="h-24 text-center">
+//                     No products found.
+//                   </TableCell>
+//                 </TableRow>
+//               ) : (
+//                 currentItems.map((product) => (
+//                   <TableRow key={product._id || product.TicketNumber || Math.random()}>
+//                     <TableCell className="font-medium">
+//                       <Badge variant="outline" className="font-mono">
+//                         {product.TicketNumber || "N/A"}
+//                       </Badge>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-3">
+//                         <Avatar className="h-8 w-8">
+//                           <AvatarFallback className="bg-blue-100 text-blue-600">
+//                             {getInitials(product.proName)}
+//                           </AvatarFallback>
+//                         </Avatar>
+//                         <div>
+//                           <div className="font-medium">{product.proName || "N/A"}</div>
+//                           <div className="text-sm text-gray-500">
+//                             Registered: {formatDate(product.createdAt)}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <Badge variant="secondary">{product.proCatogory || "N/A"}</Badge>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div>
+//                         <div className="font-medium">{product.brandName || "N/A"}</div>
+//                         <div className="text-sm text-gray-500">Model: {product.proModNum || "N/A"}</div>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
+//                         {product.proSrNo || "N/A"}
+//                       </code>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-1">
+//                         <CalendarIcon className="h-3 w-3 text-gray-400" />
+//                         <span>{formatDate(product.purDate)}</span>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-1">
+//                         <FileTextIcon className="h-3 w-3 text-gray-400" />
+//                         <span className="text-sm">{product.invoiceNum || "N/A"}</span>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell className="text-right">
+//                       <DropdownMenu>
+//                         <DropdownMenuTrigger asChild>
+//                           <Button variant="ghost" className="h-8 w-8 p-0">
+//                             <span className="sr-only">Open menu</span>
+//                             <MoreHorizontal className="h-4 w-4" />
+//                           </Button>
+//                         </DropdownMenuTrigger>
+//                         <DropdownMenuContent align="end">
+//                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//                           <DropdownMenuItem
+//                             onClick={() => handleCopy(product.TicketNumber)}
+//                             disabled={!product.TicketNumber}
+//                           >
+//                             <CopyIcon className="mr-2 h-4 w-4" />
+//                             Copy Ticket #
+//                           </DropdownMenuItem>
+//                           <DropdownMenuItem
+//                             onClick={() => handleCopy(product.proSrNo)}
+//                             disabled={!product.proSrNo}
+//                           >
+//                             <CopyIcon className="mr-2 h-4 w-4" />
+//                             Copy Serial #
+//                           </DropdownMenuItem>
+//                           <DropdownMenuSeparator />
+//                           <DropdownMenuItem>
+//                             <EyeIcon className="mr-2 h-4 w-4" />
+//                             View Details
+//                           </DropdownMenuItem>
+//                         </DropdownMenuContent>
+//                       </DropdownMenu>
+//                     </TableCell>
+//                   </TableRow>
+//                 ))
+//               )}
+//             </TableBody>
+//           </Table>
+//         </div>
+
+//         {/* Pagination */}
+//         {filteredProducts.length > 0 && (
+//           <div className="flex items-center justify-between space-x-2 py-4">
+//             <div className="text-sm text-gray-500">
+//               Showing {indexOfFirstItem + 1} to{" "}
+//               {Math.min(indexOfLastItem, filteredProducts.length)} of{" "}
+//               {filteredProducts.length} products
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <Button
+//                 variant="outline"
+//                 size="sm"
+//                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+//                 disabled={currentPage === 1}
+//               >
+//                 <ChevronLeftIcon className="h-4 w-4" />
+//                 Previous
+//               </Button>
+//               <div className="text-sm">
+//                 Page {currentPage} of {totalPages}
+//               </div>
+//               <Button
+//                 variant="outline"
+//                 size="sm"
+//                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+//                 disabled={currentPage === totalPages}
+//               >
+//                 Next
+//                 <ChevronRightIcon className="h-4 w-4" />
+//               </Button>
+//             </div>
+//           </div>
+//         )}
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+// export default CustomerCareProductHistory;
+
+// import React, { useState, useEffect } from "react";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "../ui/table";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "../ui/card";
+// import { Badge } from "../ui/badge";
+// import { Button } from "../ui/button";
+// import { Input } from "../ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "../ui/select";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "../ui/dropdown-menu";
+// import {
+//   CalendarIcon,
+//   ChevronLeftIcon,
+//   ChevronRightIcon,
+//   RefreshCwIcon,
+//   FilterIcon,
+//   MoreHorizontal,
+//   SearchIcon,
+//   CopyIcon,
+//   FileTextIcon,
+// } from "lucide-react";
+// import axiosInstance from "../../Utils/axiosIntance";
+// import { Skeleton } from "../ui/skeleton";
+// import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+// import { Avatar, AvatarFallback } from "../ui/avatar";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "../ui/tooltip";
+
+// const CustomerCareProductHistory = () => {
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [filterCategory, setFilterCategory] = useState("all");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [itemsPerPage] = useState(10);
+//   const [categories, setCategories] = useState([]);
+//   const [refreshing, setRefreshing] = useState(false);
+
+//   // Fetch products from API
+//   useEffect(() => {
+//     fetchProducts();
+//   }, []);
+
+//   const fetchProducts = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axiosInstance.get("/customerDetails/products");
+//       console.log("Full response:", response);
+//       console.log("Response data:", response.data);
+      
+//       // Handle different response structures
+//       let productsArray = [];
+      
+//       if (Array.isArray(response.data)) {
+//         productsArray = response.data;
+//       } else if (response.data?.data && Array.isArray(response.data.data)) {
+//         productsArray = response.data.data;
+//       } else if (response.data?.products && Array.isArray(response.data.products)) {
+//         productsArray = response.data.products;
+//       } else if (response.data?.result && Array.isArray(response.data.result)) {
+//         productsArray = response.data.result;
+//       } else {
+//         console.error("Unexpected API response structure:", response.data);
+//         productsArray = [];
+//       }
+      
+//       setProducts(productsArray);
+      
+//       // Extract unique categories for filter
+//       if (productsArray.length > 0) {
+//         const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory).filter(Boolean))];
+//         setCategories(uniqueCategories);
+//       }
+      
+//       setError(null);
+//     } catch (err) {
+//       console.error("Error fetching products:", err);
+//       setError(err.response?.data?.message || "Failed to fetch products");
+//       setProducts([]);
+//     } finally {
+//       setLoading(false);
+//       setRefreshing(false);
+//     }
+//   };
+
+//   const handleRefresh = () => {
+//     setRefreshing(true);
+//     fetchProducts();
+//   };
+
+//   // Filter products based on search and category
+//   const filteredProducts = Array.isArray(products) ? products.filter(product => {
+//     const matchesSearch = 
+//       product.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.proModNum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       product.TicketNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+//     const matchesCategory = filterCategory === "all" || product.proCatogory === filterCategory;
+    
+//     return matchesSearch && matchesCategory;
+//   }) : [];
+
+//   // Pagination
+//   const indexOfLastItem = currentPage * itemsPerPage;
+//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+//   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+//   // Format date with proper validation
+//   const formatDate = (dateString) => {
+//     if (!dateString) return "N/A";
+    
+//     try {
+//       // Handle different date formats
+//       let date;
+      
+//       // Check if it's a timestamp (number)
+//       if (typeof dateString === 'number') {
+//         date = new Date(dateString);
+//       } 
+//       // Check if it's a string that can be parsed
+//       else if (typeof dateString === 'string') {
+//         // Try to parse the date string
+//         date = new Date(dateString);
+        
+//         // If invalid, try to handle DD/MM/YYYY format
+//         if (isNaN(date.getTime())) {
+//           const parts = dateString.split(/[/\-]/);
+//           if (parts.length === 3) {
+//             // Try DD/MM/YYYY
+//             date = new Date(parts[2], parts[1] - 1, parts[0]);
+//           }
+//         }
+//       } else {
+//         return "N/A";
+//       }
+      
+//       // Check if date is valid
+//       if (isNaN(date.getTime())) {
+//         return "N/A";
+//       }
+      
+//       // Format the date
+//       return date.toLocaleDateString('en-IN', {
+//         day: '2-digit',
+//         month: 'short',
+//         year: 'numeric'
+//       });
+//     } catch (error) {
+//       console.error("Date parsing error:", error);
+//       return "N/A";
+//     }
+//   };
+
+//   // Get initials for avatar
+//   const getInitials = (name) => {
+//     if (!name) return "PR";
+//     return name
+//       .split(" ")
+//       .map(n => n[0])
+//       .join("")
+//       .toUpperCase()
+//       .substring(0, 2);
+//   };
+
+//   // Handle copy to clipboard
+//   const handleCopy = (text) => {
+//     if (text) {
+//       navigator.clipboard.writeText(text);
+//       // You can add a toast notification here
+//     }
+//   };
+
+//   if (loading && !refreshing) {
+//     return (
+//       <Card className="w-full border-0 shadow-lg">
+//         <CardHeader className="bg-gradient-to-r from-[#1F6E8C] to-[#2c8ab0] text-white rounded-t-lg">
+//           <CardTitle className="text-2xl font-bold">Product History</CardTitle>
+//           <CardDescription className="text-[#F7F7F2] opacity-90">
+//             Loading registered products...
+//           </CardDescription>
+//         </CardHeader>
+//         <CardContent className="p-6">
+//           <div className="space-y-4">
+//             {[...Array(5)].map((_, i) => (
+//               <div key={i} className="flex items-center space-x-4">
+//                 <Skeleton className="h-12 w-12 rounded-full" />
+//                 <div className="space-y-2">
+//                   <Skeleton className="h-4 w-[250px]" />
+//                   <Skeleton className="h-4 w-[200px]" />
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Card className="w-full border-0 shadow-lg">
+//         <CardHeader className="bg-gradient-to-r from-[#1F6E8C] to-[#2c8ab0] text-white rounded-t-lg">
+//           <CardTitle className="text-2xl font-bold">Product History</CardTitle>
+//           <CardDescription className="text-[#F7F7F2] opacity-90">
+//             Error loading products
+//           </CardDescription>
+//         </CardHeader>
+//         <CardContent className="p-6">
+//           <Alert variant="destructive" className="border-red-200 bg-red-50">
+//             <AlertTitle className="text-red-800">Error</AlertTitle>
+//             <AlertDescription className="text-red-600">{error}</AlertDescription>
+//           </Alert>
+//           <Button 
+//             className="mt-4 bg-[#1F6E8C] hover:bg-[#184f66] text-white"
+//             onClick={fetchProducts}
+//           >
+//             Retry
+//           </Button>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   return (
+//     <Card className="w-full border-0 shadow-lg overflow-hidden">
+//       <CardHeader className="bg-gradient-to-r from-[#1F6E8C] to-[#2c8ab0] text-white rounded-t-lg">
+//         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//           <div>
+//             <CardTitle className="text-2xl font-bold">Product History</CardTitle>
+//             <CardDescription className="text-[#F7F7F2] opacity-90">
+//               View all registered products ({filteredProducts.length} total)
+//             </CardDescription>
+//           </div>
+//           <div className="flex items-center gap-2">
+//             <TooltipProvider>
+//               <Tooltip>
+//                 <TooltipTrigger asChild>
+//                   <Button 
+//                     variant="outline" 
+//                     size="icon"
+//                     onClick={handleRefresh}
+//                     disabled={refreshing}
+//                     className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
+//                   >
+//                     <RefreshCwIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+//                   </Button>
+//                 </TooltipTrigger>
+//                 <TooltipContent>
+//                   <p>Refresh data</p>
+//                 </TooltipContent>
+//               </Tooltip>
+//             </TooltipProvider>
+//           </div>
+//         </div>
+//       </CardHeader>
+
+//       <CardContent className="p-6">
+//         {/* Filters */}
+//         <div className="flex flex-col md:flex-row gap-4 mb-6">
+//           <div className="flex-1 relative group">
+//             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+//               <SearchIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#6BA368] transition-colors" />
+//             </div>
+//             <Input
+//               placeholder="Search by product name, serial number, ticket number..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className="pl-10 pr-4 py-2 border-gray-200 focus:border-[#6BA368] focus:ring focus:ring-[#6BA368] focus:ring-opacity-20 rounded-lg transition-all"
+//             />
+//             {searchTerm && (
+//               <button
+//                 onClick={() => setSearchTerm("")}
+//                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+//               >
+//                 <span className="text-sm">✕</span>
+//               </button>
+//             )}
+//           </div>
+          
+//           <Select value={filterCategory} onValueChange={setFilterCategory}>
+//             <SelectTrigger className="w-full md:w-[220px] border-gray-200 focus:border-[#6BA368] focus:ring focus:ring-[#6BA368] focus:ring-opacity-20">
+//               <FilterIcon className="h-4 w-4 mr-2 text-[#6BA368]" />
+//               <SelectValue placeholder="Filter by category" />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="all">All Categories</SelectItem>
+//               {categories.map(category => (
+//                 <SelectItem key={category} value={category}>
+//                   {category}
+//                 </SelectItem>
+//               ))}
+//             </SelectContent>
+//           </Select>
+//         </div>
+
+//         {/* Table */}
+//         <div className="rounded-lg border border-gray-200 overflow-hidden">
+//           <Table>
+//             <TableHeader className="bg-gray-50">
+//               <TableRow>
+//                 <TableHead className="font-semibold text-[#1F6E8C] w-[100px]">Ticket #</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Product</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Category</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Brand/Model</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Serial Number</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Purchase Date</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C]">Invoice</TableHead>
+//                 <TableHead className="font-semibold text-[#1F6E8C] text-right">Actions</TableHead>
+//               </TableRow>
+//             </TableHeader>
+//             <TableBody>
+//               {currentItems.length === 0 ? (
+//                 <TableRow>
+//                   <TableCell colSpan={8} className="h-32 text-center text-gray-500">
+//                     <div className="flex flex-col items-center justify-center">
+//                       <FileTextIcon className="h-8 w-8 text-gray-400 mb-2" />
+//                       <p>No products found.</p>
+//                       <p className="text-sm">Try adjusting your search or filter</p>
+//                     </div>
+//                   </TableCell>
+//                 </TableRow>
+//               ) : (
+//                 currentItems.map((product) => (
+//                   <TableRow key={product._id || product.TicketNumber || Math.random()} 
+//                     className="hover:bg-gray-50 transition-colors">
+//                     <TableCell className="font-medium">
+//                       <Badge variant="outline" className="font-mono bg-[#6BA368] bg-opacity-10 text-[#1F6E8C] border-[#6BA368] border-opacity-30">
+//                         {product.TicketNumber || "N/A"}
+//                       </Badge>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-3">
+//                         <Avatar className="h-8 w-8 ring-2 ring-[#6BA368] ring-opacity-20">
+//                           <AvatarFallback className="bg-[#6BA368] bg-opacity-10 text-[#6BA368] font-semibold">
+//                             {getInitials(product.proName)}
+//                           </AvatarFallback>
+//                         </Avatar>
+//                         <div>
+//                           <div className="font-medium text-gray-900">{product.proName || "N/A"}</div>
+//                           <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+//                             <CalendarIcon className="h-3 w-3 text-[#6BA368]" />
+//                             Reg: {formatDate(product.createdAt)}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <Badge className="bg-[#6BA368] bg-opacity-10 text-[#6BA368] border-0">
+//                         {product.proCatogory || "N/A"}
+//                       </Badge>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div>
+//                         <div className="font-medium text-gray-900">{product.brandName || "N/A"}</div>
+//                         <div className="text-xs text-gray-500 mt-1">Model: {product.proModNum || "N/A"}</div>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <code className="relative rounded bg-gray-100 px-2 py-1 font-mono text-xs text-[#1F6E8C]">
+//                         {product.proSrNo || "N/A"}
+//                       </code>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg">
+//                         <CalendarIcon className="h-3.5 w-3.5 text-[#D9A441]" />
+//                         <span className="text-sm font-medium text-gray-700">
+//                           {formatDate(product.purDate)}
+//                         </span>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell>
+//                       <div className="flex items-center gap-2">
+//                         <FileTextIcon className="h-3.5 w-3.5 text-[#6BA368]" />
+//                         <span className="text-sm text-gray-600 font-mono">
+//                           {product.invoiceNum || "N/A"}
+//                         </span>
+//                       </div>
+//                     </TableCell>
+                    
+//                     <TableCell className="text-right">
+//                       <DropdownMenu>
+//                         <DropdownMenuTrigger asChild>
+//                           <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-[#6BA368] hover:bg-opacity-10 hover:text-[#6BA368]">
+//                             <span className="sr-only">Open menu</span>
+//                             <MoreHorizontal className="h-4 w-4" />
+//                           </Button>
+//                         </DropdownMenuTrigger>
+//                         <DropdownMenuContent align="end" className="w-48">
+//                           <DropdownMenuLabel className="text-[#1F6E8C]">Actions</DropdownMenuLabel>
+//                           <DropdownMenuSeparator />
+//                           <DropdownMenuItem
+//                             onClick={() => handleCopy(product.TicketNumber)}
+//                             disabled={!product.TicketNumber}
+//                             className="cursor-pointer"
+//                           >
+//                             <CopyIcon className="mr-2 h-4 w-4 text-[#6BA368]" />
+//                             Copy Ticket #
+//                           </DropdownMenuItem>
+//                           <DropdownMenuItem
+//                             onClick={() => handleCopy(product.proSrNo)}
+//                             disabled={!product.proSrNo}
+//                             className="cursor-pointer"
+//                           >
+//                             <CopyIcon className="mr-2 h-4 w-4 text-[#6BA368]" />
+//                             Copy Serial #
+//                           </DropdownMenuItem>
+//                         </DropdownMenuContent>
+//                       </DropdownMenu>
+//                     </TableCell>
+//                   </TableRow>
+//                 ))
+//               )}
+//             </TableBody>
+//           </Table>
+//         </div>
+
+//         {/* Pagination */}
+//         {filteredProducts.length > 0 && (
+//           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+//             <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+//               Showing {indexOfFirstItem + 1} to{" "}
+//               {Math.min(indexOfLastItem, filteredProducts.length)} of{" "}
+//               <span className="font-semibold text-[#1F6E8C]">{filteredProducts.length}</span> products
+//             </div>
+//             <div className="flex items-center gap-3">
+//               <Button
+//                 variant="outline"
+//                 size="sm"
+//                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+//                 disabled={currentPage === 1}
+//                 className="border-gray-200 hover:border-[#6BA368] hover:bg-[#6BA368] hover:bg-opacity-10"
+//               >
+//                 <ChevronLeftIcon className="h-4 w-4 mr-1" />
+//                 Previous
+//               </Button>
+              
+//               <div className="flex items-center gap-2">
+//                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
+//                   let pageNum;
+//                   if (totalPages <= 5) {
+//                     pageNum = i + 1;
+//                   } else if (currentPage <= 3) {
+//                     pageNum = i + 1;
+//                   } else if (currentPage >= totalPages - 2) {
+//                     pageNum = totalPages - 4 + i;
+//                   } else {
+//                     pageNum = currentPage - 2 + i;
+//                   }
+                  
+//                   return (
+//                     <Button
+//                       key={i}
+//                       variant={currentPage === pageNum ? "default" : "outline"}
+//                       size="sm"
+//                       onClick={() => setCurrentPage(pageNum)}
+//                       className={`w-8 h-8 p-0 ${
+//                         currentPage === pageNum 
+//                           ? 'bg-[#1F6E8C] hover:bg-[#184f66] text-white' 
+//                           : 'border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]'
+//                       }`}
+//                     >
+//                       {pageNum}
+//                     </Button>
+//                   );
+//                 })}
+//               </div>
+
+//               <Button
+//                 variant="outline"
+//                 size="sm"
+//                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+//                 disabled={currentPage === totalPages}
+//                 className="border-gray-200 hover:border-[#6BA368] hover:bg-[#6BA368] hover:bg-opacity-10"
+//               >
+//                 Next
+//                 <ChevronRightIcon className="h-4 w-4 ml-1" />
+//               </Button>
+//             </div>
+//           </div>
+//         )}
+//       </CardContent>
+
+//       <style jsx>{`
+//         /* Custom scrollbar */
+//         .overflow-x-auto::-webkit-scrollbar {
+//           height: 6px;
+//         }
+        
+//         .overflow-x-auto::-webkit-scrollbar-track {
+//           background: #f1f1f1;
+//           border-radius: 10px;
+//         }
+        
+//         .overflow-x-auto::-webkit-scrollbar-thumb {
+//           background: #6BA368;
+//           border-radius: 10px;
+//         }
+        
+//         .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+//           background: #1F6E8C;
+//         }
+//       `}</style>
+//     </Card>
+//   );
+// };
+
+// export default CustomerCareProductHistory;
+
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -1851,28 +2858,30 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import {
-  CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
+  RefreshCwIcon,
   FilterIcon,
   MoreHorizontal,
   SearchIcon,
   CopyIcon,
-  EyeIcon,
   FileTextIcon,
+  Calendar,
+  Package,
+  Tag,
+  Hash,
+  FileText,
 } from "lucide-react";
 import axiosInstance from "../../Utils/axiosIntance";
-// import { format } from "date-fns";
 import { Skeleton } from "../ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+// import {
+  // Tooltip,
+  // TooltipContent,
+  // TooltipDescription,
+  // TooltipProvider,
+  // TooltipTrigger,
+// } from "../ui/tooltip";
 
 const CustomerCareProductHistory = () => {
   const [products, setProducts] = useState([]);
@@ -1883,8 +2892,8 @@ const CustomerCareProductHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [categories, setCategories] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch products from API
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -1893,143 +2902,249 @@ const CustomerCareProductHistory = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.get("/customerDetails/products");
-      console.log("Full response:", response);
-      console.log("Response data:", response.data);
       
-      // Handle different response structures
       let productsArray = [];
       
       if (Array.isArray(response.data)) {
-        // Direct array response
         productsArray = response.data;
       } else if (response.data?.data && Array.isArray(response.data.data)) {
-        // Response wrapped in { data: [...] }
         productsArray = response.data.data;
       } else if (response.data?.products && Array.isArray(response.data.products)) {
-        // Response wrapped in { products: [...] }
         productsArray = response.data.products;
       } else if (response.data?.result && Array.isArray(response.data.result)) {
-        // Response wrapped in { result: [...] }
         productsArray = response.data.result;
       } else {
-        console.error("Unexpected API response structure:", response.data);
         productsArray = [];
+      }
+      
+      // Log the first product to see available fields
+      if (productsArray.length > 0) {
+        console.log("Sample product data:", productsArray[0]);
       }
       
       setProducts(productsArray);
       
-      // Extract unique categories for filter
       if (productsArray.length > 0) {
-        const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory).filter(Boolean))];
+        const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory || p.category).filter(Boolean))];
         setCategories(uniqueCategories);
       }
       
       setError(null);
     } catch (err) {
-      console.error("Error fetching products:", err);
       setError(err.response?.data?.message || "Failed to fetch products");
-      setProducts([]); // Ensure products is an array even on error
+      setProducts([]);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  // Filter products based on search and category
-  const filteredProducts = Array.isArray(products) ? products.filter(product => {
-    const matchesSearch = 
-      product.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.proModNum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.TicketNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchProducts();
+  };
+
+  // Helper function to get brand name from various possible field names
+  const getBrandName = (product) => {
+    // Check all possible field names for brand
+    const possibleFields = [
+      'brandName',
+      'brand',
+      'productBrand',
+      'manufacturer',
+      'company',
+      'proBrand',
+      'brand_name',
+      'product_brand'
+    ];
     
-    const matchesCategory = filterCategory === "all" || product.proCatogory === filterCategory;
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  // Helper function to get model number from various possible field names
+  const getModelNumber = (product) => {
+    const possibleFields = [
+      'proModNum',
+      'modelNumber',
+      'model',
+      'proModel',
+      'productModel',
+      'modNum',
+      'model_no',
+      'product_model'
+    ];
+    
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  // Helper function to get product name
+  const getProductName = (product) => {
+    const possibleFields = [
+      'proName',
+      'productName',
+      'name',
+      'product',
+      'itemName',
+      'product_name'
+    ];
+    
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  // Helper function to get category
+  const getCategory = (product) => {
+    const possibleFields = [
+      'proCatogory',
+      'category',
+      'productCategory',
+      'catogory',
+      'itemCategory',
+      'product_category'
+    ];
+    
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  // Helper function to get serial number
+  const getSerialNumber = (product) => {
+    const possibleFields = [
+      'proSrNo',
+      'serialNumber',
+      'serialNo',
+      'srNo',
+      'serial',
+      'serial_number'
+    ];
+    
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  // Helper function to get invoice number
+  const getInvoiceNumber = (product) => {
+    const possibleFields = [
+      'invoiceNum',
+      'invoiceNumber',
+      'invoice',
+      'billNumber',
+      'billNo',
+      'invoice_no'
+    ];
+    
+    for (const field of possibleFields) {
+      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+        return product[field];
+      }
+    }
+    
+    return "—";
+  };
+
+  const filteredProducts = Array.isArray(products) ? products.filter(product => {
+    const searchableText = `
+      ${getProductName(product)} 
+      ${getSerialNumber(product)} 
+      ${getModelNumber(product)} 
+      ${getBrandName(product)} 
+      ${product.TicketNumber || ''}
+    `.toLowerCase();
+    
+    const matchesSearch = searchTerm === "" || searchableText.includes(searchTerm.toLowerCase());
+    
+    const productCategory = getCategory(product);
+    const matchesCategory = filterCategory === "all" || productCategory === filterCategory;
     
     return matchesSearch && matchesCategory;
   }) : [];
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "—";
+    
     try {
-      return format(new Date(dateString), "dd MMM yyyy");
+      let date;
+      
+      if (typeof dateString === 'number') {
+        date = new Date(dateString);
+      } else if (typeof dateString === 'string') {
+        date = new Date(dateString);
+        
+        if (isNaN(date.getTime())) {
+          const parts = dateString.split(/[/\-]/);
+          if (parts.length === 3) {
+            date = new Date(parts[2], parts[1] - 1, parts[0]);
+          }
+        }
+      } else {
+        return "—";
+      }
+      
+      if (isNaN(date.getTime())) {
+        return "—";
+      }
+      
+      return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
     } catch {
-      return "Invalid Date";
+      return "—";
     }
   };
 
-  // Get initials for avatar
-  const getInitials = (name) => {
-    if (!name) return "PR";
-    return name
-      .split(" ")
-      .map(n => n[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
-  // Handle copy to clipboard
   const handleCopy = (text) => {
-    if (text) {
+    if (text && text !== "—") {
       navigator.clipboard.writeText(text);
-      // You can add a toast notification here
     }
   };
 
-  // Handle export to CSV
-  const handleExportCSV = () => {
-    if (filteredProducts.length === 0) return;
-    
-    const headers = ["Ticket Number", "Product Name", "Category", "Brand", "Model", "Serial Number", "Purchase Date", "Invoice Number", "Registration Date"];
-    const csvData = filteredProducts.map(p => [
-      p.TicketNumber || "N/A",
-      p.proName || "N/A",
-      p.proCatogory || "N/A",
-      p.brandName || "N/A",
-      p.proModNum || "N/A",
-      p.proSrNo || "N/A",
-      formatDate(p.purDate),
-      p.invoiceNum || "N/A",
-      formatDate(p.createdAt)
-    ]);
-    
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(cell => `"${cell}"`).join(","))
-      .join("\n");
-    
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `product-history-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
-  if (loading) {
+  if (loading && !refreshing) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Product History</CardTitle>
-          <CardDescription>Loading registered products...</CardDescription>
+      <Card className="w-full border-0 shadow-sm">
+        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+          <CardTitle className="text-xl font-semibold">Product History</CardTitle>
+          <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
+            Loading registered products...
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-6">
+          <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                </div>
-              </div>
+              <Skeleton key={i} className="h-12 w-full rounded" />
             ))}
           </div>
         </CardContent>
@@ -2039,17 +3154,22 @@ const CustomerCareProductHistory = () => {
 
   if (error) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Product History</CardTitle>
-          <CardDescription>Error loading products</CardDescription>
+      <Card className="w-full border-0 shadow-sm">
+        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+          <CardTitle className="text-xl font-semibold">Product History</CardTitle>
+          <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
+            Error loading products
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Alert variant="destructive">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+        <CardContent className="p-6">
+          <Alert variant="destructive" className="border-red-200 bg-red-50">
+            <AlertTitle className="text-red-800">Error</AlertTitle>
+            <AlertDescription className="text-red-600">{error}</AlertDescription>
           </Alert>
-          <Button className="mt-4" onClick={fetchProducts}>
+          <Button 
+            className="mt-4 bg-[#1F6E8C] hover:bg-[#184f66] text-white"
+            onClick={fetchProducts}
+          >
             Retry
           </Button>
         </CardContent>
@@ -2058,220 +3178,314 @@ const CustomerCareProductHistory = () => {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <div>
-          <CardTitle className="text-2xl font-bold">Product History</CardTitle>
-          <CardDescription>
-            View all registered products ({filteredProducts.length} total)
-          </CardDescription>
-        </div>
-        <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={handleExportCSV}
-                  disabled={filteredProducts.length === 0}
-                >
-                  <DownloadIcon className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Export to CSV</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <Button variant="outline" onClick={fetchProducts}>
-            Refresh
-          </Button>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search by product name, serial number, ticket number..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+    <div className="w-full">
+      <Card className="w-full border-0 shadow-sm overflow-hidden">
+        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Product History
+              </CardTitle>
+              <CardDescription className="text-[#F7F7F2] text-sm opacity-90 mt-1">
+                View all registered products ({filteredProducts.length} total)
+              </CardDescription>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white h-8 w-8"
+                  >
+                    <RefreshCwIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Refresh data</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full md:w-[200px]">
-              <FilterIcon className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        </CardHeader>
 
-        {/* Table */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Ticket #</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Brand/Model</TableHead>
-                <TableHead>Serial Number</TableHead>
-                <TableHead>Purchase Date</TableHead>
-                <TableHead>Invoice</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentItems.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
-                    No products found.
-                  </TableCell>
+        <CardContent className="p-0">
+          {/* Filters */}
+          <div className="p-6 pb-4 border-b border-gray-100">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search by product name, serial number, ticket number..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 pr-4 py-2 border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368] rounded-md text-sm"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <span className="text-xs">✕</span>
+                  </button>
+                )}
+              </div>
+              
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-full md:w-[200px] border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368]">
+                  <FilterIcon className="h-4 w-4 mr-2 text-[#6BA368]" />
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-gray-50">
+                <TableRow className="border-b border-gray-200">
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Hash className="h-3 w-3" />
+                      Ticket #
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Package className="h-3 w-3" />
+                      Product
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Tag className="h-3 w-3" />
+                      Category
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    Brand/Model
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    Serial Number
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      Purchase Date
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <FileText className="h-3 w-3" />
+                      Invoice
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 text-right whitespace-nowrap">
+                    Actions
+                  </TableHead>
                 </TableRow>
-              ) : (
-                currentItems.map((product) => (
-                  <TableRow key={product._id || product.TicketNumber || Math.random()}>
-                    <TableCell className="font-medium">
-                      <Badge variant="outline" className="font-mono">
-                        {product.TicketNumber || "N/A"}
-                      </Badge>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-blue-100 text-blue-600">
-                            {getInitials(product.proName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{product.proName || "N/A"}</div>
-                          <div className="text-sm text-gray-500">
-                            Registered: {formatDate(product.createdAt)}
-                          </div>
-                        </div>
+              </TableHeader>
+              <TableBody>
+                {currentItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-40 text-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <FileTextIcon className="h-8 w-8 text-gray-300 mb-2" />
+                        <p className="text-sm font-medium">No products found</p>
+                        <p className="text-xs">Try adjusting your search or filter</p>
                       </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <Badge variant="secondary">{product.proCatogory || "N/A"}</Badge>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{product.brandName || "N/A"}</div>
-                        <div className="text-sm text-gray-500">Model: {product.proModNum || "N/A"}</div>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-                        {product.proSrNo || "N/A"}
-                      </code>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <CalendarIcon className="h-3 w-3 text-gray-400" />
-                        <span>{formatDate(product.purDate)}</span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <FileTextIcon className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm">{product.invoiceNum || "N/A"}</span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => handleCopy(product.TicketNumber)}
-                            disabled={!product.TicketNumber}
-                          >
-                            <CopyIcon className="mr-2 h-4 w-4" />
-                            Copy Ticket #
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleCopy(product.proSrNo)}
-                            disabled={!product.proSrNo}
-                          >
-                            <CopyIcon className="mr-2 h-4 w-4" />
-                            Copy Serial #
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <EyeIcon className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Pagination */}
-        {filteredProducts.length > 0 && (
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="text-sm text-gray-500">
-              Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, filteredProducts.length)} of{" "}
-              {filteredProducts.length} products
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-                Previous
-              </Button>
-              <div className="text-sm">
-                Page {currentPage} of {totalPages}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-                <ChevronRightIcon className="h-4 w-4" />
-              </Button>
-            </div>
+                ) : (
+                  currentItems.map((product) => {
+                    const brandName = getBrandName(product);
+                    const modelNumber = getModelNumber(product);
+                    const productName = getProductName(product);
+                    const category = getCategory(product);
+                    const serialNumber = getSerialNumber(product);
+                    const invoiceNumber = getInvoiceNumber(product);
+                    
+                    return (
+                      <TableRow 
+                        key={product._id || product.TicketNumber || Math.random()} 
+                        className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                      >
+                        <TableCell className="px-4 py-3">
+                          <Badge variant="outline" className="font-mono text-xs bg-[#6BA368] bg-opacity-5 text-[#1F6E8C] border-[#6BA368] border-opacity-20 font-medium px-2 py-0.5">
+                            {product.TicketNumber || "—"}
+                          </Badge>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <div>
+                            <div className="font-medium text-sm text-gray-900">
+                              {productName}
+                            </div>
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              Reg: {formatDate(product.createdAt)}
+                            </div>
+                          </div>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <Badge className="bg-[#6BA368] bg-opacity-10 text-[#6BA368] text-xs font-medium px-2 py-0.5 rounded border-0">
+                            {category}
+                          </Badge>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <div>
+                            <div className="font-medium text-sm text-gray-900">
+                              {brandName}
+                            </div>
+                            {modelNumber !== "—" && (
+                              <div className="text-xs text-gray-400 mt-0.5">
+                                Model: {modelNumber}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <code className="text-xs bg-gray-100 px-2 py-1 rounded text-[#1F6E8C] font-mono">
+                            {serialNumber}
+                          </code>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 text-[#D9A441]" />
+                            <span className="text-sm text-gray-700">
+                              {formatDate(product.purDate)}
+                            </span>
+                          </div>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-1.5">
+                            <FileText className="h-3.5 w-3.5 text-[#6BA368]" />
+                            <span className="text-sm text-gray-600 font-mono">
+                              {invoiceNumber}
+                            </span>
+                          </div>
+                        </TableCell>
+                        
+                        <TableCell className="px-4 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-7 w-7 p-0 hover:bg-[#6BA368] hover:bg-opacity-10">
+                                <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                              <DropdownMenuLabel className="text-xs text-[#1F6E8C] py-1.5">Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleCopy(product.TicketNumber)}
+                                disabled={!product.TicketNumber}
+                                className="text-sm py-1.5 cursor-pointer"
+                              >
+                                <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
+                                Copy Ticket #
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleCopy(serialNumber)}
+                                disabled={serialNumber === "—"}
+                                className="text-sm py-1.5 cursor-pointer"
+                              >
+                                <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
+                                Copy Serial #
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Pagination */}
+          {filteredProducts.length > 0 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
+              <div className="text-xs text-gray-500">
+                Showing <span className="font-medium text-[#1F6E8C]">{indexOfFirstItem + 1}</span> to{" "}
+                <span className="font-medium text-[#1F6E8C]">{Math.min(indexOfLastItem, filteredProducts.length)}</span> of{" "}
+                <span className="font-medium text-[#1F6E8C]">{filteredProducts.length}</span> products
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+                >
+                  <ChevronLeftIcon className="h-3.5 w-3.5 mr-1" />
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={i}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`h-8 w-8 p-0 text-xs ${
+                          currentPage === pageNum 
+                            ? 'bg-[#1F6E8C] hover:bg-[#184f66] text-white border-0' 
+                            : 'border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+                >
+                  Next
+                  <ChevronRightIcon className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -54,7 +54,7 @@ export default function Header() {
   <h1 className="text-2xl md:text-4xl font-extrabold tracking-wide 
                  bg-gradient-to-r from-blue-600 to-cyan-500 
                  bg-clip-text text-transparent">
-    H-Tech Solutions <span className="text-sm md:text-base font-semibold text-gray-500">Pvt. Ltd.</span>
+    HTech Solutions <span className="text-sm md:text-base font-semibold text-gray-500">Pvt. Ltd.</span>
   </h1>
 </Link>
 

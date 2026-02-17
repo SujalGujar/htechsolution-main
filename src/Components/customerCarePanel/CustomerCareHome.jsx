@@ -2667,53 +2667,907 @@
 //   );
 // }
 
-import React, { useState } from "react";
-import axiosInstance from "../../Utils/axiosIntance"; // Make sure this import path is correct
+// import React, { useState } from "react";
+// import axiosInstance from "../../Utils/axiosIntance"; // Make sure this import path is correct
 
-// Hardware categories constant
+// // Hardware categories constant
+// const HARDWARE_CATS = [
+//   "Networking",
+//   "Router",
+//   "Network Switch",
+//   "Firewall / UTM Device",
+//   "Modem",
+//   "Access Point / WiFi",
+//   "Network Cable / Patch Panel",
+//   // Servers & Storage
+//   "Server",
+//   "NAS / Storage Device",
+//   "UPS / Power Supply",
+//   "Rack / Cabinet",
+//   // Computers
+//   "Desktop Computer",
+//   "Laptop",
+//   "Workstation",
+//   "Mini PC",
+//   // Peripherals
+//   "Monitor / Display",
+//   "Keyboard / Mouse",
+//   "Printer",
+//   "Scanner",
+//   "Projector",
+//   "Barcode Scanner",
+//   // Components
+//   "Hard Disk / SSD",
+//   "RAM / Memory",
+//   "Graphics Card / GPU",
+//   "Motherboard",
+//   "Processor / CPU",
+//   "Power Supply Unit (PSU)",
+//   "Cooling Fan / Heatsink",
+//   // Security
+//   "CCTV Camera",
+//   "DVR / NVR",
+//   "Biometric Device",
+//   "Access Control System",
+//   // Communication
+//   "IP Phone",
+//   "EPABX / PBX System",
+//   "Video Conferencing System",
+//   // Other
+//   "Other Hardware",
+// ];
+
+// const EMPTY_CUST = {
+//   customerName: "",
+//   email: "",
+//   mobileNum: "",
+//   proName: "",
+//   proCatogory: "",
+//   proSrNo: "",
+//   proModNum: "",
+//   ticketNumber: "", // ✅ Ticket number field
+//   warrStartDate: "",
+//   warrEndDate: "",
+// };
+
+// const EMPTY_PROD = {
+//   proName: "",
+//   proCatogory: "",
+//   proSrNo: "",
+//   proModNum: "",
+//   brandName: "",
+//   purDate: "",
+//   invoiceNum: "",
+//   warrStartDate: "",
+//   warrEndDate: "",
+// };
+
+// const STYLES = `
+//   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+//   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+//   :root {
+//     --bg: #f0f2f5; --surface: #fff; --surface2: #f7f8fa;
+//     --border: #e4e7ec; --border2: #d0d5dd;
+//     --text: #101828; --muted: #667085; --subtle: #98a2b3;
+//     --accent: #1a56db; --accent-lt: #ebf0ff;
+//     --accent2: #0ea47a; --accent2-lt: #e6f7f2;
+//     --danger: #d92d20; --warning: #f79009;
+//     --shadow-sm: 0 1px 2px rgba(16,24,40,.05);
+//     --shadow-md: 0 4px 16px rgba(16,24,40,.08);
+//     --shadow-lg: 0 12px 40px rgba(16,24,40,.12);
+//     --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
+//     --font: 'Plus Jakarta Sans', sans-serif;
+//   }
+//   .cc-wrap { min-height:100vh; background:var(--bg); font-family:var(--font); color:var(--text); display:flex; align-items:flex-start; justify-content:center; padding:40px 20px; }
+//   .cc-container { width:100%; max-width:820px; }
+//   .cc-page-title { font-size:32px; font-weight:800; color:var(--text); letter-spacing:-0.5px; margin-bottom:6px; text-align:center; }
+//   .cc-page-desc { font-size:14px; color:var(--muted); margin-bottom:28px; text-align:center; }
+//   .cc-tabs { display:flex; gap:8px; margin-bottom:24px; background:var(--surface); padding:6px; border-radius:var(--r-lg); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+//   .cc-tab { flex:1; padding:12px 20px; border:none; background:transparent; border-radius:var(--r-md); font-family:var(--font); font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+//   .cc-tab:hover { background:var(--surface2); color:var(--text); }
+//   .cc-tab.active { background:var(--accent); color:white; box-shadow:0 2px 8px rgba(26,86,219,.2); }
+//   .cc-tab.active.green { background:var(--accent2); box-shadow:0 2px 8px rgba(14,164,122,.2); }
+//   .cc-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); overflow:hidden; box-shadow:var(--shadow-md); animation:fadeUp .3s cubic-bezier(.22,1,.36,1) both; }
+//   @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+//   .cc-card-top { padding:24px 28px 20px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:14px; background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%); }
+//   .cti { width:48px; height:48px; border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+//   .cti.blue { background:var(--accent-lt); } .cti.green { background:var(--accent2-lt); }
+//   .cth { font-size:18px; font-weight:700; color:var(--text); } .ctp { font-size:13px; color:var(--muted); margin-top:4px; line-height:1.5; }
+//   .cc-form-body { padding:28px; display:flex; flex-direction:column; gap:24px; }
+//   .cc-sec-head { display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+//   .sec-ico { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+//   .sec-ico.blue { background:var(--accent-lt); } .sec-ico.green { background:var(--accent2-lt); }
+//   .sec-ttl { font-size:14px; font-weight:700; color:var(--text); } .sec-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+//   .cc-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+//   .cc-grid.g3 { grid-template-columns:1fr 1fr 1fr; }
+//   .full { grid-column:1/-1; }
+//   .cc-field { display:flex; flex-direction:column; gap:6px; }
+//   .cc-label { font-size:13px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:4px; }
+//   .req { color:var(--danger); font-size:14px; } .cc-hint { font-size:11.5px; color:var(--subtle); margin-top:2px; }
+//   .cc-input, .cc-select { width:100%; height:42px; padding:0 14px; border:1.5px solid var(--border2); border-radius:var(--r-sm); background:var(--surface); font-family:var(--font); font-size:14px; font-weight:500; color:var(--text); transition:border-color .15s,box-shadow .15s,background .15s; outline:none; -webkit-appearance:none; appearance:none; }
+//   .cc-input::placeholder { color:var(--subtle); font-weight:400; }
+//   .cc-input:hover, .cc-select:hover { border-color:#b0bac7; }
+//   .cc-input:focus, .cc-select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(26,86,219,.12); background:#fafcff; }
+//   .cc-select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2398a2b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; cursor:pointer; }
+//   .cc-divider { height:1px; background:var(--border); }
+//   .cc-form-footer { padding:20px 28px; background:var(--surface2); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+//   .footer-note { font-size:12px; color:var(--muted); } .footer-acts { display:flex; gap:10px; }
+//   .btn { display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 20px; border-radius:var(--r-sm); font-family:var(--font); font-size:14px; font-weight:600; cursor:pointer; border:none; transition:all .18s ease; }
+//   .btn-ghost { background:transparent; color:var(--muted); border:1.5px solid var(--border2); }
+//   .btn-ghost:hover { background:var(--surface2); color:var(--text); border-color:#b0bac7; }
+//   .btn-blue { background:var(--accent); color:white; box-shadow:0 1px 3px rgba(26,86,219,.3),0 4px 12px rgba(26,86,219,.18); }
+//   .btn-blue:hover { background:#1447c0; transform:translateY(-1px); }
+//   .btn-green { background:var(--accent2); color:white; box-shadow:0 1px 3px rgba(14,164,122,.3),0 4px 12px rgba(14,164,122,.18); }
+//   .btn-green:hover { background:#0b8c67; transform:translateY(-1px); }
+//   .btn:disabled { opacity:0.65; cursor:not-allowed; transform:none !important; }
+//   .cc-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; backdrop-filter:blur(4px); }
+//   .cc-modal { background:var(--surface); border-radius:var(--r-xl); padding:36px; max-width:480px; width:90%; box-shadow:var(--shadow-lg); animation:fadeUp .3s ease both; }
+//   .modal-icon { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:36px; }
+//   .modal-icon.blue { background:var(--accent-lt); color:var(--accent); } .modal-icon.green { background:var(--accent2-lt); color:var(--accent2); }
+//   .modal-title { font-size:22px; font-weight:700; color:var(--text); text-align:center; margin-bottom:8px; }
+//   .modal-subtitle { font-size:14px; color:var(--muted); text-align:center; margin-bottom:28px; }
+//   .credential-item { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r-md); padding:14px 18px; margin-bottom:14px; }
+//   .cred-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--subtle); margin-bottom:6px; }
+//   .cred-value { font-size:15px; font-weight:600; color:var(--text); display:flex; align-items:center; justify-content:space-between; word-break:break-all; }
+//   .copy-btn { background:none; border:none; color:var(--accent); cursor:pointer; padding:6px 10px; border-radius:var(--r-sm); font-size:12px; font-weight:600; transition:all .15s; flex-shrink:0; margin-left:8px; }
+//   .copy-btn:hover { background:var(--accent-lt); }
+//   .modal-note { font-size:13px; text-align:center; margin:20px 0; padding:12px; border-radius:var(--r-md); border:1px solid #fedf89; background:#fffaeb; color:#b54708; line-height:1.5; }
+//   .modal-note.info { color:var(--accent); background:var(--accent-lt); border-color:#b3d0ff; }
+//   .ticket-display { background:linear-gradient(135deg,var(--accent2-lt),#f0faf7); border:1px solid var(--accent2); border-radius:var(--r-lg); padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+//   .ticket-icon { width:48px; height:48px; background:var(--accent2); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:20px; flex-shrink:0; }
+//   .ticket-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--accent2); margin-bottom:4px; }
+//   .ticket-number { font-size:24px; font-weight:700; color:var(--text); font-family:monospace; letter-spacing:1px; }
+//   .ticket-note { font-size:12px; color:var(--muted); margin-top:4px; }
+//   .cc-toast { position:fixed; bottom:24px; right:24px; background:white; border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 18px; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:14px; z-index:200; min-width:300px; animation:fadeUp .35s ease both; }
+//   .toast-dot { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+//   .toast-dot.blue { background:var(--accent-lt); color:var(--accent); }
+//   .toast-dot.green { background:var(--accent2-lt); color:var(--accent2); }
+//   .toast-dot.red { background:#fef3f2; color:var(--danger); }
+//   .toast-ttl { font-size:15px; font-weight:700; color:var(--text); } .toast-sub { font-size:13px; color:var(--muted); margin-top:3px; }
+//   .toast-x { margin-left:auto; background:none; border:none; cursor:pointer; color:var(--subtle); font-size:16px; padding:4px; border-radius:5px; transition:background .15s; }
+//   .toast-x:hover { background:var(--surface2); color:var(--text); }
+//   @media(max-width:768px) { .cc-wrap{padding:20px 12px;} .cc-grid,.cc-grid.g3{grid-template-columns:1fr;} .cc-page-title{font-size:26px;} }
+// `;
+
+// export default function CustomerCareHome() {
+//   const [view, setView] = useState("customer");
+//   const [toast, setToast] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   // State for forms - preserved when switching tabs
+//   const [cust, setCust] = useState(EMPTY_CUST);
+//   const [prod, setProd] = useState(EMPTY_PROD);
+
+//   // Modal state
+//   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+//   const [userCredentials, setUserCredentials] = useState({ username: "", password: "" });
+//   const [showTicketModal, setShowTicketModal] = useState(false);
+//   const [ticketInfo, setTicketInfo] = useState({ ticketNumber: "", message: "" });
+
+//   const show = (type, msg = null) => {
+//     setToast({ type, message: msg });
+//     setTimeout(() => setToast(null), 3500);
+//   };
+
+//   // Update handlers
+//   const onC = (e) => setCust({ ...cust, [e.target.name]: e.target.value });
+//   const onP = (e) => setProd({ ...prod, [e.target.name]: e.target.value });
+
+//   const copyToClipboard = (text) => {
+//     navigator.clipboard.writeText(text);
+//     show("copy", "Copied to clipboard!");
+//   };
+
+//   // ── SUBMIT CUSTOMER ──
+//   const submitCust = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setError(null);
+    
+//     try {
+//       // Log the data being sent (for debugging)
+//       console.log("Submitting customer data:", cust);
+      
+//       const response = await axiosInstance.post("/customerDetails/newcustomer", cust);
+      
+//       if (response.data.password) {
+//         setUserCredentials({
+//           username: response.data.username || cust.customerName, // Using customerName as username
+//           password: response.data.password,
+//         });
+//         setShowCredentialsModal(true);
+//       }
+      
+//       show("customer", "Customer registered successfully!");
+//       setCust(EMPTY_CUST); // Reset form after success
+//     } catch (err) {
+//       const msg = err.response?.data?.message || "Customer registration failed";
+//       setError(msg);
+//       show("error", msg);
+//       console.error("Registration error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // ── SUBMIT PRODUCT ──
+//   const submitProd = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setError(null);
+    
+//     try {
+//       console.log("Submitting product data:", prod);
+      
+//       const response = await axiosInstance.post("/auth/register", prod);
+      
+//       if (response.data.TicketNumber || response.data.ticketNumber) {
+//         setTicketInfo({
+//           ticketNumber: response.data.TicketNumber || response.data.ticketNumber,
+//           message: response.data.message || "Product registered successfully!"
+//         });
+//         setShowTicketModal(true);
+//       }
+      
+//       show("product", "Product registered successfully!");
+//       setProd(EMPTY_PROD);
+//     } catch (err) {
+//       const msg = err.response?.data?.message || "Product registration failed";
+//       setError(msg);
+//       show("error", msg);
+//       console.error("Product registration error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <style>{STYLES}</style>
+//       <div className="cc-wrap">
+//         <div className="cc-container">
+
+//           <div className="cc-page-title">
+//             {view === "customer" ? "Customer Registration" : "Product Registration"}
+//           </div>
+//           <div className="cc-page-desc">
+//             {view === "customer"
+//               ? "Add a new customer to the support system for warranty and service access."
+//               : "Register a hardware product to activate warranty coverage and service tracking."}
+//           </div>
+
+//           {/* Tab Navigation */}
+//           <div className="cc-tabs">
+//             <button
+//               className={`cc-tab ${view === "customer" ? "active" : ""}`}
+//               onClick={() => { setView("customer"); setError(null); }}
+//             >
+//               <span>👤</span> Customer Registration
+//             </button>
+//             <button
+//               className={`cc-tab ${view === "product" ? "active green" : ""}`}
+//               onClick={() => { setView("product"); setError(null); }}
+//             >
+//               <span>🖥️</span> Product Registration
+//             </button>
+//           </div>
+
+//           {/* Error Display */}
+//           {error && (
+//             <div style={{ 
+//               background:"#fef3f2", 
+//               border:"1px solid #fecdca", 
+//               borderRadius:"var(--r-md)", 
+//               padding:"14px 18px", 
+//               marginBottom:"24px", 
+//               color:"var(--danger)", 
+//               fontSize:"13px", 
+//               textAlign:"center" 
+//             }}>
+//               {error}
+//             </div>
+//           )}
+
+//           {/* Customer Registration Form */}
+//           {view === "customer" && (
+//             <div className="cc-card">
+//               <div className="cc-card-top">
+//                 <div className="cti blue">👤</div>
+//                 <div>
+//                   <div className="cth">New Customer Registration</div>
+//                   <div className="ctp">Register a customer to grant access to warranty claims and support history.</div>
+//                 </div>
+//               </div>
+              
+//               <form onSubmit={submitCust}>
+//                 <div className="cc-form-body">
+
+//                   {/* Personal Info */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico blue">🪪</div>
+//                       <div>
+//                         <div className="sec-ttl">Personal Information</div>
+//                         <div className="sec-sub">Basic contact details</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field full">
+//                         <label className="cc-label">
+//                           Full Name <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="customerName" 
+//                           value={cust.customerName} 
+//                           onChange={onC} 
+//                           placeholder="e.g. Rahul Sharma" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Email Address <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           type="email" 
+//                           name="email" 
+//                           value={cust.email} 
+//                           onChange={onC} 
+//                           placeholder="rahul@example.com" 
+//                           required 
+//                         />
+//                         <span className="cc-hint">Used for communication</span>
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Mobile Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           type="tel" 
+//                           name="mobileNum" 
+//                           value={cust.mobileNum} 
+//                           onChange={onC} 
+//                           placeholder="9876543210" 
+//                           required 
+//                         />
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="cc-divider" />
+
+//                   {/* Product Info */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico blue">📦</div>
+//                       <div>
+//                         <div className="sec-ttl">Product Information</div>
+//                         <div className="sec-sub">Hardware product linked to this customer</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Product Name <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proName" 
+//                           value={cust.proName} 
+//                           onChange={onC} 
+//                           placeholder="e.g. Cisco 24-Port Switch" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Product Category <span className="req">*</span>
+//                         </label>
+//                         <select 
+//                           className="cc-select" 
+//                           name="proCatogory" 
+//                           value={cust.proCatogory} 
+//                           onChange={onC} 
+//                           required
+//                         >
+//                           <option value="">Select hardware category</option>
+//                           {HARDWARE_CATS.map(c => (
+//                             <option key={c} value={c}>{c}</option>
+//                           ))}
+//                         </select>
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Serial Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proSrNo" 
+//                           value={cust.proSrNo} 
+//                           onChange={onC} 
+//                           placeholder="e.g. SN2024XXXXXX" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Model Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proModNum" 
+//                           value={cust.proModNum} 
+//                           onChange={onC} 
+//                           placeholder="e.g. WS-C2960X-24TS" 
+//                           required 
+//                         />
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="cc-divider" />
+
+//                   {/* Ticket Number - THIS IS THE KEY FIELD */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico blue">🎫</div>
+//                       <div>
+//                         <div className="sec-ttl">Product Verification</div>
+//                         <div className="sec-sub">Enter the ticket number from product registration</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field full">
+//                         <label className="cc-label">
+//                           Ticket Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="ticketNumber" 
+//                           value={cust.ticketNumber} 
+//                           onChange={onC} 
+//                           placeholder="e.g. TKT-20260214-25671" 
+//                           required 
+//                           style={{fontFamily:"monospace", fontSize:"15px"}} 
+//                         />
+//                         <span className="cc-hint">
+//                           ℹ️ This ticket number will be saved to database and used to link customer to their warranty
+//                         </span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="cc-divider" />
+
+//                   {/* Warranty Info */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico blue">🛡️</div>
+//                       <div>
+//                         <div className="sec-ttl">Warranty Information</div>
+//                         <div className="sec-sub">Warranty coverage period for the linked product</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Warranty Start Date <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           type="date" 
+//                           name="warrStartDate" 
+//                           value={cust.warrStartDate} 
+//                           onChange={onC} 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Warranty End Date <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           type="date" 
+//                           name="warrEndDate" 
+//                           value={cust.warrEndDate} 
+//                           onChange={onC} 
+//                           required 
+//                         />
+//                         <span className="cc-hint">
+//                           {cust.warrEndDate && cust.warrStartDate
+//                             ? `${Math.round((new Date(cust.warrEndDate) - new Date(cust.warrStartDate)) / (1000*60*60*24*30))} months warranty`
+//                             : "e.g. 1 year after purchase"}
+//                         </span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                 </div>
+                
+//                 <div className="cc-form-footer">
+//                   <div className="footer-note">
+//                     <span style={{color:"var(--danger)"}}>*</span> Required fields
+//                   </div>
+//                   <div className="footer-acts">
+//                     <button 
+//                       type="button" 
+//                       className="btn btn-ghost" 
+//                       onClick={() => setCust(EMPTY_CUST)} 
+//                       disabled={loading}
+//                     >
+//                       Clear
+//                     </button>
+//                     <button 
+//                       type="submit" 
+//                       className="btn btn-blue" 
+//                       disabled={loading}
+//                     >
+//                       {loading ? "Registering…" : "Register Customer →"}
+//                     </button>
+//                   </div>
+//                 </div>
+//               </form>
+//             </div>
+//           )}
+
+//           {/* Product Registration Form */}
+//           {view === "product" && (
+//             <div className="cc-card">
+//               <div className="cc-card-top">
+//                 <div className="cti green">🖥️</div>
+//                 <div>
+//                   <div className="cth">Hardware Product Registration</div>
+//                   <div className="ctp">Register hardware to activate warranty and service request tracking.</div>
+//                 </div>
+//               </div>
+              
+//               <form onSubmit={submitProd}>
+//                 <div className="cc-form-body">
+
+//                   {/* Product Details */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico green">🔧</div>
+//                       <div>
+//                         <div className="sec-ttl">Hardware Details</div>
+//                         <div className="sec-sub">Identify the hardware being registered</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Product Name <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proName" 
+//                           value={prod.proName} 
+//                           onChange={onP} 
+//                           placeholder="e.g. Cisco 24-Port Switch" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Hardware Category <span className="req">*</span>
+//                         </label>
+//                         <select 
+//                           className="cc-select" 
+//                           name="proCatogory" 
+//                           value={prod.proCatogory} 
+//                           onChange={onP} 
+//                           required
+//                         >
+//                           <option value="">Select hardware category</option>
+//                           {HARDWARE_CATS.map(c => (
+//                             <option key={c} value={c}>{c}</option>
+//                           ))}
+//                         </select>
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Brand Name <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="brandName" 
+//                           value={prod.brandName} 
+//                           onChange={onP} 
+//                           placeholder="e.g. Cisco, HP, Dell" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Model Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proModNum" 
+//                           value={prod.proModNum} 
+//                           onChange={onP} 
+//                           placeholder="e.g. WS-C2960X-24TS" 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field full">
+//                         <label className="cc-label">
+//                           Serial Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="proSrNo" 
+//                           value={prod.proSrNo} 
+//                           onChange={onP} 
+//                           placeholder="e.g. FTX2024XXXXXXXX" 
+//                           required 
+//                         />
+//                         <span className="cc-hint">Found on the device label or packaging</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="cc-divider" />
+
+//                   {/* Purchase Info */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico green">🧾</div>
+//                       <div>
+//                         <div className="sec-ttl">Purchase Information</div>
+//                         <div className="sec-sub">Invoice and purchase details</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Purchase Date <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           type="date" 
+//                           name="purDate" 
+//                           value={prod.purDate} 
+//                           onChange={onP} 
+//                           required 
+//                         />
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Invoice Number <span className="req">*</span>
+//                         </label>
+//                         <input 
+//                           className="cc-input" 
+//                           name="invoiceNum" 
+//                           value={prod.invoiceNum} 
+//                           onChange={onP} 
+//                           placeholder="INV-2024-001" 
+//                           required 
+//                         />
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="cc-divider" />
+
+//                   {/* Warranty Period */}
+//                   <div>
+//                     <div className="cc-sec-head">
+//                       <div className="sec-ico green">🛡️</div>
+//                       <div>
+//                         <div className="sec-ttl">Warranty Period</div>
+//                         <div className="sec-sub">Start and end date of warranty coverage</div>
+//                       </div>
+//                     </div>
+//                     <div className="cc-grid">
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Warranty Start Date <span className="req">*</span>
+//                         </label>
+//                         <input
+//                           className="cc-input"
+//                           type="date"
+//                           name="warrStartDate"
+//                           value={prod.warrStartDate}
+//                           onChange={onP}
+//                           required
+//                         />
+//                         <span className="cc-hint">Usually same as purchase date</span>
+//                       </div>
+//                       <div className="cc-field">
+//                         <label className="cc-label">
+//                           Warranty End Date <span className="req">*</span>
+//                         </label>
+//                         <input
+//                           className="cc-input"
+//                           type="date"
+//                           name="warrEndDate"
+//                           value={prod.warrEndDate}
+//                           onChange={onP}
+//                           required
+//                         />
+//                         <span className="cc-hint">
+//                           {prod.warrEndDate && prod.warrStartDate
+//                             ? `${Math.round((new Date(prod.warrEndDate) - new Date(prod.warrStartDate)) / (1000 * 60 * 60 * 24 * 30))} months warranty`
+//                             : "e.g. 1 year after purchase"}
+//                         </span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                 </div>
+                
+//                 <div className="cc-form-footer">
+//                   <div className="footer-note">
+//                     <span style={{color:"var(--danger)"}}>*</span> All fields required
+//                   </div>
+//                   <div className="footer-acts">
+//                     <button 
+//                       type="button" 
+//                       className="btn btn-ghost" 
+//                       onClick={() => setProd(EMPTY_PROD)} 
+//                       disabled={loading}
+//                     >
+//                       Clear
+//                     </button>
+//                     <button 
+//                       type="submit" 
+//                       className="btn btn-green" 
+//                       disabled={loading}
+//                     >
+//                       {loading ? "Registering…" : "Register Product →"}
+//                     </button>
+//                   </div>
+//                 </div>
+//               </form>
+//             </div>
+//           )}
+
+//         </div>
+//       </div>
+
+//       {/* Credentials Modal - Shows username as customerName */}
+//       {showCredentialsModal && (
+//         <div className="cc-modal-overlay" onClick={() => setShowCredentialsModal(false)}>
+//           <div className="cc-modal" onClick={e => e.stopPropagation()}>
+//             <div className="modal-icon blue">🔐</div>
+//             <div className="modal-title">Registration Successful!</div>
+//             <div className="modal-subtitle">Login credentials generated</div>
+            
+//             <div className="credential-item">
+//               <div className="cred-label">Username (Your Name)</div>
+//               <div className="cred-value">
+//                 <span>{userCredentials.username}</span>
+//                 <button 
+//                   className="copy-btn" 
+//                   onClick={() => copyToClipboard(userCredentials.username)}
+//                 >
+//                   Copy
+//                 </button>
+//               </div>
+//             </div>
+            
+//             <div className="credential-item">
+//               <div className="cred-label">Auto-Generated Password</div>
+//               <div className="cred-value">
+//                 <span style={{fontFamily:"monospace", fontSize:"14px"}}>
+//                   {userCredentials.password}
+//                 </span>
+//                 <button 
+//                   className="copy-btn" 
+//                   onClick={() => copyToClipboard(userCredentials.password)}
+//                 >
+//                   Copy
+//                 </button>
+//               </div>
+//             </div>
+            
+//             <div className="modal-note">
+//               ⚠️ Save these credentials now - they won't be shown again!
+//             </div>
+            
+//             <button 
+//               className="btn btn-blue" 
+//               onClick={() => setShowCredentialsModal(false)} 
+//               style={{width:"100%"}}
+//             >
+//               I've Saved the Credentials
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Ticket Modal */}
+//       {showTicketModal && (
+//         <div className="cc-modal-overlay" onClick={() => setShowTicketModal(false)}>
+//           <div className="cc-modal" onClick={e => e.stopPropagation()}>
+//             <div className="modal-icon green">🎫</div>
+//             <div className="modal-title">Product Registered!</div>
+//             <div className="modal-subtitle">{ticketInfo.message}</div>
+            
+//             <div className="ticket-display">
+//               <div className="ticket-icon">#</div>
+//               <div>
+//                 <div className="ticket-label">Ticket Number</div>
+//                 <div className="ticket-number">{ticketInfo.ticketNumber}</div>
+//                 <div className="ticket-note">Share this with the customer</div>
+//               </div>
+//             </div>
+            
+//             <div className="credential-item">
+//               <div className="cred-label">Ticket Number</div>
+//               <div className="cred-value">
+//                 <span style={{fontFamily:"monospace", fontSize:"14px"}}>
+//                   {ticketInfo.ticketNumber}
+//                 </span>
+//                 <button 
+//                   className="copy-btn" 
+//                   onClick={() => copyToClipboard(ticketInfo.ticketNumber)}
+//                 >
+//                   Copy
+//                 </button>
+//               </div>
+//             </div>
+            
+//             <div className="modal-note info">
+//               ℹ️ Customer needs this ticket number to search their product and raise complaints.
+//             </div>
+            
+//             <button 
+//               className="btn btn-green" 
+//               onClick={() => setShowTicketModal(false)} 
+//               style={{width:"100%"}}
+//             >
+//               Got It
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Toast Notification */}
+//       {toast && (
+//         <div className="cc-toast">
+//           <div className={`toast-dot ${
+//             toast.type === "customer" ? "blue" : 
+//             toast.type === "product" ? "green" : 
+//             toast.type === "error" ? "red" : "blue"
+//           }`}>
+//             {toast.type === "error" ? "✕" : "✓"}
+//           </div>
+//           <div>
+//             <div className="toast-ttl">
+//               {toast.type === "customer" && "Customer Registered!"}
+//               {toast.type === "product" && "Product Registered!"}
+//               {toast.type === "copy" && "Copied!"}
+//               {toast.type === "error" && "Error"}
+//             </div>
+//             <div className="toast-sub">{toast.message}</div>
+//           </div>
+//           <button className="toast-x" onClick={() => setToast(null)}>✕</button>
+//         </div>
+//       )}
+//     </>
+//   );
+// }
+
+import React, { useState } from "react";
+import axiosInstance from "../../Utils/axiosIntance";
+
 const HARDWARE_CATS = [
-  "Networking",
-  "Router",
-  "Network Switch",
-  "Firewall / UTM Device",
-  "Modem",
-  "Access Point / WiFi",
-  "Network Cable / Patch Panel",
-  // Servers & Storage
-  "Server",
-  "NAS / Storage Device",
-  "UPS / Power Supply",
-  "Rack / Cabinet",
-  // Computers
-  "Desktop Computer",
-  "Laptop",
-  "Workstation",
-  "Mini PC",
-  // Peripherals
-  "Monitor / Display",
-  "Keyboard / Mouse",
-  "Printer",
-  "Scanner",
-  "Projector",
-  "Barcode Scanner",
-  // Components
-  "Hard Disk / SSD",
-  "RAM / Memory",
-  "Graphics Card / GPU",
-  "Motherboard",
-  "Processor / CPU",
-  "Power Supply Unit (PSU)",
-  "Cooling Fan / Heatsink",
-  // Security
-  "CCTV Camera",
-  "DVR / NVR",
-  "Biometric Device",
-  "Access Control System",
-  // Communication
-  "IP Phone",
-  "EPABX / PBX System",
-  "Video Conferencing System",
-  // Other
+  "Networking", "Router", "Network Switch", "Firewall / UTM Device", "Modem",
+  "Access Point / WiFi", "Network Cable / Patch Panel",
+  "Server", "NAS / Storage Device", "UPS / Power Supply", "Rack / Cabinet",
+  "Desktop Computer", "Laptop", "Workstation", "Mini PC",
+  "Monitor / Display", "Keyboard / Mouse", "Printer", "Scanner", "Projector", "Barcode Scanner",
+  "Hard Disk / SSD", "RAM / Memory", "Graphics Card / GPU", "Motherboard",
+  "Processor / CPU", "Power Supply Unit (PSU)", "Cooling Fan / Heatsink",
+  "CCTV Camera", "DVR / NVR", "Biometric Device", "Access Control System",
+  "IP Phone", "EPABX / PBX System", "Video Conferencing System",
   "Other Hardware",
 ];
 
@@ -2725,7 +3579,9 @@ const EMPTY_CUST = {
   proCatogory: "",
   proSrNo: "",
   proModNum: "",
-  ticketNumber: "", // ✅ Ticket number field
+  ticketNumber: "",
+  invoiceNum: "",      // ✅ NEW
+  brandName: "",       // ✅ NEW
   warrStartDate: "",
   warrEndDate: "",
 };
@@ -2830,16 +3686,14 @@ const STYLES = `
 `;
 
 export default function CustomerCareHome() {
-  const [view, setView] = useState("customer");
-  const [toast, setToast] = useState(null);
+  const [view, setView]     = useState("customer");
+  const [toast, setToast]   = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]   = useState(null);
 
-  // State for forms - preserved when switching tabs
   const [cust, setCust] = useState(EMPTY_CUST);
   const [prod, setProd] = useState(EMPTY_PROD);
 
-  // Modal state
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [userCredentials, setUserCredentials] = useState({ username: "", password: "" });
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -2850,7 +3704,6 @@ export default function CustomerCareHome() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  // Update handlers
   const onC = (e) => setCust({ ...cust, [e.target.name]: e.target.value });
   const onP = (e) => setProd({ ...prod, [e.target.name]: e.target.value });
 
@@ -2864,28 +3717,21 @@ export default function CustomerCareHome() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
     try {
-      // Log the data being sent (for debugging)
-      console.log("Submitting customer data:", cust);
-      
       const response = await axiosInstance.post("/customerDetails/newcustomer", cust);
-      
       if (response.data.password) {
         setUserCredentials({
-          username: response.data.username || cust.customerName, // Using customerName as username
+          username: response.data.username || cust.customerName,
           password: response.data.password,
         });
         setShowCredentialsModal(true);
       }
-      
       show("customer", "Customer registered successfully!");
-      setCust(EMPTY_CUST); // Reset form after success
+      setCust(EMPTY_CUST);
     } catch (err) {
       const msg = err.response?.data?.message || "Customer registration failed";
       setError(msg);
       show("error", msg);
-      console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
@@ -2896,27 +3742,21 @@ export default function CustomerCareHome() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
     try {
-      console.log("Submitting product data:", prod);
-      
       const response = await axiosInstance.post("/auth/register", prod);
-      
       if (response.data.TicketNumber || response.data.ticketNumber) {
         setTicketInfo({
           ticketNumber: response.data.TicketNumber || response.data.ticketNumber,
-          message: response.data.message || "Product registered successfully!"
+          message: response.data.message || "Product registered successfully!",
         });
         setShowTicketModal(true);
       }
-      
       show("product", "Product registered successfully!");
       setProd(EMPTY_PROD);
     } catch (err) {
       const msg = err.response?.data?.message || "Product registration failed";
       setError(msg);
       show("error", msg);
-      console.error("Product registration error:", err);
     } finally {
       setLoading(false);
     }
@@ -2939,37 +3779,22 @@ export default function CustomerCareHome() {
 
           {/* Tab Navigation */}
           <div className="cc-tabs">
-            <button
-              className={`cc-tab ${view === "customer" ? "active" : ""}`}
-              onClick={() => { setView("customer"); setError(null); }}
-            >
+            <button className={`cc-tab ${view === "customer" ? "active" : ""}`} onClick={() => { setView("customer"); setError(null); }}>
               <span>👤</span> Customer Registration
             </button>
-            <button
-              className={`cc-tab ${view === "product" ? "active green" : ""}`}
-              onClick={() => { setView("product"); setError(null); }}
-            >
+            <button className={`cc-tab ${view === "product" ? "active green" : ""}`} onClick={() => { setView("product"); setError(null); }}>
               <span>🖥️</span> Product Registration
             </button>
           </div>
 
           {/* Error Display */}
           {error && (
-            <div style={{ 
-              background:"#fef3f2", 
-              border:"1px solid #fecdca", 
-              borderRadius:"var(--r-md)", 
-              padding:"14px 18px", 
-              marginBottom:"24px", 
-              color:"var(--danger)", 
-              fontSize:"13px", 
-              textAlign:"center" 
-            }}>
+            <div style={{ background:"#fef3f2", border:"1px solid #fecdca", borderRadius:"var(--r-md)", padding:"14px 18px", marginBottom:"24px", color:"var(--danger)", fontSize:"13px", textAlign:"center" }}>
               {error}
             </div>
           )}
 
-          {/* Customer Registration Form */}
+          {/* ── CUSTOMER REGISTRATION FORM ── */}
           {view === "customer" && (
             <div className="cc-card">
               <div className="cc-card-top">
@@ -2979,7 +3804,7 @@ export default function CustomerCareHome() {
                   <div className="ctp">Register a customer to grant access to warranty claims and support history.</div>
                 </div>
               </div>
-              
+
               <form onSubmit={submitCust}>
                 <div className="cc-form-body">
 
@@ -2994,46 +3819,17 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field full">
-                        <label className="cc-label">
-                          Full Name <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="customerName" 
-                          value={cust.customerName} 
-                          onChange={onC} 
-                          placeholder="e.g. Rahul Sharma" 
-                          required 
-                        />
+                        <label className="cc-label">Full Name <span className="req">*</span></label>
+                        <input className="cc-input" name="customerName" value={cust.customerName} onChange={onC} placeholder="e.g. Rahul Sharma" required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Email Address <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          type="email" 
-                          name="email" 
-                          value={cust.email} 
-                          onChange={onC} 
-                          placeholder="rahul@example.com" 
-                          required 
-                        />
+                        <label className="cc-label">Email Address <span className="req">*</span></label>
+                        <input className="cc-input" type="email" name="email" value={cust.email} onChange={onC} placeholder="rahul@example.com" required />
                         <span className="cc-hint">Used for communication</span>
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Mobile Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          type="tel" 
-                          name="mobileNum" 
-                          value={cust.mobileNum} 
-                          onChange={onC} 
-                          placeholder="9876543210" 
-                          required 
-                        />
+                        <label className="cc-label">Mobile Number <span className="req">*</span></label>
+                        <input className="cc-input" type="tel" name="mobileNum" value={cust.mobileNum} onChange={onC} placeholder="9876543210" required />
                       </div>
                     </div>
                   </div>
@@ -3051,67 +3847,40 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Product Name <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proName" 
-                          value={cust.proName} 
-                          onChange={onC} 
-                          placeholder="e.g. Cisco 24-Port Switch" 
-                          required 
-                        />
+                        <label className="cc-label">Product Name <span className="req">*</span></label>
+                        <input className="cc-input" name="proName" value={cust.proName} onChange={onC} placeholder="e.g. Cisco 24-Port Switch" required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Product Category <span className="req">*</span>
-                        </label>
-                        <select 
-                          className="cc-select" 
-                          name="proCatogory" 
-                          value={cust.proCatogory} 
-                          onChange={onC} 
-                          required
-                        >
+                        <label className="cc-label">Product Category <span className="req">*</span></label>
+                        <select className="cc-select" name="proCatogory" value={cust.proCatogory} onChange={onC} required>
                           <option value="">Select hardware category</option>
-                          {HARDWARE_CATS.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
+                          {HARDWARE_CATS.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
+                      {/* ── NEW: Brand Name ── */}
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Serial Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proSrNo" 
-                          value={cust.proSrNo} 
-                          onChange={onC} 
-                          placeholder="e.g. SN2024XXXXXX" 
-                          required 
-                        />
+                        <label className="cc-label">Brand Name <span className="req">*</span></label>
+                        <input className="cc-input" name="brandName" value={cust.brandName} onChange={onC} placeholder="e.g. Cisco, HP, Dell" required />
+                      </div>
+                      {/* ── NEW: Invoice Number ── */}
+                      <div className="cc-field">
+                        <label className="cc-label">Invoice Number <span className="req">*</span></label>
+                        <input className="cc-input" name="invoiceNum" value={cust.invoiceNum} onChange={onC} placeholder="e.g. INV-2024-001" required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Model Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proModNum" 
-                          value={cust.proModNum} 
-                          onChange={onC} 
-                          placeholder="e.g. WS-C2960X-24TS" 
-                          required 
-                        />
+                        <label className="cc-label">Serial Number <span className="req">*</span></label>
+                        <input className="cc-input" name="proSrNo" value={cust.proSrNo} onChange={onC} placeholder="e.g. SN2024XXXXXX" required />
+                      </div>
+                      <div className="cc-field">
+                        <label className="cc-label">Model Number <span className="req">*</span></label>
+                        <input className="cc-input" name="proModNum" value={cust.proModNum} onChange={onC} placeholder="e.g. WS-C2960X-24TS" required />
                       </div>
                     </div>
                   </div>
 
                   <div className="cc-divider" />
 
-                  {/* Ticket Number - THIS IS THE KEY FIELD */}
+                  {/* Ticket Number */}
                   <div>
                     <div className="cc-sec-head">
                       <div className="sec-ico blue">🎫</div>
@@ -3122,21 +3891,17 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field full">
-                        <label className="cc-label">
-                          Ticket Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="ticketNumber" 
-                          value={cust.ticketNumber} 
-                          onChange={onC} 
-                          placeholder="e.g. TKT-20260214-25671" 
-                          required 
-                          style={{fontFamily:"monospace", fontSize:"15px"}} 
+                        <label className="cc-label">Ticket Number <span className="req">*</span></label>
+                        <input
+                          className="cc-input"
+                          name="ticketNumber"
+                          value={cust.ticketNumber}
+                          onChange={onC}
+                          placeholder="e.g. TKT-20260214-25671"
+                          required
+                          style={{ fontFamily: "monospace", fontSize: "15px" }}
                         />
-                        <span className="cc-hint">
-                          ℹ️ This ticket number will be saved to database and used to link customer to their warranty
-                        </span>
+                        <span className="cc-hint">ℹ️ This ticket number links the customer to their warranty record</span>
                       </div>
                     </div>
                   </div>
@@ -3154,30 +3919,12 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Warranty Start Date <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          type="date" 
-                          name="warrStartDate" 
-                          value={cust.warrStartDate} 
-                          onChange={onC} 
-                          required 
-                        />
+                        <label className="cc-label">Warranty Start Date <span className="req">*</span></label>
+                        <input className="cc-input" type="date" name="warrStartDate" value={cust.warrStartDate} onChange={onC} required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Warranty End Date <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          type="date" 
-                          name="warrEndDate" 
-                          value={cust.warrEndDate} 
-                          onChange={onC} 
-                          required 
-                        />
+                        <label className="cc-label">Warranty End Date <span className="req">*</span></label>
+                        <input className="cc-input" type="date" name="warrEndDate" value={cust.warrEndDate} onChange={onC} required />
                         <span className="cc-hint">
                           {cust.warrEndDate && cust.warrStartDate
                             ? `${Math.round((new Date(cust.warrEndDate) - new Date(cust.warrStartDate)) / (1000*60*60*24*30))} months warranty`
@@ -3188,25 +3935,12 @@ export default function CustomerCareHome() {
                   </div>
 
                 </div>
-                
+
                 <div className="cc-form-footer">
-                  <div className="footer-note">
-                    <span style={{color:"var(--danger)"}}>*</span> Required fields
-                  </div>
+                  <div className="footer-note"><span style={{color:"var(--danger)"}}>*</span> Required fields</div>
                   <div className="footer-acts">
-                    <button 
-                      type="button" 
-                      className="btn btn-ghost" 
-                      onClick={() => setCust(EMPTY_CUST)} 
-                      disabled={loading}
-                    >
-                      Clear
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="btn btn-blue" 
-                      disabled={loading}
-                    >
+                    <button type="button" className="btn btn-ghost" onClick={() => setCust(EMPTY_CUST)} disabled={loading}>Clear</button>
+                    <button type="submit" className="btn btn-blue" disabled={loading}>
                       {loading ? "Registering…" : "Register Customer →"}
                     </button>
                   </div>
@@ -3215,7 +3949,7 @@ export default function CustomerCareHome() {
             </div>
           )}
 
-          {/* Product Registration Form */}
+          {/* ── PRODUCT REGISTRATION FORM ── */}
           {view === "product" && (
             <div className="cc-card">
               <div className="cc-card-top">
@@ -3225,7 +3959,7 @@ export default function CustomerCareHome() {
                   <div className="ctp">Register hardware to activate warranty and service request tracking.</div>
                 </div>
               </div>
-              
+
               <form onSubmit={submitProd}>
                 <div className="cc-form-body">
 
@@ -3240,73 +3974,27 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Product Name <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proName" 
-                          value={prod.proName} 
-                          onChange={onP} 
-                          placeholder="e.g. Cisco 24-Port Switch" 
-                          required 
-                        />
+                        <label className="cc-label">Product Name <span className="req">*</span></label>
+                        <input className="cc-input" name="proName" value={prod.proName} onChange={onP} placeholder="e.g. Cisco 24-Port Switch" required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Hardware Category <span className="req">*</span>
-                        </label>
-                        <select 
-                          className="cc-select" 
-                          name="proCatogory" 
-                          value={prod.proCatogory} 
-                          onChange={onP} 
-                          required
-                        >
+                        <label className="cc-label">Hardware Category <span className="req">*</span></label>
+                        <select className="cc-select" name="proCatogory" value={prod.proCatogory} onChange={onP} required>
                           <option value="">Select hardware category</option>
-                          {HARDWARE_CATS.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
+                          {HARDWARE_CATS.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Brand Name <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="brandName" 
-                          value={prod.brandName} 
-                          onChange={onP} 
-                          placeholder="e.g. Cisco, HP, Dell" 
-                          required 
-                        />
+                        <label className="cc-label">Brand Name <span className="req">*</span></label>
+                        <input className="cc-input" name="brandName" value={prod.brandName} onChange={onP} placeholder="e.g. Cisco, HP, Dell" required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Model Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proModNum" 
-                          value={prod.proModNum} 
-                          onChange={onP} 
-                          placeholder="e.g. WS-C2960X-24TS" 
-                          required 
-                        />
+                        <label className="cc-label">Model Number <span className="req">*</span></label>
+                        <input className="cc-input" name="proModNum" value={prod.proModNum} onChange={onP} placeholder="e.g. WS-C2960X-24TS" required />
                       </div>
                       <div className="cc-field full">
-                        <label className="cc-label">
-                          Serial Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="proSrNo" 
-                          value={prod.proSrNo} 
-                          onChange={onP} 
-                          placeholder="e.g. FTX2024XXXXXXXX" 
-                          required 
-                        />
+                        <label className="cc-label">Serial Number <span className="req">*</span></label>
+                        <input className="cc-input" name="proSrNo" value={prod.proSrNo} onChange={onP} placeholder="e.g. FTX2024XXXXXXXX" required />
                         <span className="cc-hint">Found on the device label or packaging</span>
                       </div>
                     </div>
@@ -3325,30 +4013,12 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Purchase Date <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          type="date" 
-                          name="purDate" 
-                          value={prod.purDate} 
-                          onChange={onP} 
-                          required 
-                        />
+                        <label className="cc-label">Purchase Date <span className="req">*</span></label>
+                        <input className="cc-input" type="date" name="purDate" value={prod.purDate} onChange={onP} required />
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Invoice Number <span className="req">*</span>
-                        </label>
-                        <input 
-                          className="cc-input" 
-                          name="invoiceNum" 
-                          value={prod.invoiceNum} 
-                          onChange={onP} 
-                          placeholder="INV-2024-001" 
-                          required 
-                        />
+                        <label className="cc-label">Invoice Number <span className="req">*</span></label>
+                        <input className="cc-input" name="invoiceNum" value={prod.invoiceNum} onChange={onP} placeholder="INV-2024-001" required />
                       </div>
                     </div>
                   </div>
@@ -3366,34 +4036,16 @@ export default function CustomerCareHome() {
                     </div>
                     <div className="cc-grid">
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Warranty Start Date <span className="req">*</span>
-                        </label>
-                        <input
-                          className="cc-input"
-                          type="date"
-                          name="warrStartDate"
-                          value={prod.warrStartDate}
-                          onChange={onP}
-                          required
-                        />
+                        <label className="cc-label">Warranty Start Date <span className="req">*</span></label>
+                        <input className="cc-input" type="date" name="warrStartDate" value={prod.warrStartDate} onChange={onP} required />
                         <span className="cc-hint">Usually same as purchase date</span>
                       </div>
                       <div className="cc-field">
-                        <label className="cc-label">
-                          Warranty End Date <span className="req">*</span>
-                        </label>
-                        <input
-                          className="cc-input"
-                          type="date"
-                          name="warrEndDate"
-                          value={prod.warrEndDate}
-                          onChange={onP}
-                          required
-                        />
+                        <label className="cc-label">Warranty End Date <span className="req">*</span></label>
+                        <input className="cc-input" type="date" name="warrEndDate" value={prod.warrEndDate} onChange={onP} required />
                         <span className="cc-hint">
                           {prod.warrEndDate && prod.warrStartDate
-                            ? `${Math.round((new Date(prod.warrEndDate) - new Date(prod.warrStartDate)) / (1000 * 60 * 60 * 24 * 30))} months warranty`
+                            ? `${Math.round((new Date(prod.warrEndDate) - new Date(prod.warrStartDate)) / (1000*60*60*24*30))} months warranty`
                             : "e.g. 1 year after purchase"}
                         </span>
                       </div>
@@ -3401,25 +4053,12 @@ export default function CustomerCareHome() {
                   </div>
 
                 </div>
-                
+
                 <div className="cc-form-footer">
-                  <div className="footer-note">
-                    <span style={{color:"var(--danger)"}}>*</span> All fields required
-                  </div>
+                  <div className="footer-note"><span style={{color:"var(--danger)"}}>*</span> All fields required</div>
                   <div className="footer-acts">
-                    <button 
-                      type="button" 
-                      className="btn btn-ghost" 
-                      onClick={() => setProd(EMPTY_PROD)} 
-                      disabled={loading}
-                    >
-                      Clear
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="btn btn-green" 
-                      disabled={loading}
-                    >
+                    <button type="button" className="btn btn-ghost" onClick={() => setProd(EMPTY_PROD)} disabled={loading}>Clear</button>
+                    <button type="submit" className="btn btn-green" disabled={loading}>
                       {loading ? "Registering…" : "Register Product →"}
                     </button>
                   </div>
@@ -3431,51 +4070,29 @@ export default function CustomerCareHome() {
         </div>
       </div>
 
-      {/* Credentials Modal - Shows username as customerName */}
+      {/* Credentials Modal */}
       {showCredentialsModal && (
         <div className="cc-modal-overlay" onClick={() => setShowCredentialsModal(false)}>
           <div className="cc-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-icon blue">🔐</div>
             <div className="modal-title">Registration Successful!</div>
             <div className="modal-subtitle">Login credentials generated</div>
-            
             <div className="credential-item">
               <div className="cred-label">Username (Your Name)</div>
               <div className="cred-value">
                 <span>{userCredentials.username}</span>
-                <button 
-                  className="copy-btn" 
-                  onClick={() => copyToClipboard(userCredentials.username)}
-                >
-                  Copy
-                </button>
+                <button className="copy-btn" onClick={() => copyToClipboard(userCredentials.username)}>Copy</button>
               </div>
             </div>
-            
             <div className="credential-item">
               <div className="cred-label">Auto-Generated Password</div>
               <div className="cred-value">
-                <span style={{fontFamily:"monospace", fontSize:"14px"}}>
-                  {userCredentials.password}
-                </span>
-                <button 
-                  className="copy-btn" 
-                  onClick={() => copyToClipboard(userCredentials.password)}
-                >
-                  Copy
-                </button>
+                <span style={{ fontFamily:"monospace", fontSize:"14px" }}>{userCredentials.password}</span>
+                <button className="copy-btn" onClick={() => copyToClipboard(userCredentials.password)}>Copy</button>
               </div>
             </div>
-            
-            <div className="modal-note">
-              ⚠️ Save these credentials now - they won't be shown again!
-            </div>
-            
-            <button 
-              className="btn btn-blue" 
-              onClick={() => setShowCredentialsModal(false)} 
-              style={{width:"100%"}}
-            >
+            <div className="modal-note">⚠️ Save these credentials now — they won't be shown again!</div>
+            <button className="btn btn-blue" onClick={() => setShowCredentialsModal(false)} style={{ width:"100%" }}>
               I've Saved the Credentials
             </button>
           </div>
@@ -3489,7 +4106,6 @@ export default function CustomerCareHome() {
             <div className="modal-icon green">🎫</div>
             <div className="modal-title">Product Registered!</div>
             <div className="modal-subtitle">{ticketInfo.message}</div>
-            
             <div className="ticket-display">
               <div className="ticket-icon">#</div>
               <div>
@@ -3498,53 +4114,31 @@ export default function CustomerCareHome() {
                 <div className="ticket-note">Share this with the customer</div>
               </div>
             </div>
-            
             <div className="credential-item">
               <div className="cred-label">Ticket Number</div>
               <div className="cred-value">
-                <span style={{fontFamily:"monospace", fontSize:"14px"}}>
-                  {ticketInfo.ticketNumber}
-                </span>
-                <button 
-                  className="copy-btn" 
-                  onClick={() => copyToClipboard(ticketInfo.ticketNumber)}
-                >
-                  Copy
-                </button>
+                <span style={{ fontFamily:"monospace", fontSize:"14px" }}>{ticketInfo.ticketNumber}</span>
+                <button className="copy-btn" onClick={() => copyToClipboard(ticketInfo.ticketNumber)}>Copy</button>
               </div>
             </div>
-            
-            <div className="modal-note info">
-              ℹ️ Customer needs this ticket number to search their product and raise complaints.
-            </div>
-            
-            <button 
-              className="btn btn-green" 
-              onClick={() => setShowTicketModal(false)} 
-              style={{width:"100%"}}
-            >
-              Got It
-            </button>
+            <div className="modal-note info">ℹ️ Customer needs this ticket number to search their product and raise complaints.</div>
+            <button className="btn btn-green" onClick={() => setShowTicketModal(false)} style={{ width:"100%" }}>Got It</button>
           </div>
         </div>
       )}
 
-      {/* Toast Notification */}
+      {/* Toast */}
       {toast && (
         <div className="cc-toast">
-          <div className={`toast-dot ${
-            toast.type === "customer" ? "blue" : 
-            toast.type === "product" ? "green" : 
-            toast.type === "error" ? "red" : "blue"
-          }`}>
+          <div className={`toast-dot ${toast.type === "customer" ? "blue" : toast.type === "product" ? "green" : toast.type === "error" ? "red" : "blue"}`}>
             {toast.type === "error" ? "✕" : "✓"}
           </div>
           <div>
             <div className="toast-ttl">
               {toast.type === "customer" && "Customer Registered!"}
-              {toast.type === "product" && "Product Registered!"}
-              {toast.type === "copy" && "Copied!"}
-              {toast.type === "error" && "Error"}
+              {toast.type === "product"  && "Product Registered!"}
+              {toast.type === "copy"     && "Copied!"}
+              {toast.type === "error"    && "Error"}
             </div>
             <div className="toast-sub">{toast.message}</div>
           </div>

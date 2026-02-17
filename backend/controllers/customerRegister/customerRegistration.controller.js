@@ -347,6 +347,10 @@ export const registerCustomer = async (req, res) => {
       warrStartDate,
       warrEndDate,
       ticketNumber,
+      // ── NEW FIELDS ───────────────────────────────────────────────────────
+      invoiceNum,
+      brandName,
+      // ────────────────────────────────────────────────────────────────────
     } = body;
 
     if (!customerName || !email || !mobileNum) {
@@ -364,8 +368,8 @@ export const registerCustomer = async (req, res) => {
     }
 
     // ── Passwords ───────────────────────────────────────────────────────
-    const plainPassword  = generateSecurePassword();              // "aB3#kP9z" — readable
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);  // "$2b$10$..." — for login
+    const plainPassword  = generateSecurePassword();
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     // ── Customer collection ─────────────────────────────────────────────
     const customer = new Customer({
@@ -379,18 +383,21 @@ export const registerCustomer = async (req, res) => {
       warrStartDate: new Date(warrStartDate),
       warrEndDate:   new Date(warrEndDate),
       ticketNumber,
-      password:      hashedPassword,  // ✅ bcrypt — login uses bcrypt.compare → untouched
-      plainPassword: plainPassword,   // ✅ plain  — CC team reads this in history panel
+      // ── NEW FIELDS ─────────────────────────────────────────────────────
+      invoiceNum:    invoiceNum    || "",
+      brandName:     brandName     || "",
+      // ───────────────────────────────────────────────────────────────────
+      password:      hashedPassword,
+      plainPassword: plainPassword,
     });
 
     await customer.save();
 
     // ── Admin collection ────────────────────────────────────────────────
     const newAdminUser = new Admin({
-      username:      customerName,
-      password:      hashedPassword,  // ✅ bcrypt — all existing logins still work
-      // plainPassword: plainPassword,   // ✅ plain  — CC team readable
-      role:          "user",
+      username: customerName,
+      password: hashedPassword,
+      role:     "user",
     });
 
     await newAdminUser.save();
@@ -400,7 +407,7 @@ export const registerCustomer = async (req, res) => {
       success:  true,
       message:  "Customer registered successfully",
       username: customerName,
-      password: plainPassword,  // plain sent to frontend modal
+      password: plainPassword,
     });
 
   } catch (error) {
