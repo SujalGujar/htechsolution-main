@@ -15,6 +15,7 @@ const complainDataSchema = new mongoose.Schema({
   serialNumber:{
     type:String,
     required:true
+    
   },
   complaintTitle:{
     type:String,
@@ -29,9 +30,15 @@ const complainDataSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
+  status:{
+    type:String,
+    enum:["open","in progress","resolved"],
+    default:"open"
+  }
+},{timestamps:true})
 
-})
+
 
 const complainData = mongoose.model("complainData",complainDataSchema)
 
-export default complainData
+export default complainData;
