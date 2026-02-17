@@ -14,5 +14,5 @@ router.get('/products',verifyToken,authorizeRoles("admin","manager"),productHist
 router.post("/newcustomer",verifyToken,authorizeRoles("admin","manager"),registerCustomer);
 router.get("/customer", verifyToken,authorizeRoles("admin","manager"),customerDetails);
 // router.get("/complains",verifyToken,authorizeRoles("admin","manager"), complains);
-router.get("/complains", verifyToken, authorizeRoles("admin", "manager"), complains);
+router.get("/cusComplains", verifyToken, authorizeRoles("admin", "manager","user"), complains);
 export default router;

@@ -2054,7 +2054,8 @@ const CustomerCareCustomerHistory = () => {
         item.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.invoiceNum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.ticketNumber && item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase())) // Added ticket number search
+        (item.ticketNumber && item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+         // Added ticket number search
       );
       setFilteredData(filtered);
       setCurrentPage(1);

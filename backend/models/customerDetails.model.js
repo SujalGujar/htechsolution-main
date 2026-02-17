@@ -77,7 +77,7 @@ const customerDetailsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    ticketNumber: {  // ✅ Ticket number field
+    ticketNumber: {  
         type: String,
         required: true,
         unique: true

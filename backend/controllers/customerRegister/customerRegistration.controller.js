@@ -240,9 +240,7 @@ export const registerCustomer = async(req, res) => {
     } = body;
 
     // Validate all required fields including ticketNumber
-    if (!customerName || !email || !mobileNum || !proName || 
-        !proCatogory || !proSrNo || !proModNum || 
-        !warrStartDate || !warrEndDate || !ticketNumber) {
+    if (!customerName || !email || !mobileNum ) {
       return res.status(400).json({
         message: "All fields are required"
       });
@@ -257,12 +255,12 @@ export const registerCustomer = async(req, res) => {
     }
 
     // Check if ticket number already exists
-    const existingTicket = await Customer.findOne({ ticketNumber });
-    if (existingTicket) {
-      return res.status(400).json({
-        message: "Ticket number already exists"
-      });
-    }
+    // const existingTicket = await Customer.findOne({ ticketNumber });
+    // if (existingTicket) {
+    //   return res.status(400).json({
+    //     message: "Ticket number already exists"
+    //   });
+    // }
 
     // Check if admin user already exists with this customerName
     const existingAdmin = await Admin.findOne({ username: customerName });
@@ -313,12 +311,12 @@ export const registerCustomer = async(req, res) => {
     console.error("Registration error:", error);
     
     // Handle specific MongoDB errors
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({ 
-        message: `${field} already exists. Please use a different ${field}.`
-      });
-    }
+    // if (error.code === 11000) {
+    //   const field = Object.keys(error.keyPattern)[0];
+    //   return res.status(400).json({ 
+    //     message: `${field} already exists. Please use a different ${field}.`
+    //   });
+    // }
     
     return res.status(500).json({ 
       message: error.message || "Internal server error"

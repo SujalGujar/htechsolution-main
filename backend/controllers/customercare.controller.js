@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import Customer from "../models/customerDetails.model.js";
 import Product from "../models/productDetails.model.js";
-// import complainData from "../models/complainsData.model.js";
+import complainData from "../models/complainsData.model.js";
 
 dotenv.config();
 
