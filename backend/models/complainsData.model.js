@@ -35,10 +35,10 @@ const complainDataSchema = new mongoose.Schema({
     enum:["open","in progress","resolved"],
     default:"open"
   }
-},{timestamps:true})
+},{timestamps:true});
 
 
 
-const complainData = mongoose.model("complainData",complainDataSchema)
+const complainData = mongoose.model("complainData",complainDataSchema);
 
 export default complainData;
