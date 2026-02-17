@@ -595,92 +595,92 @@ const StatusBadge = ({ status }) => {
 };
 
 // ─── Complaint Card ────────────────────────────────────────────────────────
-// const ComplaintCard = ({ item }) => {
-//   const [expanded, setExpanded] = useState(false);
+const ComplaintCard = ({ item }) => {
+  const [expanded, setExpanded] = useState(false);
 
-//   return (
-//     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-//       <div className="p-4 sm:p-5">
-//         <div className="flex items-start justify-between gap-3">
-//           <div className="flex items-start gap-3 flex-1 min-w-0">
-//             <div className="bg-orange-50 rounded-xl p-2.5 flex-shrink-0 mt-0.5">
-//               <MessageSquare className="w-4 h-4 text-orange-500" />
-//             </div>
-//             <div className="flex-1 min-w-0">
-//               <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-snug truncate">
-//                 {item.subject || item.title || item.complaintTitle || "Complaint"}
-//               </h3>
-//               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
-//                 {(item.ticketNumber || item.ticket) && (
-//                   <span className="flex items-center gap-1 text-xs text-gray-500">
-//                     <TicketCheck className="w-3.5 h-3.5" />
-//                     {item.ticketNumber || item.ticket}
-//                   </span>
-//                 )}
-//                 {(item.createdAt || item.date) && (
-//                   <span className="flex items-center gap-1 text-xs text-gray-400">
-//                     <Calendar className="w-3.5 h-3.5" />
-//                     {new Date(item.createdAt || item.date).toLocaleDateString("en-IN", {
-//                       day: "numeric", month: "short", year: "numeric",
-//                     })}
-//                   </span>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//           {/* ✅ Reads item.status directly from DB — no extra API call needed */}
-//           <StatusBadge status={item.status} />
-//         </div>
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="bg-orange-50 rounded-xl p-2.5 flex-shrink-0 mt-0.5">
+              <MessageSquare className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-snug truncate">
+                {item.subject || item.title || item.complaintTitle || "Complaint"}
+              </h3>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
+                {(item.ticketNumber || item.ticket) && (
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <TicketCheck className="w-3.5 h-3.5" />
+                    {item.ticketNumber || item.ticket}
+                  </span>
+                )}
+                {(item.createdAt || item.date) && (
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {new Date(item.createdAt || item.date).toLocaleDateString("en-IN", {
+                      day: "numeric", month: "short", year: "numeric",
+                    })}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          {/* ✅ Reads item.status directly from DB — no extra API call needed */}
+          <StatusBadge status={item.status} />
+        </div>
 
-//         {(item.proName || item.productName || item.proSrNo || item.serialNumber) && (
-//           <div className="mt-3 flex flex-wrap gap-2">
-//             {(item.proName || item.productName) && (
-//               <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg text-xs text-gray-600">
-//                 <Package className="w-3.5 h-3.5 text-gray-400" />
-//                 {item.proName || item.productName}
-//               </span>
-//             )}
-//             {(item.proSrNo || item.serialNumber) && (
-//               <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg text-xs text-gray-600 font-mono">
-//                 <Hash className="w-3.5 h-3.5 text-gray-400" />
-//                 {item.proSrNo || item.serialNumber}
-//               </span>
-//             )}
-//           </div>
-//         )}
-//       </div>
+        {(item.proName || item.productName || item.proSrNo || item.serialNumber) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(item.proName || item.productName) && (
+              <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg text-xs text-gray-600">
+                <Package className="w-3.5 h-3.5 text-gray-400" />
+                {item.proName || item.productName}
+              </span>
+            )}
+            {(item.proSrNo || item.serialNumber) && (
+              <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg text-xs text-gray-600 font-mono">
+                <Hash className="w-3.5 h-3.5 text-gray-400" />
+                {item.proSrNo || item.serialNumber}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
-//       {(item.description || item.message || item.complaint) && (
-//         <>
-//           <button
-//             onClick={() => setExpanded(v => !v)}
-//             className="w-full flex items-center justify-between px-5 py-2.5 bg-gray-50 border-t border-gray-100 text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors"
-//           >
-//             <span>{expanded ? "Hide details" : "View details"}</span>
-//             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-//           </button>
+      {(item.description || item.message || item.complaint) && (
+        <>
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="w-full flex items-center justify-between px-5 py-2.5 bg-gray-50 border-t border-gray-100 text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <span>{expanded ? "Hide details" : "View details"}</span>
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
 
-//           {expanded && (
-//             <div className="px-5 py-4 border-t border-gray-100 bg-white">
-//               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Description</p>
-//               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                 {item.description || item.message || item.complaint}
-//               </p>
-//               {(item.response || item.adminResponse || item.reply) && (
-//                 <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-3">
-//                   <p className="text-xs font-semibold text-green-700 mb-1">Support Response</p>
-//                   <p className="text-sm text-green-800 leading-relaxed">
-//                     {item.response || item.adminResponse || item.reply}
-//                   </p>
-//                 </div>
-//               )}
-//             </div>
-//           )}
-//         </>
-//       )}
-//     </div>
-//   );
-// };
+          {expanded && (
+            <div className="px-5 py-4 border-t border-gray-100 bg-white">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Description</p>
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {item.description || item.message || item.complaint}
+              </p>
+              {(item.response || item.adminResponse || item.reply) && (
+                <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-green-700 mb-1">Support Response</p>
+                  <p className="text-sm text-green-800 leading-relaxed">
+                    {item.response || item.adminResponse || item.reply}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
 // ─── Raise Complaint Modal ─────────────────────────────────────────────────
 const RaiseModal = ({ onClose, onSuccess }) => {
