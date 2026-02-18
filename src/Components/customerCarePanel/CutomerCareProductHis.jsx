@@ -2875,13 +2875,13 @@ import {
 import axiosInstance from "../../Utils/axiosIntance";
 import { Skeleton } from "../ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-// import {
-  // Tooltip,
-  // TooltipContent,
+import {
+  Tooltip,
+  TooltipContent,
   // TooltipDescription,
-  // TooltipProvider,
-  // TooltipTrigger,
-// } from "../ui/tooltip";
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const CustomerCareProductHistory = () => {
   const [products, setProducts] = useState([]);

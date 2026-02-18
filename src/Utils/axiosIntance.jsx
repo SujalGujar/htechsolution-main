@@ -84,12 +84,13 @@ import axios from "axios";
 
 // ✅ Create axios instance
 const axiosInstance = axios.create({
-  baseURL: "/api",
-  timeout: 10000,
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  timeout: 100000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
 
 // ===============================
 // ✅ REQUEST INTERCEPTOR

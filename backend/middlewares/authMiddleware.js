@@ -100,6 +100,8 @@ import jwt from "jsonwebtoken";
 
 const verifyToken = (req, res, next) => {
   // ✅ Read Authorization header (works lowercase and capitalized)
+    console.log("📦 req.body in verifyToken:", req.body); // 👈 check body here
+
   const authHeader = req.headers.authorization;
 
   // ✅ Check: header must exist AND start with "bearer "

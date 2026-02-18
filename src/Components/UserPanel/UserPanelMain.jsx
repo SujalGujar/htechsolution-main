@@ -86,7 +86,7 @@ const UserPanelMain = () => {
   const navigate         = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ── Auth guard ─────────────────────────────────────────────────────────
+  
   if (!user || (user.role !== "user" && user.role !== "manager")) {
     return <Navigate to="/login" replace />;
   }
@@ -95,12 +95,7 @@ const UserPanelMain = () => {
     return <Navigate to="home" replace />;
   }
 
-  // ── How to show user name ──────────────────────────────────────────────
-  // We check multiple field names because different backends use different keys.
-  // user.username → if your backend returns { username: "Rahul" }
-  // user.name     → if your backend returns { name: "Rahul" }
-  // user.customerName → if your backend returns { customerName: "Rahul" }
-  // user.email    → fallback if no name field exists
+ 
   const displayName =
     user.username     ||   // most common
     user.name         ||   // alternative
@@ -108,17 +103,12 @@ const UserPanelMain = () => {
     user.email        ||   // fallback to email
     "User";                // last resort default
 
-  // ── First letter avatar ────────────────────────────────────────────────
-  // Takes first character of name to show in avatar circle
+  
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   const isManager = user.role === "manager";
 
-  // ── Logout handler ─────────────────────────────────────────────────────
-  // How it works:
-  // 1. If your AuthContext has a logout() function → call it (it clears token + user state)
-  // 2. If no logout() in context → manually clear token from localStorage
-  // 3. Navigate to login page either way
+  
   const handleLogout = () => {
     if (typeof logout === "function") {
       // Your AuthContext has logout() → use it
@@ -131,13 +121,13 @@ const UserPanelMain = () => {
     navigate("/login", { replace: true });
   };
 
-  // ── Nav items ──────────────────────────────────────────────────────────
+
   const navItems = [
     { to: "home",      label: "Home",       icon: Home          },
     { to: "complains", label: "Complaints", icon: MessageSquare },
   ];
 
-  // ── Sidebar content (reused for mobile + desktop) ──────────────────────
+  
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
 

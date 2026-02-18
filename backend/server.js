@@ -427,7 +427,10 @@ const PORT = 5000;
 import dns from "node:dns/promises"; 
 dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
-
+app.use(cors({
+  origin: "https://htechsolution.in", // your real domain
+  credentials: true
+}));
 const startServer = async () => {
   try {
     console.log("🔌 Connecting to database...");
@@ -436,7 +439,7 @@ const startServer = async () => {
                         
     app.listen(PORT, () => {
       console.log(` Server running on http://localhost:${PORT}`);
-      app.use(cors({ origin: 'https://htechsolution-main-d7ku.vercel.app' }))
+      // app.use(cors({ origin: 'https://htechsolution-main-d7ku.vercel.app' }))
     });               
   } catch (error) {
     console.error(" Failed to start server:", error.message);
