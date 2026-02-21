@@ -89,6 +89,7 @@ const customerDetails = async(req, res) => {
     try{
         const{id} = req.params;
         const{status} =req.body;
+        
         if(!status || !["pending", "processing", "completed"].includes(status)){
             return res.status(400).json({message:"Invalid status value"})
         }

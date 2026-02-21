@@ -1,0 +1,15 @@
+.env
+nodemodules/
+dist/
+build/
+logs/
+*.log
+coverage/
+.DS_Store
+*.pem
+*.key
+*.crt
+
+# Ignore IDE specific files
+.vscode/
+.idea/
