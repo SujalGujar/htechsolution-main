@@ -1,9 +1,9 @@
-import {removeFieldFromConfig} from "../../services/categoryconfig.service.js";
+import { removeFieldFromConfig } from "../../services/catogoryConfigServices/removeFieldFromConfig.service.js";
 export const removeField = async (req, res) => {
   try {
     const config = await removeFieldFromConfig(
-      req.params.categoryId,
-      req.params.fieldKey  // /api/category-config/:categoryId/field/:fieldKey
+      req.params.categoryId, 
+      req.params.fieldKey 
     );
     res.status(200).json({ success: true, message: "Field removed", data: config });
   } catch (error) {

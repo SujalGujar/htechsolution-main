@@ -67,42 +67,42 @@
 // controllers/customerRegister/customerSearchProduct.controller.js
 
 // import Product from "../../models/productDetails.model.js";
-import Customer from "../../models/customerDetails.model.js";
-const customerSearchProducts = async (req, res) => {
-  console.log("REQ BODY:", req.body);
+// import Customer from "../../models/customerDetails.model.js";
+// const customerSearchProducts = async (req, res) => {
+//   console.log("REQ BODY:", req.body);
 
-  try {
+//   try {
 
-    // ✅ CHANGE 1 — was req.params, now req.body
-    // WHY: Your route is POST → data comes in body, not URL
-    // router.post("/search") → frontend sends { ticketNumber } in body
-    // req.params is for GET /search/:ticketNumber (in the URL)
-    // req.body   is for POST /search (hidden inside request)
-    const { ticketNumber } = req.body; // ← THIS WAS req.params BEFORE (THE BUG)
+//     // ✅ CHANGE 1 — was req.params, now req.body
+//     // WHY: Your route is POST → data comes in body, not URL
+//     // router.post("/search") → frontend sends { ticketNumber } in body
+//     // req.params is for GET /search/:ticketNumber (in the URL)
+//     // req.body   is for POST /search (hidden inside request)
+//     const { ticketNumber } = req.body; // ← THIS WAS req.params BEFORE (THE BUG)
 
-    if (!ticketNumber) {
-      return res.status(400).json({ message: "Please provide a ticket number" });
-    }
+//     if (!ticketNumber) {
+//       return res.status(400).json({ message: "Please provide a ticket number" });
+//     }
 
-    // ✅ CHANGE 2 — TicketNumber (capital T capital N)
-    // WHY: Your schema defines it as "TicketNumber" not "ticketNumber"
-    // MongoDB is case sensitive — wrong case = never finds anything
-    const findProduct = await Customer.findOne({ ticketNumber: ticketNumber });
+//     // ✅ CHANGE 2 — TicketNumber (capital T capital N)
+//     // WHY: Your schema defines it as "TicketNumber" not "ticketNumber"
+//     // MongoDB is case sensitive — wrong case = never finds anything
+//     const findProduct = await Customer.findOne({ ticketNumber: ticketNumber });
 
-    if (!findProduct) {
+//     if (!findProduct) {
       
-      return res.status(404).json({ message: "Wrong Ticket Number, product not found" });
-    }
+//       return res.status(404).json({ message: "Wrong Ticket Number, product not found" });
+//     }
 
-    // ✅ Return found product
-    return res.status(200).json({
-      message: "Product found",
-      product: findProduct,
-    });
+//     // ✅ Return found product
+//     return res.status(200).json({
+//       message: "Product found",
+//       product: findProduct,
+//     });
 
-  } catch (error) {
-    return res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
+//   } catch (error) {
+//     return res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// };
 
-export default customerSearchProducts;
+// export default customerSearchProducts;

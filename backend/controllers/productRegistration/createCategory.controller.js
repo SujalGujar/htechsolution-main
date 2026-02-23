@@ -1,6 +1,6 @@
 // controllers/category.controller.js
-import {createCategory} from "../../services/catogory.service.js";
-
+// import {createCategory} from "../../services/catogory.service.js";
+import {createCategory} from "../../services/catogoryServices/createCategory.service.js";
 
 
 export const createCategoryProduct = async (req, res) => {

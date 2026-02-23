@@ -1,4 +1,4 @@
-import {updateCategory}  from "../../services/catogory.service.js";
+import { updateCategory } from "../../services/catogoryServices/updateCategory.service.js";
 export const updateCategoryProduct = async (req, res) => {
   try {
     const category = await updateCategory(

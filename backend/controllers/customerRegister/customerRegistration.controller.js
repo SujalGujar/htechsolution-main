@@ -317,106 +317,106 @@ import Admin from "../../models/admin.model.js";
 //   }
 // };
 
-const generateSecurePassword = () => {
-  const length  = 8;
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
-  let password  = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  return password;
-};
+// const generateSecurePassword = () => {
+//   const length  = 8;
+//   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+//   let password  = "";
+//   for (let i = 0; i < length; i++) {
+//     const randomIndex = Math.floor(Math.random() * charset.length);
+//     password += charset[randomIndex];
+//   }
+//   return password;
+// };
 
-export const registerCustomer = async (req, res) => {
-  try {
-    const body = req.body;
+// export const registerCustomer = async (req, res) => {
+//   try {
+//     const body = req.body;
 
-    if (!body) {
-      return res.status(400).json({ message: "Request body missing" });
-    }
+//     if (!body) {
+//       return res.status(400).json({ message: "Request body missing" });
+//     }
 
-    const {
-      customerName,
-      email,
-      mobileNum,
-      proName,
-      proCatogory,
-      proSrNo,
-      proModNum,
-      warrStartDate,
-      warrEndDate,
-      ticketNumber,
-      // ── NEW FIELDS ───────────────────────────────────────────────────────
-      invoiceNum,
-      brandName,
-      // ────────────────────────────────────────────────────────────────────
-    } = body;
+//     const {
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate,
+//       warrEndDate,
+//       ticketNumber,
+//       // ── NEW FIELDS ───────────────────────────────────────────────────────
+//       invoiceNum,
+//       brandName,
+//       // ────────────────────────────────────────────────────────────────────
+//     } = body;
 
-    if (!customerName || !email || !mobileNum) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+//     if (!customerName || !email || !mobileNum) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
 
-    const existingCus = await Customer.findOne({ email });
-    if (existingCus) {
-      return res.status(400).json({ message: "Customer with this email already exists" });
-    }
+//     const existingCus = await Customer.findOne({ email });
+//     if (existingCus) {
+//       return res.status(400).json({ message: "Customer with this email already exists" });
+//     }
 
-    const existingAdmin = await Admin.findOne({ username: customerName });
-    if (existingAdmin) {
-      return res.status(400).json({ message: "Username already exists in the system" });
-    }
+//     const existingAdmin = await Admin.findOne({ username: customerName });
+//     if (existingAdmin) {
+//       return res.status(400).json({ message: "Username already exists in the system" });
+//     }
 
-    // ── Passwords ───────────────────────────────────────────────────────
-    const plainPassword  = generateSecurePassword();
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+//     // ── Passwords ───────────────────────────────────────────────────────
+//     const plainPassword  = generateSecurePassword();
+//     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-    // ── Customer collection ─────────────────────────────────────────────
-    const customer = new Customer({
-      customerName,
-      email,
-      mobileNum,
-      proName,
-      proCatogory,
-      proSrNo,
-      proModNum,
-      warrStartDate: new Date(warrStartDate),
-      warrEndDate:   new Date(warrEndDate),
-      ticketNumber,
-      // ── NEW FIELDS ─────────────────────────────────────────────────────
-      invoiceNum:    invoiceNum    || "",
-      brandName:     brandName     || "",
-      // ───────────────────────────────────────────────────────────────────
-      password:      hashedPassword,
-      plainPassword: plainPassword,
-    });
+//     // ── Customer collection ─────────────────────────────────────────────
+//     const customer = new Customer({
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate: new Date(warrStartDate),
+//       warrEndDate:   new Date(warrEndDate),
+//       ticketNumber,
+//       // ── NEW FIELDS ─────────────────────────────────────────────────────
+//       invoiceNum:    invoiceNum    || "",
+//       brandName:     brandName     || "",
+//       // ───────────────────────────────────────────────────────────────────
+//       password:      hashedPassword,
+//       plainPassword: plainPassword,
+//     });
 
-    await customer.save();
+//     await customer.save();
 
-    // ── Admin collection ────────────────────────────────────────────────
-    const newAdminUser = new Admin({
-      username: customerName,
-      password: hashedPassword,
-      role:     "user",
-    });
+//     // ── Admin collection ────────────────────────────────────────────────
+//     const newAdminUser = new Admin({
+//       username: customerName,
+//       password: hashedPassword,
+//       role:     "user",
+//     });
 
-    await newAdminUser.save();
+//     await newAdminUser.save();
 
-    // ── Response ────────────────────────────────────────────────────────
-    return res.status(201).json({
-      success:  true,
-      message:  "Customer registered successfully",
-      username: customerName,
-      password: plainPassword,
-    });
+//     // ── Response ────────────────────────────────────────────────────────
+//     return res.status(201).json({
+//       success:  true,
+//       message:  "Customer registered successfully",
+//       username: customerName,
+//       password: plainPassword,
+//     });
 
-  } catch (error) {
-    console.error("Registration error:", error);
-    return res.status(500).json({
-      message: error.message || "Internal server error",
-    });
-  }
-};
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     return res.status(500).json({
+//       message: error.message || "Internal server error",
+//     });
+//   }
+// };
 
 // Optional: Get customer by ticket number (useful for panel)
 // export const getCustomerByTicketNumber = async(req, res) => {

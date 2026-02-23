@@ -1,4 +1,5 @@
-import {getCategoryById}  from "../../services/catogory.service.js";
+import { getCategoryById } 
+from "../../services/catogoryServices/getCategoryById.service.js";
  export const getCategoryByIdProduct = async (req, res) => {
   try {
     // req.params.id → comes from URL → /api/category/:id

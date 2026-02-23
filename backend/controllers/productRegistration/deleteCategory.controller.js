@@ -1,4 +1,4 @@
-import {deleteCategory}  from "../../services/catogory.service.js";
+import {deleteCategory} from "../../services/catogoryServices/deleteCategory.service.js";
 export const deleteCategoryProduct = async (req, res) => {
   try {
     await deleteCategory(req.params.id);

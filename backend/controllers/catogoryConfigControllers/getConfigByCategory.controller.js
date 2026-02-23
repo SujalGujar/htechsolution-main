@@ -1,5 +1,5 @@
-import {getConfigByCategory} from "../../services/categoryconfig.service.js";
-export const getConfigByCategory = async (req, res) => {
+import { getConfigByCategory } from "../../services/catogoryConfigServices/getConfigByCategory.service.js";
+export const getConfigByCategoryProduct = async (req, res) => {
   try {
     // /api/category-config/:categoryId
     const config = await getConfigByCategory(req.params.categoryId);
