@@ -597,10 +597,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
-// ─── GOOGLE FONTS (add to your index.html or main CSS) ───────────────────────
-// <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
 
-// ─── ICONS ───────────────────────────────────────────────────────────────────
 const Icon = ({ d, size = 18, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -811,7 +808,7 @@ export default function CustomerCareHome() {
         await axiosInstance.put(`/category/updateProduct/${editCat._id}`, catForm);
         addToast("Category updated!");
       } else {
-        await axiosInstance.post("/category", catForm);
+        await axiosInstance.post("/category/createCategory", catForm);
         addToast("Category created!");
       }
       setShowCatModal(false);
@@ -933,8 +930,7 @@ export default function CustomerCareHome() {
               <TagIcon />
             </div>
             <div>
-              <div className="font-extrabold text-lg tracking-tight leading-none"
-                style={{ fontFamily: "'Syne', sans-serif" }}>
+              <div className="font-extrabold text-lg tracking-tight leading-none">
                 Category Manager
               </div>
               <div className="text-xs text-gray-500 mt-0.5">Customer Care Portal</div>

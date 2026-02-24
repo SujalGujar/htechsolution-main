@@ -10,7 +10,7 @@ export const createCategory = async (data) => {
   });
 
   if (existing) {
-    // We throw an error — controller will catch it
+    
     throw new Error("Category already exists");
   }
 
