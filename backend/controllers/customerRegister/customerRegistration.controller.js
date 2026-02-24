@@ -205,117 +205,117 @@ import Customer from "../../models/customerDetails.model.js";
 import Admin from "../../models/admin.model.js";
 
 // Function to generate secure password
-// const generateSecurePassword = () => {
-//     const length = 5;
-//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
-//     let password = "";
-//     for (let i = 0; i < length; i++) {
-//         const randomIndex = Math.floor(Math.random() * charset.length);
-//         password += charset[randomIndex];
-//     }
-//     return password;
-// };
+const generateSecurePassword = () => {
+    const length = 5;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+    return password;
+};
 
-// export const registerCustomer = async(req, res) => {
-//   try {
-//     const body = req.body;
+export const registerCustomer = async(req, res) => {
+  try {
+    const body = req.body;
     
-//     if (!body) {
-//       return res.status(400).json({  
-//         message: "Request body missing"
-//       });
-//     }
+    if (!body) {
+      return res.status(400).json({  
+        message: "Request body missing"
+      });
+    }
 
-//     const {
-//       customerName,
-//       email,
-//       mobileNum,
-//       proName,
-//       proCatogory,
-//       proSrNo,
-//       proModNum,
-//       warrStartDate,
-//       warrEndDate,
-//       ticketNumber  // ✅ From form
-//     } = body;
+    const {
+      customerName,
+      email,
+      mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
+      warrStartDate,
+      warrEndDate,
+      ticketNumber 
+    } = body;
 
-//     // Validate all required fields including ticketNumber
-//     if (!customerName || !email || !mobileNum ) {
-//       return res.status(400).json({
-//         message: "All fields are required"
-//       });
-//     }
+    // Validate all required fields including ticketNumber
+    if (!customerName || !email || !mobileNum || !ticketNumber) {
+      return res.status(400).json({
+        message: "All fields are required"
+      });
+    }
 
-//     // Check if customer already exists by email
-//     const existingCus = await Customer.findOne({ email });
-//     if (existingCus) {
-//       return res.status(400).json({
-//         message: "Customer with this email already exists"
-//       });
-//     }
+    // Check if customer already exists by email
+    const existingCus = await Customer.findOne({ email });
+    if (existingCus) {
+      return res.status(400).json({
+        message: "Customer with this email already exists"
+      });
+    }
 
    
-//     const existingAdmin = await Admin.findOne({ username: customerName });
-//     if (existingAdmin) {
-//       return res.status(400).json({
-//         message: "Username already exists in the system"
-//       });
-//     }
+    const existingAdmin = await Admin.findOne({ username: customerName });
+    if (existingAdmin) {
+      return res.status(400).json({
+        message: "Username already exists in the system"
+      });
+    }
 
-//     // Generate password
-//     const plainPassword = generateSecurePassword();
-//     const hashedPassword = await bcrypt.hash(plainPassword, 10); 
-//     // const encryptPass = encrypt(hashedPassword)// Increased salt rounds for better security
+    // Generate password
+    const plainPassword = generateSecurePassword();
+    const hashedPassword = await bcrypt.hash(plainPassword, 10); 
+    // const encryptPass = encrypt(hashedPassword)// Increased salt rounds for better security
     
-//     // Create customer record - NOW INCLUDING TICKET NUMBER
-//     const customer = new Customer({
-//       customerName,
-//       email,
-//       mobileNum,
-//       proName,
-//       proCatogory,
-//       proSrNo,
-//       proModNum,
-//       warrStartDate: new Date(warrStartDate), // Convert to Date object
-//       warrEndDate: new Date(warrEndDate),     // Convert to Date object
-//       password: plainPassword,  // Store plain password for panel use (consider security implications)
-//       ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
-//     });
+    // Create customer record - NOW INCLUDING TICKET NUMBER
+    const customer = new Customer({
+      customerName,
+      email,
+      mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
+      warrStartDate: new Date(warrStartDate), // Convert to Date object
+      warrEndDate: new Date(warrEndDate),     // Convert to Date object
+      password: plainPassword,  // Store plain password for panel use (consider security implications)
+      ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
+    });
 
-//     await customer.save();
+    await customer.save();
 
-//     // Create admin user record with customerName as username
-//     const newAdminUser = new Admin({
-//       username: customerName,  // ✅ Using customerName as username
-//       password: plainPassword,  // Store plain password for panel use (consider security implications)
-//       role: "user"  
-//     });
+    // Create admin user record with customerName as username
+    const newAdminUser = new Admin({
+      username: customerName,  // ✅ Using customerName as username
+      password: plainPassword,  // Store plain password for panel use (consider security implications)
+      role: "user"  
+    });
 
-//     await newAdminUser.save();
+    await newAdminUser.save();
 
-//     return res.status(201).json({  
-//       success: true,
-//       message: "Customer registered successfully",
-//       password: plainPassword,  // Send plain password only once
-//       username: customerName    // ✅ Return customerName as username
-//     });
+    return res.status(201).json({  
+      success: true,
+      message: "Customer registered successfully",
+      password: plainPassword,  // Send plain password only once
+      username: customerName    // ✅ Return customerName as username
+    });
 
-//   } catch (error) {
-//     console.error("Registration error:", error);
+  } catch (error) {
+    console.error("Registration error:", error);
     
-//     // Handle specific MongoDB errors
-//     // if (error.code === 11000) {
-//     //   const field = Object.keys(error.keyPattern)[0];
-//     //   return res.status(400).json({ 
-//     //     message: `${field} already exists. Please use a different ${field}.`
-//     //   });
-//     // }
+    // Handle specific MongoDB errors
+    // if (error.code === 11000) {
+    //   const field = Object.keys(error.keyPattern)[0];
+    //   return res.status(400).json({ 
+    //     message: `${field} already exists. Please use a different ${field}.`
+    //   });
+    // }
     
-//     return res.status(500).json({ 
-//       message: error.message || "Internal server error"
-//     });
-//   }
-// };
+    return res.status(500).json({ 
+      message: error.message || "Internal server error"
+    });
+  }
+};
 
 // const generateSecurePassword = () => {
 //   const length  = 8;

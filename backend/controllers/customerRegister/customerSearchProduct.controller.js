@@ -106,3 +106,10 @@
 // };
 
 // export default customerSearchProducts;
+
+// Fallback default export so routes that import the module succeed
+const customerSearchProducts = async (req, res) => {
+	res.status(501).json({ success: false, message: "Customer search not implemented" });
+};
+
+export default customerSearchProducts;

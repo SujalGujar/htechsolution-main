@@ -428,7 +428,11 @@ import dns from "node:dns/promises";
 dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 app.use(cors({
-  origin: "https://htechsolution.in", // your real domain
+  origin: ["https://htechsolution.in", // your real domain
+  "https://htechsolution-main-d7ku.vercel.app", // your vercel domain
+  "http://localhost:3000", // for local development
+  "http://localhost:5173", ],// for local development (Vite)
+  
   credentials: true
 }));
 const startServer = async () => {

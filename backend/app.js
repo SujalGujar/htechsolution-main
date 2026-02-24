@@ -12,7 +12,7 @@ import categoryRoutes from "./routes/productCatogory.route.js";
 import categoryConfigRoutes from "./routes/productConfig.route.js";
 // import customerDetailRoutes from "./routes/customerDetails.routes.js"
 import customerDetailRoutes from "./routes/customerCare.route.js"
-import customerRoutes from "./routes/customer.route.js"
+// import customerRoutes from "./routes/customer.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -32,7 +32,7 @@ app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users",userRoutes)
 app.use("/api/customerDetails",customerDetailRoutes)
-app.use("/api/customer",customerRoutes)
+// app.use("/api/customer",customerRoutes)
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", categoryConfigRoutes);
   // Dynamic import for productConfig.route.js

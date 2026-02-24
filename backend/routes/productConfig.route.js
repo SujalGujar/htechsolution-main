@@ -3,10 +3,11 @@ import express from "express";
 // import * as configController from "../controllers/categoryConfig.controller.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
-import createCategoryConfigProduct from "../controllers/catogoryConfigControllers/createCatogoryConfig.controller.js";
-import getConfigByCategoryProduct from "../controllers/catogoryConfigControllers/getConfigByCategory.controller.js";
-import addField from "../controllers/catogoryConfigControllers/addField.controller.js";
-import removeField from "../controllers/catogoryConfigControllers/removeField.controller.js";
+import { createCategoryConfigProduct } 
+from "../controllers/catogoryConfigControllers/createCategoryConfigProduct.controller.js";
+import {getConfigByCategoryProduct} from "../controllers/catogoryConfigControllers/getConfigByCategoryProduct.controller.js";
+import {addField} from "../controllers/catogoryConfigControllers/addField.controller.js";
+import {removeField} from "../controllers/catogoryConfigControllers/removeField.controller.js";
 const router = express.Router();
 
 router.post("/configuration", verifyToken,authorizeRoles("admin","manager"), createCategoryConfigProduct);                            // Create config for a category
