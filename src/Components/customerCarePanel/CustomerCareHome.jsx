@@ -791,7 +791,7 @@ export default function CustomerCareHome() {
   const fetchConfig = async (categoryId) => {
     if (configs[categoryId] !== undefined) return;
     try {
-      const { data } = await axiosInstance.get(`/category/getconfigrations/${categoryId}`);
+      const { data } = await axiosInstance.get(`/product/getconfigrations/${categoryId}`);
       setConfigs(p => ({ ...p, [categoryId]: data.data }));
     } catch {
       setConfigs(p => ({ ...p, [categoryId]: null }));
