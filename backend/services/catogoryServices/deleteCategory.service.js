@@ -2,7 +2,7 @@ import Category from "../../models/productsRegisterModel/catogory.js";
 export const deleteCategory = async (id) => {
   const category = await Category.findByIdAndUpdate(
     id,
-    { isActive: false },  // Just deactivate, don't remove from DB
+    { isActive: false },  
     { new: true }
   );
 

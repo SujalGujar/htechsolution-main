@@ -791,16 +791,17 @@ export default function CustomerCareHome() {
   const fetchConfig = async (categoryId) => {
     if (configs[categoryId] !== undefined) return;
     try {
-      const { data } = await axiosInstance.get(`/product/getconfigrations/${categoryId}`);
+      const { data } = await axiosInstance.get(`/product/${categoryId}/configurations`);
       setConfigs(p => ({ ...p, [categoryId]: data.data }));
-    } catch {
+    } catch (e) {
       setConfigs(p => ({ ...p, [categoryId]: null }));
+      addToast(e.response?.data?.message || "Failed to load configuration", "error");
     }
   };
 
   useEffect(() => { fetchCategories(); }, []);
 
-  // ── CATEGORY CRUD ──────────────────────────────────────────────────────────
+  
   const handleSaveCategory = async () => {
     if (!catForm.name.trim()) return addToast("Category name is required", "error");
     try {
@@ -854,7 +855,7 @@ export default function CustomerCareHome() {
   const handleCreateConfig = async () => {
     if (!configFields.length) return addToast("Add at least one field", "error");
     try {
-      await axiosInstance.post("/category/configuration", {
+      await axiosInstance.post("/product/configuration", {
         category: activeCategoryForConfig._id,
         fields: configFields.map(({ _tempId, ...f }) => f),
       });
@@ -875,7 +876,7 @@ export default function CustomerCareHome() {
       ? field.options.split(",").map(o => o.trim()).filter(Boolean)
       : [];
     try {
-      await axiosInstance.post(`/category/addconfigration/${categoryId}/add-field`, { ...field, options });
+      await axiosInstance.post(`/product/addconfigration/${categoryId}/add-field`, { ...field, options });
       addToast("Field added!");
       setShowFieldModal(false);
       setConfigs(p => ({ ...p, [categoryId]: undefined }));
@@ -888,7 +889,7 @@ export default function CustomerCareHome() {
   const handleRemoveField = async (categoryId, fieldKey) => {
     if (!confirm(`Remove field "${fieldKey}"?`)) return;
     try {
-      await axiosInstance.delete(`/category/removeconfigration/${categoryId}/remove-field/${fieldKey}`);
+      await axiosInstance.delete(`/product/removeconfigration/${categoryId}/remove-field/${fieldKey}`);
       addToast("Field removed");
       setConfigs(p => ({ ...p, [categoryId]: undefined }));
       fetchConfig(categoryId);

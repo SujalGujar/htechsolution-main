@@ -7,7 +7,7 @@ export const createCategoryConfig = async (data) => {
     throw new Error("Category not found");
   }
 
-  // Check config already exists for this category
+  
   const existing = await CategoryConfig.findOne({ category: data.category });
   if (existing) {
     throw new Error("Config already exists for this category. Use update instead.");

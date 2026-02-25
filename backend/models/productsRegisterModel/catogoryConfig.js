@@ -35,20 +35,12 @@ const categoryConfigSchema = new mongoose.Schema(
   {
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",   // ← This is how we LINK to Category collection
+      ref: "Category",   
       required: true,
-      unique: true,       // One config per category
+      unique: true,       
     },
     fields: [configFieldSchema],
-    // Array of all configurable fields for this category
-    // Laptop example:
-    // [
-    //   { fieldName: "RAM", fieldKey: "ram", fieldType: "Number", unit: "GB", isRequired: true, options: ["8", "16", "32"] },
-    //   { fieldName: "Processor", fieldKey: "processor", fieldType: "String", isRequired: true },
-    //   { fieldName: "Screen Size", fieldKey: "screenSize", fieldType: "Number", unit: "inch" },
-    //   { fieldName: "Storage", fieldKey: "storage", fieldType: "String", unit: "GB" },
-    //   { fieldName: "OS", fieldKey: "os", fieldType: "String" }
-    // ]
+    
   },
   { timestamps: true }
 );
