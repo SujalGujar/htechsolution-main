@@ -20,81 +20,81 @@ dotenv.config();
 //   return randomBytes.toString("hex").slice(0, length);
 // };
 
-// export const register = async (req, res) => {
-//   try {
+export const register = async (req, res) => {
+  try {
     
-//     const body = req.body;
-//     if (!body) {
-//       return res.status(400).json({ message: "Request body missing" });
-//     }
+    const body = req.body;
+    if (!body) {
+      return res.status(400).json({ message: "Request body missing" });
+    }
 
-//     const {
-//       // customerName,
-//       // email,
-//       // mobileNum,
-//       proName,
-//       proCatogory,
-//       proSrNo,
-//       proModNum,
+    const {
+      // customerName,
+      // email,
+      // mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
       
-//       brandName,
-//       purDate,
-//       invoiceNum,
-//       // warrStartDate,
-//       // warrEndDate
-//     } = body;
+      brandName,
+      purDate,
+      invoiceNum,
+      // warrStartDate,
+      // warrEndDate
+    } = body;
 
-//     // ✅ STEP 4: Validation
-//     if (
+    // ✅ STEP 4: Validation
+    if (
       
-//       !proName || !proCatogory || !proSrNo ||
-//       !proModNum || !brandName || !purDate ||
-//       !invoiceNum 
-//     ) {
-//       return res.status(400).json({ message: "All fields are required" });
-//     }
+      !proName || !proCatogory || !proSrNo ||
+      !proModNum || !brandName || !purDate ||
+      !invoiceNum 
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-//     // ✅ STEP 5: Duplicate checks (REALISTIC)
-//     const existingProduct = await Product.findOne({ proSrNo });
-//     if (existingProduct) {
-//       return res.status(400).json({ message: "Product already registered" });
-//     }
+    // ✅ STEP 5: Duplicate checks (REALISTIC)
+    const existingProduct = await Product.findOne({ proSrNo });
+    if (existingProduct) {
+      return res.status(400).json({ message: "Product already registered" });
+    }
 
-//     // ✅ STEP 6: Password generation
-//     // const plainPassword = generateSecurePassword();
-//     // const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    // ✅ STEP 6: Password generation
+    // const plainPassword = generateSecurePassword();
+    // const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-//     // ✅ STEP 7: Create document using save()
-//     const product = new Product({
-//       // customerName,
-//       // email,
-//       // mobileNum,
-//       proName,
-//       proCatogory,
-//       proSrNo,
-//       proModNum,
-//       brandName,
-//       purDate,
-//       invoiceNum,
-//       // warrStartDate,
-//       // warrEndDate,
-//       // password: hashedPassword
-//     });
+    // ✅ STEP 7: Create document using save()
+    const product = new Product({
+      // customerName,
+      // email,
+      // mobileNum,
+      proName,
+      proCatogory,
+      proSrNo,
+      proModNum,
+      brandName,
+      purDate,
+      invoiceNum,
+      // warrStartDate,
+      // warrEndDate,
+      // password: hashedPassword
+    });
 
-//     await product.save(); // 🔥 pre("save") runs here
+    await product.save(); // 🔥 pre("save") runs here
 
-//     // ✅ STEP 8: Response
-//     res.status(201).json({
-//       message: "Product registered successfully",
-//       ticketNumber: product.TicketNumber,
-//       // password: plainPassword
-//     });
+    // ✅ STEP 8: Response
+    res.status(201).json({
+      message: "Product registered successfully",
+      ticketNumber: product.TicketNumber,
+      // password: plainPassword
+    });
 
-//   } catch (error) {
-//     console.error("Registration error:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 // export const registerCustomer = async(req,res) => {
 //   // res.json({message:"registercustomer route is working"};
 //   try{
