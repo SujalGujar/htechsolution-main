@@ -47,10 +47,10 @@
 //   };
 // };
 
-import Product from "../../models/Product.js";
-import CategoryConfig from "../../models/CategoryConfig.js";
+import Product from "../../models/productsRegisterModel/ProductItem.js";
+import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
 
-export const registerProductsService = async (data) => {
+export const registerProductsBatch= async (data) => {
   const {
     category,
     productName,

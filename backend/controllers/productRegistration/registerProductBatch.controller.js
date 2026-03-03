@@ -18,11 +18,11 @@
 //   }
 // };
 
-import { registerProductsService } from "../../services/productServices/registerProducts.service.js";
+import { registerProductsBatch } from "../../services/productBatch/registerProductBatch.service.js";
 
-export const registerProductsController = async (req, res) => {
+export const registerProductBatch= async (req, res) => {
   try {
-    const products = await registerProductsService(req.body);
+    const products = await registerProductsBatch(req.body);
 
     res.status(201).json({
       success: true,

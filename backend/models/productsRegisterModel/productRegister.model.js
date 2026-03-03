@@ -32,7 +32,6 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 productSchema.pre("save", function (next) {
   if (this.ticketNumber) return next();
 
@@ -47,4 +46,4 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-export default productRegisterSchema = mongoose.model("Product", productSchema);
+export default mongoose.model("Product", productSchema);

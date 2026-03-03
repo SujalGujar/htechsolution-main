@@ -9,7 +9,8 @@ import {getCategoryByIdProduct} from "../controllers/productRegistration/getCate
 import {updateCategoryProduct} from "../controllers/productRegistration/updateCategoryProduct.controller.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
-import registerProductBatch from "../controllers/productRegistration/registerProducts.controller.js";
+import {registerProductBatch} from "../controllers/productRegistration/registerProductBatch.controller.js";
+import {getAllProductsController} from "../controllers/productRegistration/getAllProductsController.Controller.js"
 const router = express.Router();
 
 // Route → Controller → Service → DB

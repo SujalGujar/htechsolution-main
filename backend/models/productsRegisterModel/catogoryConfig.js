@@ -1,5 +1,5 @@
 // models/CategoryConfig.js
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
 // This sub-schema defines ONE field template
 // e.g. { fieldName: "RAM", fieldKey: "ram", fieldType: "Number", unit: "GB" }
