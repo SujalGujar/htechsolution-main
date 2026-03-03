@@ -9,6 +9,7 @@ import {getCategoryByIdProduct} from "../controllers/productRegistration/getCate
 import {updateCategoryProduct} from "../controllers/productRegistration/updateCategoryProduct.controller.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleMiddleware.js";
+import registerProductBatch from "../controllers/productRegistration/registerProducts.controller.js";
 const router = express.Router();
 
 // Route → Controller → Service → DB
@@ -17,5 +18,21 @@ router.get("/allproducts", verifyToken,authorizeRoles("admin","manager"),getAllC
 router.get("/product/:id", verifyToken,authorizeRoles("admin","manager"),getCategoryByIdProduct);
 router.put("/updateProduct/:id", verifyToken,authorizeRoles("admin","manager"),updateCategoryProduct);
 router.delete("/:id", verifyToken,authorizeRoles("admin","manager"),deleteCategoryProduct);
+router.post(
+  "/register",
+  verifyToken,
+  authorizeRoles("admin", "customercare"),
+  registerProductBatch
+);
+
+// 🔥 Product History
+router.get(
+  "/history",
+  verifyToken,
+  authorizeRoles("admin", "manager"),
+  getAllProductsController
+);
+
+// export default router;
 
 export default router;
