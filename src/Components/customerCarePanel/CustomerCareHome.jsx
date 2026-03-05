@@ -2164,7 +2164,8 @@ export default function CustomerCareHome() {
                     category: registerCategory._id,
                     productName: registerForm.productName,
                     configurations: registerForm,
-                    quantity
+                    quantity,
+                    batch: registerForm.batch 
                   });
 
                   addToast("Product registered successfully!");

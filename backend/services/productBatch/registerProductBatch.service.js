@@ -47,7 +47,8 @@
 //   };
 // };
 
-import Product from "../../models/productsRegisterModel/ProductItem.js";
+// import Product from "../../models/productsRegisterModel/ProductItem.js";
+import Product from "../../models/productsRegisterModel/productRegister.model.js"
 import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
 
 export const registerProductsBatch= async (data) => {
