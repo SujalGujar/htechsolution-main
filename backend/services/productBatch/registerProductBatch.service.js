@@ -48,52 +48,105 @@
 // };
 
 // import Product from "../../models/productsRegisterModel/ProductItem.js";
-import Product from "../../models/productsRegisterModel/productRegister.model.js"
+// import Product from "../../models/productsRegisterModel/productRegister.model.js"
+// import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
+
+// export const registerProductsBatch= async (data) => {
+//   const {
+//     category,
+//     productName,
+//     configurations,
+//     quantity
+//   } = data;
+
+//    console.log("🔍 category:", category);         // 👈 ADD
+//   console.log("🔍 productName:", productName);   // 👈 ADD
+//   console.log("🔍 configurations:", configurations); // 👈 ADD
+//   console.log("🔍 quantity:", quantity)
+
+//   if (!quantity || quantity <= 0) {
+//     throw new Error("Quantity must be greater than 0");
+//   }
+
+//   // Validate Category Configuration
+//   const categoryConfig = await CategoryConfig.findOne({ category });
+
+//   if (!categoryConfig) {
+//     throw new Error("Category configuration not found");
+//   }
+
+//   // Validate Required Fields
+//   categoryConfig.fields.forEach((field) => {
+//     if (field.isRequired && !configurations[field.fieldKey]) {
+//       throw new Error(`${field.fieldName} is required`);
+//     }
+//   });
+
+//   const createdProducts = [];
+
+//   // 🔥 IMPORTANT: Use create() not insertMany()
+//   for (let i = 0; i < quantity; i++) {
+//     const product = await Product.create({
+//       category,
+//       productName,
+//       configurations
+//     });
+
+//     createdProducts.push(product);
+//   }
+
+//   return createdProducts;
+// };
+
+import Product from "../../models/productsRegisterModel/productRegister.model.js";
 import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
 
-export const registerProductsBatch= async (data) => {
-  const {
-    category,
-    productName,
-    configurations,
-    quantity
-  } = data;
+export const registerProductsBatch = async (data) => {
+  try {
+    const { category, productName, configurations, quantity } = data;
 
-   console.log("🔍 category:", category);         // 👈 ADD
-  console.log("🔍 productName:", productName);   // 👈 ADD
-  console.log("🔍 configurations:", configurations); // 👈 ADD
-  console.log("🔍 quantity:", quantity)
+    console.log("✅ STEP 1 - data received:", JSON.stringify(data));
 
-  if (!quantity || quantity <= 0) {
-    throw new Error("Quantity must be greater than 0");
-  }
+    if (!quantity || quantity <= 0) throw new Error("Quantity must be greater than 0");
 
-  // Validate Category Configuration
-  const categoryConfig = await CategoryConfig.findOne({ category });
+    console.log("✅ STEP 2 - quantity ok");
 
-  if (!categoryConfig) {
-    throw new Error("Category configuration not found");
-  }
+    const categoryConfig = await CategoryConfig.findOne({  category: new mongoose.Types.ObjectId(category) });
+    console.log("✅ STEP 3 - categoryConfig:", categoryConfig ? "found" : "NOT FOUND");
 
-  // Validate Required Fields
-  categoryConfig.fields.forEach((field) => {
-    if (field.isRequired && !configurations[field.fieldKey]) {
-      throw new Error(`${field.fieldName} is required`);
-    }
-  });
+    if (!categoryConfig) throw new Error("Category configuration not found");
 
-  const createdProducts = [];
-
-  // 🔥 IMPORTANT: Use create() not insertMany()
-  for (let i = 0; i < quantity; i++) {
-    const product = await Product.create({
-      category,
-      productName,
-      configurations
+    console.log("✅ STEP 4 - validating fields");
+    categoryConfig.fields.forEach((field) => {
+      if (field.isRequired && !configurations[field.fieldKey]) {
+        throw new Error(`${field.fieldName} is required`);
+      }
     });
 
-    createdProducts.push(product);
-  }
+    console.log("✅ STEP 5 - starting product creation loop");
+    const createdProducts = [];
 
-  return createdProducts;
+    for (let i = 0; i < quantity; i++) {
+      console.log(`✅ STEP 6 - creating product ${i + 1}`);
+      
+      // ✅ Convert plain object to Map
+      const configMap = new Map(Object.entries(configurations || {}));
+      
+      const product = await Product.create({
+        category,
+        productName,
+        configurations: configMap
+      });
+
+      console.log(`✅ STEP 7 - product ${i + 1} created:`, product._id);
+      createdProducts.push(product);
+    }
+
+    return createdProducts;
+
+  } catch (err) {
+    // ✅ Log full stack here in service too
+    console.error("💥 SERVICE ERROR:", err.stack);
+    throw err;
+  }
 };

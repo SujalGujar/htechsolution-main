@@ -32,8 +32,8 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-productSchema.pre("save", function (next) {
-  if (this.ticketNumber) return next();
+productSchema.pre("save", async function () {
+  if (this.ticketNumber) return;
 
   const date = new Date();
   const y = date.getFullYear();
@@ -42,8 +42,6 @@ productSchema.pre("save", function (next) {
   const rand = Math.floor(10000 + Math.random() * 90000);
 
   this.ticketNumber = `PRD-${y}${m}${d}-${rand}`;
-
-  next();
 });
 
 export default mongoose.model("Product", productSchema);

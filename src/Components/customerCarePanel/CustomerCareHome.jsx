@@ -1650,7 +1650,7 @@ export default function CustomerCareHome() {
     }
   };
 
-  // ══════════════════════════════ RENDER ════════════════════════════════════
+  
   return (
     <>
       {/* Global font injection */}
@@ -2157,7 +2157,7 @@ export default function CustomerCareHome() {
               Cancel
             </Btn>
 
-            <Btn
+            {/* <Btn
               onClick={async () => {
                 try {
                   await axiosInstance.post("/category/register", {
@@ -2176,7 +2176,37 @@ export default function CustomerCareHome() {
               }}
             >
               Register
-            </Btn>
+            </Btn> */}
+           <Btn
+  onClick={async () => {
+    try {
+      const { productName, ...configFields } = registerForm;
+      
+      // 👇 ADD THIS - see exactly what you're sending
+      console.log("📤 Sending to backend:", {
+        category: registerCategory._id,
+        productName,
+        configurations: configFields,
+        quantity
+      });
+
+      await axiosInstance.post("/category/register", {
+        category: registerCategory._id,
+        productName,
+        configurations: configFields,
+        quantity
+      });
+
+      addToast("Product registered successfully!");
+      setShowRegisterModal(false);
+    } catch (e) {
+      console.log("❌ Full error:", e.response?.data); // 👈 ADD THIS
+      addToast(e.response?.data?.message || "Failed", "error");
+    }
+  }}
+>
+  Register
+</Btn>
           </div>
         </div>
       </Modal>
