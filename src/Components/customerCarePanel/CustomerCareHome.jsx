@@ -2160,7 +2160,7 @@ export default function CustomerCareHome() {
             <Btn
               onClick={async () => {
                 try {
-                  await axiosInstance.post("/product/register", {
+                  await axiosInstance.post("/category/register", {
                     category: registerCategory._id,
                     productName: registerForm.productName,
                     configurations: registerForm,

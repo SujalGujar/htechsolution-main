@@ -9,6 +9,7 @@ const authorizeRoles=(...allowedRoles)=>{
       });
     }
     if(!allowedRoles.includes(req.user.role)){
+      console.log("❌ Role mismatch | Token role:", `"${req.user.role}"`, "| Allowed:", allowedRoles);
         return res.status(403).json({message:"access denied"})
     }
     next();

@@ -22,7 +22,7 @@ router.delete("/:id", verifyToken,authorizeRoles("admin","manager"),deleteCatego
 router.post(
   "/register",
   verifyToken,
-  authorizeRoles("admin", "customercare"),
+  authorizeRoles("admin", "manager"),
   registerProductBatch
 );
 
