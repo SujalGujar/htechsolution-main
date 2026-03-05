@@ -20,7 +20,7 @@
 import { registerProductsBatch } from "../../services/productBatch/registerProductBatch.service.js";
 export const registerProductBatch = async (req, res) => {
   try {
-    console.log("🔍 Controller received:", req.body); // 👈 ADD
+    console.log("🔍 Controller received:", req.body);
     const products = await registerProductsBatch(req.body);
     res.status(201).json({
       success: true,

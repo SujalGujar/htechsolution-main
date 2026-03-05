@@ -2823,670 +2823,1165 @@
 
 // export default CustomerCareProductHistory;
 
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  RefreshCwIcon,
-  FilterIcon,
-  MoreHorizontal,
-  SearchIcon,
-  CopyIcon,
-  FileTextIcon,
-  Calendar,
-  Package,
-  Tag,
-  Hash,
-  FileText,
-} from "lucide-react";
-import axiosInstance from "../../Utils/axiosIntance";
-import { Skeleton } from "../ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import {
-  Tooltip,
-  TooltipContent,
-  // TooltipDescription,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+// import React, { useState, useEffect } from "react";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "../ui/table";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "../ui/card";
+// import { Badge } from "../ui/badge";
+// import { Button } from "../ui/button";
+// import { Input } from "../ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "../ui/select";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "../ui/dropdown-menu";
+// import {
+//   ChevronLeftIcon,
+//   ChevronRightIcon,
+//   RefreshCwIcon,
+//   FilterIcon,
+//   MoreHorizontal,
+//   SearchIcon,
+//   CopyIcon,
+//   FileTextIcon,
+//   Calendar,
+//   Package,
+//   Tag,
+//   Hash,
+//   FileText,
+// } from "lucide-react";
+// import axiosInstance from "../../Utils/axiosIntance";
+// import { Skeleton } from "../ui/skeleton";
+// import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   // TooltipDescription,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "../ui/tooltip";
 
-const CustomerCareProductHistory = () => {
+// const CustomerCareProductHistory = () => {
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [filterCategory, setFilterCategory] = useState("all");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [itemsPerPage] = useState(10);
+//   const [categories, setCategories] = useState([]);
+//   const [refreshing, setRefreshing] = useState(false);
+
+//   useEffect(() => {
+//     fetchProducts();
+//   }, []);
+
+//   const fetchProducts = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axiosInstance.get("/customerDetails/products");
+      
+//       let productsArray = [];
+      
+//       if (Array.isArray(response.data)) {
+//         productsArray = response.data;
+//       } else if (response.data?.data && Array.isArray(response.data.data)) {
+//         productsArray = response.data.data;
+//       } else if (response.data?.products && Array.isArray(response.data.products)) {
+//         productsArray = response.data.products;
+//       } else if (response.data?.result && Array.isArray(response.data.result)) {
+//         productsArray = response.data.result;
+//       } else {
+//         productsArray = [];
+//       }
+      
+//       // Log the first product to see available fields
+//       if (productsArray.length > 0) {
+//         console.log("Sample product data:", productsArray[0]);
+//       }
+      
+//       setProducts(productsArray);
+      
+//       if (productsArray.length > 0) {
+//         const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory || p.category).filter(Boolean))];
+//         setCategories(uniqueCategories);
+//       }
+      
+//       setError(null);
+//     } catch (err) {
+//       setError(err.response?.data?.message || "Failed to fetch products");
+//       setProducts([]);
+//     } finally {
+//       setLoading(false);
+//       setRefreshing(false);
+//     }
+//   };
+
+//   const handleRefresh = () => {
+//     setRefreshing(true);
+//     fetchProducts();
+//   };
+
+//   // Helper function to get brand name from various possible field names
+//   const getBrandName = (product) => {
+//     // Check all possible field names for brand
+//     const possibleFields = [
+//       'brandName',
+//       'brand',
+//       'productBrand',
+//       'manufacturer',
+//       'company',
+//       'proBrand',
+//       'brand_name',
+//       'product_brand'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   // Helper function to get model number from various possible field names
+//   const getModelNumber = (product) => {
+//     const possibleFields = [
+//       'proModNum',
+//       'modelNumber',
+//       'model',
+//       'proModel',
+//       'productModel',
+//       'modNum',
+//       'model_no',
+//       'product_model'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   // Helper function to get product name
+//   const getProductName = (product) => {
+//     const possibleFields = [
+//       'proName',
+//       'productName',
+//       'name',
+//       'product',
+//       'itemName',
+//       'product_name'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   // Helper function to get category
+//   const getCategory = (product) => {
+//     const possibleFields = [
+//       'proCatogory',
+//       'category',
+//       'productCategory',
+//       'catogory',
+//       'itemCategory',
+//       'product_category'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   // Helper function to get serial number
+//   const getSerialNumber = (product) => {
+//     const possibleFields = [
+//       'proSrNo',
+//       'serialNumber',
+//       'serialNo',
+//       'srNo',
+//       'serial',
+//       'serial_number'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   // Helper function to get invoice number
+//   const getInvoiceNumber = (product) => {
+//     const possibleFields = [
+//       'invoiceNum',
+//       'invoiceNumber',
+//       'invoice',
+//       'billNumber',
+//       'billNo',
+//       'invoice_no'
+//     ];
+    
+//     for (const field of possibleFields) {
+//       if (product[field] && product[field] !== "N/A" && product[field] !== "") {
+//         return product[field];
+//       }
+//     }
+    
+//     return "—";
+//   };
+
+//   const filteredProducts = Array.isArray(products) ? products.filter(product => {
+//     const searchableText = `
+//       ${getProductName(product)} 
+//       ${getSerialNumber(product)} 
+//       ${getModelNumber(product)} 
+//       ${getBrandName(product)} 
+//       ${product.TicketNumber || ''}
+//     `.toLowerCase();
+    
+//     const matchesSearch = searchTerm === "" || searchableText.includes(searchTerm.toLowerCase());
+    
+//     const productCategory = getCategory(product);
+//     const matchesCategory = filterCategory === "all" || productCategory === filterCategory;
+    
+//     return matchesSearch && matchesCategory;
+//   }) : [];
+
+//   const indexOfLastItem = currentPage * itemsPerPage;
+//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+//   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+//   const formatDate = (dateString) => {
+//     if (!dateString) return "—";
+    
+//     try {
+//       let date;
+      
+//       if (typeof dateString === 'number') {
+//         date = new Date(dateString);
+//       } else if (typeof dateString === 'string') {
+//         date = new Date(dateString);
+        
+//         if (isNaN(date.getTime())) {
+//           const parts = dateString.split(/[/\-]/);
+//           if (parts.length === 3) {
+//             date = new Date(parts[2], parts[1] - 1, parts[0]);
+//           }
+//         }
+//       } else {
+//         return "—";
+//       }
+      
+//       if (isNaN(date.getTime())) {
+//         return "—";
+//       }
+      
+//       return date.toLocaleDateString('en-IN', {
+//         day: '2-digit',
+//         month: 'short',
+//         year: 'numeric'
+//       });
+//     } catch {
+//       return "—";
+//     }
+//   };
+
+//   const handleCopy = (text) => {
+//     if (text && text !== "—") {
+//       navigator.clipboard.writeText(text);
+//     }
+//   };
+
+//   if (loading && !refreshing) {
+//     return (
+//       <Card className="w-full border-0 shadow-sm">
+//         <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+//           <CardTitle className="text-xl font-semibold">Product History</CardTitle>
+//           <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
+//             Loading registered products...
+//           </CardDescription>
+//         </CardHeader>
+//         <CardContent className="p-6">
+//           <div className="space-y-3">
+//             {[...Array(5)].map((_, i) => (
+//               <Skeleton key={i} className="h-12 w-full rounded" />
+//             ))}
+//           </div>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Card className="w-full border-0 shadow-sm">
+//         <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+//           <CardTitle className="text-xl font-semibold">Product History</CardTitle>
+//           <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
+//             Error loading products
+//           </CardDescription>
+//         </CardHeader>
+//         <CardContent className="p-6">
+//           <Alert variant="destructive" className="border-red-200 bg-red-50">
+//             <AlertTitle className="text-red-800">Error</AlertTitle>
+//             <AlertDescription className="text-red-600">{error}</AlertDescription>
+//           </Alert>
+//           <Button 
+//             className="mt-4 bg-[#1F6E8C] hover:bg-[#184f66] text-white"
+//             onClick={fetchProducts}
+//           >
+//             Retry
+//           </Button>
+//         </CardContent>
+//       </Card>
+//     );
+//   }
+
+//   return (
+//     <div className="w-full">
+//       <Card className="w-full border-0 shadow-sm overflow-hidden">
+//         <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <CardTitle className="text-xl font-semibold flex items-center gap-2">
+//                 <Package className="h-5 w-5" />
+//                 Product History
+//               </CardTitle>
+//               <CardDescription className="text-[#F7F7F2] text-sm opacity-90 mt-1">
+//                 View all registered products ({filteredProducts.length} total)
+//               </CardDescription>
+//             </div>
+//             <TooltipProvider>
+//               <Tooltip>
+//                 <TooltipTrigger asChild>
+//                   <Button 
+//                     variant="outline" 
+//                     size="icon"
+//                     onClick={handleRefresh}
+//                     disabled={refreshing}
+//                     className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white h-8 w-8"
+//                   >
+//                     <RefreshCwIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+//                   </Button>
+//                 </TooltipTrigger>
+//                 <TooltipContent>
+//                   <p>Refresh data</p>
+//                 </TooltipContent>
+//               </Tooltip>
+//             </TooltipProvider>
+//           </div>
+//         </CardHeader>
+
+//         <CardContent className="p-0">
+//           {/* Filters */}
+//           <div className="p-6 pb-4 border-b border-gray-100">
+//             <div className="flex flex-col md:flex-row gap-4">
+//               <div className="flex-1 relative">
+//                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                 <Input
+//                   placeholder="Search by product name, serial number, ticket number..."
+//                   value={searchTerm}
+//                   onChange={(e) => setSearchTerm(e.target.value)}
+//                   className="pl-9 pr-4 py-2 border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368] rounded-md text-sm"
+//                 />
+//                 {searchTerm && (
+//                   <button
+//                     onClick={() => setSearchTerm("")}
+//                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                   >
+//                     <span className="text-xs">✕</span>
+//                   </button>
+//                 )}
+//               </div>
+              
+//               <Select value={filterCategory} onValueChange={setFilterCategory}>
+//                 <SelectTrigger className="w-full md:w-[200px] border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368]">
+//                   <FilterIcon className="h-4 w-4 mr-2 text-[#6BA368]" />
+//                   <SelectValue placeholder="Filter by category" />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                   <SelectItem value="all">All Categories</SelectItem>
+//                   {categories.map(category => (
+//                     <SelectItem key={category} value={category}>
+//                       {category}
+//                     </SelectItem>
+//                   ))}
+//                 </SelectContent>
+//               </Select>
+//             </div>
+//           </div>
+
+//           {/* Table */}
+//           <div className="overflow-x-auto">
+//             <Table>
+//               <TableHeader className="bg-gray-50">
+//                 <TableRow className="border-b border-gray-200">
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     <div className="flex items-center gap-1">
+//                       <Hash className="h-3 w-3" />
+//                       Ticket #
+//                     </div>
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     <div className="flex items-center gap-1">
+//                       <Package className="h-3 w-3" />
+//                       Product
+//                     </div>
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     <div className="flex items-center gap-1">
+//                       <Tag className="h-3 w-3" />
+//                       Category
+//                     </div>
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     Brand/Model
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     Serial Number
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     <div className="flex items-center gap-1">
+//                       <Calendar className="h-3 w-3" />
+//                       Purchase Date
+//                     </div>
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+//                     <div className="flex items-center gap-1">
+//                       <FileText className="h-3 w-3" />
+//                       Invoice
+//                     </div>
+//                   </TableHead>
+//                   <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 text-right whitespace-nowrap">
+//                     Actions
+//                   </TableHead>
+//                 </TableRow>
+//               </TableHeader>
+//               <TableBody>
+//                 {currentItems.length === 0 ? (
+//                   <TableRow>
+//                     <TableCell colSpan={8} className="h-40 text-center text-gray-500">
+//                       <div className="flex flex-col items-center justify-center">
+//                         <FileTextIcon className="h-8 w-8 text-gray-300 mb-2" />
+//                         <p className="text-sm font-medium">No products found</p>
+//                         <p className="text-xs">Try adjusting your search or filter</p>
+//                       </div>
+//                     </TableCell>
+//                   </TableRow>
+//                 ) : (
+//                   currentItems.map((product) => {
+//                     const brandName = getBrandName(product);
+//                     const modelNumber = getModelNumber(product);
+//                     const productName = getProductName(product);
+//                     const category = getCategory(product);
+//                     const serialNumber = getSerialNumber(product);
+//                     const invoiceNumber = getInvoiceNumber(product);
+                    
+//                     return (
+//                       <TableRow 
+//                         key={product._id || product.TicketNumber || Math.random()} 
+//                         className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+//                       >
+//                         <TableCell className="px-4 py-3">
+//                           <Badge variant="outline" className="font-mono text-xs bg-[#6BA368] bg-opacity-5 text-[#1F6E8C] border-[#6BA368] border-opacity-20 font-medium px-2 py-0.5">
+//                             {product.TicketNumber || "—"}
+//                           </Badge>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <div>
+//                             <div className="font-medium text-sm text-gray-900">
+//                               {productName}
+//                             </div>
+//                             <div className="text-xs text-gray-400 mt-0.5">
+//                               Reg: {formatDate(product.createdAt)}
+//                             </div>
+//                           </div>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <Badge className="bg-[#6BA368] bg-opacity-10 text-[#6BA368] text-xs font-medium px-2 py-0.5 rounded border-0">
+//                             {category}
+//                           </Badge>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <div>
+//                             <div className="font-medium text-sm text-gray-900">
+//                               {brandName}
+//                             </div>
+//                             {modelNumber !== "—" && (
+//                               <div className="text-xs text-gray-400 mt-0.5">
+//                                 Model: {modelNumber}
+//                               </div>
+//                             )}
+//                           </div>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <code className="text-xs bg-gray-100 px-2 py-1 rounded text-[#1F6E8C] font-mono">
+//                             {serialNumber}
+//                           </code>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <div className="flex items-center gap-1.5">
+//                             <Calendar className="h-3.5 w-3.5 text-[#D9A441]" />
+//                             <span className="text-sm text-gray-700">
+//                               {formatDate(product.purDate)}
+//                             </span>
+//                           </div>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3">
+//                           <div className="flex items-center gap-1.5">
+//                             <FileText className="h-3.5 w-3.5 text-[#6BA368]" />
+//                             <span className="text-sm text-gray-600 font-mono">
+//                               {invoiceNumber}
+//                             </span>
+//                           </div>
+//                         </TableCell>
+                        
+//                         <TableCell className="px-4 py-3 text-right">
+//                           <DropdownMenu>
+//                             <DropdownMenuTrigger asChild>
+//                               <Button variant="ghost" className="h-7 w-7 p-0 hover:bg-[#6BA368] hover:bg-opacity-10">
+//                                 <MoreHorizontal className="h-4 w-4 text-gray-500" />
+//                               </Button>
+//                             </DropdownMenuTrigger>
+//                             <DropdownMenuContent align="end" className="w-44">
+//                               <DropdownMenuLabel className="text-xs text-[#1F6E8C] py-1.5">Actions</DropdownMenuLabel>
+//                               <DropdownMenuSeparator />
+//                               <DropdownMenuItem
+//                                 onClick={() => handleCopy(product.TicketNumber)}
+//                                 disabled={!product.TicketNumber}
+//                                 className="text-sm py-1.5 cursor-pointer"
+//                               >
+//                                 <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
+//                                 Copy Ticket #
+//                               </DropdownMenuItem>
+//                               <DropdownMenuItem
+//                                 onClick={() => handleCopy(serialNumber)}
+//                                 disabled={serialNumber === "—"}
+//                                 className="text-sm py-1.5 cursor-pointer"
+//                               >
+//                                 <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
+//                                 Copy Serial #
+//                               </DropdownMenuItem>
+//                             </DropdownMenuContent>
+//                           </DropdownMenu>
+//                         </TableCell>
+//                       </TableRow>
+//                     );
+//                   })
+//                 )}
+//               </TableBody>
+//             </Table>
+//           </div>
+
+//           {/* Pagination */}
+//           {filteredProducts.length > 0 && (
+//             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
+//               <div className="text-xs text-gray-500">
+//                 Showing <span className="font-medium text-[#1F6E8C]">{indexOfFirstItem + 1}</span> to{" "}
+//                 <span className="font-medium text-[#1F6E8C]">{Math.min(indexOfLastItem, filteredProducts.length)}</span> of{" "}
+//                 <span className="font-medium text-[#1F6E8C]">{filteredProducts.length}</span> products
+//               </div>
+//               <div className="flex items-center gap-2">
+//                 <Button
+//                   variant="outline"
+//                   size="sm"
+//                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+//                   disabled={currentPage === 1}
+//                   className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+//                 >
+//                   <ChevronLeftIcon className="h-3.5 w-3.5 mr-1" />
+//                   Previous
+//                 </Button>
+                
+//                 <div className="flex items-center gap-1">
+//                   {[...Array(Math.min(5, totalPages))].map((_, i) => {
+//                     let pageNum;
+//                     if (totalPages <= 5) {
+//                       pageNum = i + 1;
+//                     } else if (currentPage <= 3) {
+//                       pageNum = i + 1;
+//                     } else if (currentPage >= totalPages - 2) {
+//                       pageNum = totalPages - 4 + i;
+//                     } else {
+//                       pageNum = currentPage - 2 + i;
+//                     }
+                    
+//                     return (
+//                       <Button
+//                         key={i}
+//                         variant={currentPage === pageNum ? "default" : "outline"}
+//                         size="sm"
+//                         onClick={() => setCurrentPage(pageNum)}
+//                         className={`h-8 w-8 p-0 text-xs ${
+//                           currentPage === pageNum 
+//                             ? 'bg-[#1F6E8C] hover:bg-[#184f66] text-white border-0' 
+//                             : 'border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]'
+//                         }`}
+//                       >
+//                         {pageNum}
+//                       </Button>
+//                     );
+//                   })}
+//                 </div>
+
+//                 <Button
+//                   variant="outline"
+//                   size="sm"
+//                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+//                   disabled={currentPage === totalPages}
+//                   className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+//                 >
+//                   Next
+//                   <ChevronRightIcon className="h-3.5 w-3.5 ml-1" />
+//                 </Button>
+//               </div>
+//             </div>
+//           )}
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// };
+
+// export default CustomerCareProductHistory;
+
+
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../Utils/axiosIntance";
+
+export default function CustomerCareProductHistory() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [categories, setCategories] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/customerDetails/products");
-      
-      let productsArray = [];
-      
-      if (Array.isArray(response.data)) {
-        productsArray = response.data;
-      } else if (response.data?.data && Array.isArray(response.data.data)) {
-        productsArray = response.data.data;
-      } else if (response.data?.products && Array.isArray(response.data.products)) {
-        productsArray = response.data.products;
-      } else if (response.data?.result && Array.isArray(response.data.result)) {
-        productsArray = response.data.result;
-      } else {
-        productsArray = [];
-      }
-      
-      // Log the first product to see available fields
-      if (productsArray.length > 0) {
-        console.log("Sample product data:", productsArray[0]);
-      }
-      
-      setProducts(productsArray);
-      
-      if (productsArray.length > 0) {
-        const uniqueCategories = [...new Set(productsArray.map(p => p.proCatogory || p.category).filter(Boolean))];
-        setCategories(uniqueCategories);
-      }
-      
       setError(null);
+      const { data } = await axiosInstance.get("/category/history");
+      const list = data.data || data.products || data || [];
+      setProducts(Array.isArray(list) ? list : []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products");
-      setProducts([]);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchProducts();
+  // Get configurations as array of [key, value] pairs
+  const getConfigs = (configurations) => {
+    if (!configurations) return [];
+    if (configurations instanceof Map) return [...configurations.entries()];
+    if (typeof configurations === "object") return Object.entries(configurations);
+    return [];
   };
 
-  // Helper function to get brand name from various possible field names
-  const getBrandName = (product) => {
-    // Check all possible field names for brand
-    const possibleFields = [
-      'brandName',
-      'brand',
-      'productBrand',
-      'manufacturer',
-      'company',
-      'proBrand',
-      'brand_name',
-      'product_brand'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
+  // Search by product name, ticket number, or serial number
+  const filtered = products.filter(p => {
+    const name = p.productName?.toLowerCase() || "";
+    const ticket = p.ticketNumber?.toLowerCase() || "";
+    const serial = p.serialNumber?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+    return !searchTerm || name.includes(search) || ticket.includes(search) || serial.includes(search);
+  });
 
-  // Helper function to get model number from various possible field names
-  const getModelNumber = (product) => {
-    const possibleFields = [
-      'proModNum',
-      'modelNumber',
-      'model',
-      'proModel',
-      'productModel',
-      'modNum',
-      'model_no',
-      'product_model'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
-
-  // Helper function to get product name
-  const getProductName = (product) => {
-    const possibleFields = [
-      'proName',
-      'productName',
-      'name',
-      'product',
-      'itemName',
-      'product_name'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
-
-  // Helper function to get category
-  const getCategory = (product) => {
-    const possibleFields = [
-      'proCatogory',
-      'category',
-      'productCategory',
-      'catogory',
-      'itemCategory',
-      'product_category'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
-
-  // Helper function to get serial number
-  const getSerialNumber = (product) => {
-    const possibleFields = [
-      'proSrNo',
-      'serialNumber',
-      'serialNo',
-      'srNo',
-      'serial',
-      'serial_number'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
-
-  // Helper function to get invoice number
-  const getInvoiceNumber = (product) => {
-    const possibleFields = [
-      'invoiceNum',
-      'invoiceNumber',
-      'invoice',
-      'billNumber',
-      'billNo',
-      'invoice_no'
-    ];
-    
-    for (const field of possibleFields) {
-      if (product[field] && product[field] !== "N/A" && product[field] !== "") {
-        return product[field];
-      }
-    }
-    
-    return "—";
-  };
-
-  const filteredProducts = Array.isArray(products) ? products.filter(product => {
-    const searchableText = `
-      ${getProductName(product)} 
-      ${getSerialNumber(product)} 
-      ${getModelNumber(product)} 
-      ${getBrandName(product)} 
-      ${product.TicketNumber || ''}
-    `.toLowerCase();
-    
-    const matchesSearch = searchTerm === "" || searchableText.includes(searchTerm.toLowerCase());
-    
-    const productCategory = getCategory(product);
-    const matchesCategory = filterCategory === "all" || productCategory === filterCategory;
-    
-    return matchesSearch && matchesCategory;
-  }) : [];
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "—";
-    
-    try {
-      let date;
-      
-      if (typeof dateString === 'number') {
-        date = new Date(dateString);
-      } else if (typeof dateString === 'string') {
-        date = new Date(dateString);
-        
-        if (isNaN(date.getTime())) {
-          const parts = dateString.split(/[/\-]/);
-          if (parts.length === 3) {
-            date = new Date(parts[2], parts[1] - 1, parts[0]);
-          }
-        }
-      } else {
-        return "—";
-      }
-      
-      if (isNaN(date.getTime())) {
-        return "—";
-      }
-      
-      return date.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
-    } catch {
-      return "—";
-    }
-  };
-
-  const handleCopy = (text) => {
-    if (text && text !== "—") {
-      navigator.clipboard.writeText(text);
-    }
-  };
-
-  if (loading && !refreshing) {
-    return (
-      <Card className="w-full border-0 shadow-sm">
-        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
-          <CardTitle className="text-xl font-semibold">Product History</CardTitle>
-          <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
-            Loading registered products...
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full rounded" />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className="w-full border-0 shadow-sm">
-        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
-          <CardTitle className="text-xl font-semibold">Product History</CardTitle>
-          <CardDescription className="text-[#F7F7F2] text-sm opacity-90">
-            Error loading products
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <Alert variant="destructive" className="border-red-200 bg-red-50">
-            <AlertTitle className="text-red-800">Error</AlertTitle>
-            <AlertDescription className="text-red-600">{error}</AlertDescription>
-          </Alert>
-          <Button 
-            className="mt-4 bg-[#1F6E8C] hover:bg-[#184f66] text-white"
-            onClick={fetchProducts}
-          >
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="w-full">
-      <Card className="w-full border-0 shadow-sm overflow-hidden">
-        <CardHeader className="bg-[#1F6E8C] text-white px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                Product History
-              </CardTitle>
-              <CardDescription className="text-[#F7F7F2] text-sm opacity-90 mt-1">
-                View all registered products ({filteredProducts.length} total)
-              </CardDescription>
-            </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={handleRefresh}
-                    disabled={refreshing}
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white h-8 w-8"
-                  >
-                    <RefreshCwIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Refresh data</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </CardHeader>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+        .ph-root * { box-sizing: border-box; }
+        .ph-root { font-family: 'DM Sans', sans-serif; background: #020818; min-height: 100vh; padding: 24px; }
+        .ph-card { background: #0f172a; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .ph-header { background: linear-gradient(135deg, #0f172a 0%, #1a2639 100%); padding: 28px 32px 24px; border-bottom: 1px solid #1e293b; }
+        .ph-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.5px; color: #f1f5f9; }
+        .ph-subtitle { font-size: 13px; color: #64748b; margin: 0; }
+        .ph-toolbar { padding: 20px 24px; border-bottom: 1px solid #1e293b; }
+        .ph-search { position: relative; max-width: 500px; }
+        .ph-search input { 
+          width: 100%; 
+          padding: 12px 16px 12px 44px; 
+          border: 1px solid #1e293b; 
+          border-radius: 10px; 
+          font-size: 14px; 
+          outline: none; 
+          background: #0a1628; 
+          color: #e2e8f0;
+          font-family: 'DM Sans', sans-serif;
+          transition: border-color 0.2s;
+        }
+        .ph-search input:focus { border-color: #38bdf8; }
+        .ph-search input::placeholder { color: #475569; }
+        .ph-search-icon { 
+          position: absolute; 
+          left: 14px; 
+          top: 50%; 
+          transform: translateY(-50%); 
+          color: #64748b;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ph-refresh { 
+          padding: 8px 16px; 
+          background: #1e293b; 
+          color: #94a3b8; 
+          border: 1px solid #334155; 
+          border-radius: 8px; 
+          font-size: 13px; 
+          font-weight: 600; 
+          cursor: pointer; 
+          transition: all 0.2s; 
+          font-family: 'DM Sans', sans-serif; 
+        }
+        .ph-refresh:hover { background: #263347; color: #f1f5f9; border-color: #475569; }
+        .ph-table-wrap { overflow-x: auto; }
+        table.ph-table { width: 100%; border-collapse: collapse; }
+        .ph-table th { 
+          padding: 14px 16px; 
+          text-align: left; 
+          font-size: 11px; 
+          font-weight: 700; 
+          text-transform: uppercase; 
+          letter-spacing: 0.06em; 
+          color: #64748b; 
+          background: #0f172a; 
+          border-bottom: 1px solid #1e293b; 
+          white-space: nowrap; 
+        }
+        .ph-table td { 
+          padding: 16px; 
+          font-size: 13px; 
+          border-bottom: 1px solid #1e293b; 
+          vertical-align: top;
+          color: #e2e8f0;
+        }
+        .ph-table tr:last-child td { border-bottom: none; }
+        .ph-table tbody tr { transition: background 0.15s; cursor: pointer; }
+        .ph-table tbody tr:hover { background: #1a2639; }
+        .ph-table tbody tr.expanded { background: #1e2a3a; }
+        .ph-ticket { 
+          font-family: 'DM Mono', monospace; 
+          font-size: 11px; 
+          background: #1e293b; 
+          color: #c4b5fd; 
+          padding: 4px 8px; 
+          border-radius: 6px; 
+          border: 1px solid #334155; 
+          font-weight: 500; 
+          white-space: nowrap; 
+        }
+        .ph-serial { 
+          font-family: 'DM Mono', monospace; 
+          font-size: 11px; 
+          color: #94a3b8; 
+          margin-top: 4px;
+          display: block;
+        }
+        .ph-configs { 
+          display: flex; 
+          flex-wrap: wrap; 
+          gap: 6px; 
+          margin-top: 10px; 
+          padding: 12px 16px; 
+          background: #0f172a; 
+          border-radius: 10px; 
+          border: 1px solid #1e293b; 
+        }
+        .ph-config-chip { 
+          display: flex; 
+          gap: 4px; 
+          align-items: center; 
+          background: #1e293b; 
+          border: 1px solid #334155; 
+          border-radius: 6px; 
+          padding: 4px 10px; 
+          font-size: 12px; 
+        }
+        .ph-config-key { color: #94a3b8; font-weight: 500; }
+        .ph-config-val { color: #38bdf8; font-weight: 600; }
+        .ph-empty { 
+          text-align: center; 
+          padding: 56px 24px; 
+          color: #64748b; 
+        }
+        .ph-empty-icon { font-size: 40px; margin-bottom: 12px; }
+        .ph-pagination { 
+          display: flex; 
+          align-items: center; 
+          justify-content: space-between; 
+          padding: 16px 24px; 
+          border-top: 1px solid #1e293b; 
+          background: #0f172a; 
+          flex-wrap: wrap; 
+          gap: 10px; 
+        }
+        .ph-page-info { font-size: 12px; color: #64748b; }
+        .ph-page-btns { display: flex; gap: 6px; align-items: center; }
+        .ph-page-btn { 
+          padding: 6px 12px; 
+          border: 1px solid #1e293b; 
+          border-radius: 6px; 
+          font-size: 12px; 
+          font-weight: 600; 
+          background: #0f172a; 
+          cursor: pointer; 
+          color: #94a3b8; 
+          transition: all 0.15s; 
+          font-family: 'DM Sans', sans-serif; 
+        }
+        .ph-page-btn:hover:not(:disabled) { 
+          border-color: #38bdf8; 
+          color: #38bdf8; 
+          background: #1e293b; 
+        }
+        .ph-page-btn.active { 
+          background: #38bdf8; 
+          color: #0f172a; 
+          border-color: #38bdf8; 
+        }
+        .ph-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .ph-error { 
+          margin: 24px; 
+          padding: 16px 20px; 
+          background: #2a0f0f; 
+          border: 1px solid #ef4444; 
+          border-radius: 10px; 
+          color: #ef4444; 
+          font-size: 13px; 
+        }
+        .ph-loading { padding: 40px 24px; display: flex; flex-direction: column; gap: 10px; }
+        .ph-skeleton { 
+          height: 44px; 
+          border-radius: 8px; 
+          background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%); 
+          background-size: 200% 100%; 
+          animation: shimmer 1.4s infinite; 
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .ph-expand-hint { 
+          font-size: 11px; 
+          color: #64748b; 
+          margin-left: 8px;
+          font-weight: 400;
+        }
+        .ph-no-config { font-size: 12px; color: #64748b; font-style: italic; }
+        .ph-count-badge { 
+          display: inline-block; 
+          background: #1e293b; 
+          border-radius: 20px; 
+          padding: 2px 10px; 
+          font-size: 12px; 
+          font-weight: 600; 
+          margin-left: 10px;
+          color: #94a3b8;
+        }
+        .ph-product-name {
+          font-weight: 600;
+          color: #f1f5f9;
+        }
+        .ph-category {
+          font-size: 12px;
+          color: #38bdf8;
+          font-weight: 600;
+          background: #1e293b;
+          padding: 4px 8px;
+          border-radius: 6px;
+          display: inline-block;
+        }
+        .ph-date {
+          color: #64748b;
+          font-size: 12px;
+        }
+      `}</style>
 
-        <CardContent className="p-0">
-          {/* Filters */}
-          <div className="p-6 pb-4 border-b border-gray-100">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by product name, serial number, ticket number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-4 py-2 border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368] rounded-md text-sm"
-                />
-                {searchTerm && (
-                  <button
-                    onClick={() => setSearchTerm("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <span className="text-xs">✕</span>
-                  </button>
-                )}
+      <div className="ph-root">
+        <div className="ph-card">
+
+          {/* Header */}
+          <div className="ph-header">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <h2 className="ph-title">
+                  📋 Product History
+                  <span className="ph-count-badge">{filtered.length}</span>
+                </h2>
+                <p className="ph-subtitle">All registered products with their configurations</p>
               </div>
-              
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-full md:w-[200px] border-gray-200 focus:border-[#6BA368] focus:ring-1 focus:ring-[#6BA368]">
-                  <FilterIcon className="h-4 w-4 mr-2 text-[#6BA368]" />
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <button className="ph-refresh" onClick={fetchProducts} disabled={loading}>
+                {loading ? "⏳" : "↻"} Refresh
+              </button>
             </div>
           </div>
+
+          {/* Search Bar */}
+          <div className="ph-toolbar">
+            <div className="ph-search">
+              <span className="ph-search-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+              </span>
+              <input
+                placeholder="Search by product name, ticket number, or serial number..."
+                value={searchTerm}
+                onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="ph-error">
+              ⚠️ {error} &nbsp;
+              <button onClick={fetchProducts} style={{ color: "#38bdf8", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Loading */}
+          {loading && (
+            <div className="ph-loading">
+              {[...Array(5)].map((_, i) => <div key={i} className="ph-skeleton" />)}
+            </div>
+          )}
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-gray-50">
-                <TableRow className="border-b border-gray-200">
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Hash className="h-3 w-3" />
-                      Ticket #
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Package className="h-3 w-3" />
-                      Product
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Tag className="h-3 w-3" />
-                      Category
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    Brand/Model
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    Serial Number
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      Purchase Date
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <FileText className="h-3 w-3" />
-                      Invoice
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold text-[#1F6E8C] uppercase tracking-wider px-4 py-3 text-right whitespace-nowrap">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentItems.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="h-40 text-center text-gray-500">
-                      <div className="flex flex-col items-center justify-center">
-                        <FileTextIcon className="h-8 w-8 text-gray-300 mb-2" />
-                        <p className="text-sm font-medium">No products found</p>
-                        <p className="text-xs">Try adjusting your search or filter</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  currentItems.map((product) => {
-                    const brandName = getBrandName(product);
-                    const modelNumber = getModelNumber(product);
-                    const productName = getProductName(product);
-                    const category = getCategory(product);
-                    const serialNumber = getSerialNumber(product);
-                    const invoiceNumber = getInvoiceNumber(product);
-                    
-                    return (
-                      <TableRow 
-                        key={product._id || product.TicketNumber || Math.random()} 
-                        className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
-                      >
-                        <TableCell className="px-4 py-3">
-                          <Badge variant="outline" className="font-mono text-xs bg-[#6BA368] bg-opacity-5 text-[#1F6E8C] border-[#6BA368] border-opacity-20 font-medium px-2 py-0.5">
-                            {product.TicketNumber || "—"}
-                          </Badge>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <div>
-                            <div className="font-medium text-sm text-gray-900">
-                              {productName}
-                            </div>
-                            <div className="text-xs text-gray-400 mt-0.5">
-                              Reg: {formatDate(product.createdAt)}
-                            </div>
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <Badge className="bg-[#6BA368] bg-opacity-10 text-[#6BA368] text-xs font-medium px-2 py-0.5 rounded border-0">
-                            {category}
-                          </Badge>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <div>
-                            <div className="font-medium text-sm text-gray-900">
-                              {brandName}
-                            </div>
-                            {modelNumber !== "—" && (
-                              <div className="text-xs text-gray-400 mt-0.5">
-                                Model: {modelNumber}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded text-[#1F6E8C] font-mono">
-                            {serialNumber}
-                          </code>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5 text-[#D9A441]" />
-                            <span className="text-sm text-gray-700">
-                              {formatDate(product.purDate)}
-                            </span>
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-1.5">
-                            <FileText className="h-3.5 w-3.5 text-[#6BA368]" />
-                            <span className="text-sm text-gray-600 font-mono">
-                              {invoiceNumber}
-                            </span>
-                          </div>
-                        </TableCell>
-                        
-                        <TableCell className="px-4 py-3 text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-7 w-7 p-0 hover:bg-[#6BA368] hover:bg-opacity-10">
-                                <MoreHorizontal className="h-4 w-4 text-gray-500" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44">
-                              <DropdownMenuLabel className="text-xs text-[#1F6E8C] py-1.5">Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleCopy(product.TicketNumber)}
-                                disabled={!product.TicketNumber}
-                                className="text-sm py-1.5 cursor-pointer"
-                              >
-                                <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
-                                Copy Ticket #
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleCopy(serialNumber)}
-                                disabled={serialNumber === "—"}
-                                className="text-sm py-1.5 cursor-pointer"
-                              >
-                                <CopyIcon className="mr-2 h-3.5 w-3.5 text-[#6BA368]" />
-                                Copy Serial #
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          {!loading && !error && (
+            <div className="ph-table-wrap">
+              <table className="ph-table">
+                <thead>
+                  <tr>
+                    <th>Ticket # / Serial #</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Registered</th>
+                    <th>Configurations</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.length === 0 ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <div className="ph-empty">
+                          <div className="ph-empty-icon">🔍</div>
+                          <div style={{ fontWeight: 600, color: "#94a3b8" }}>No products found</div>
+                          <div style={{ fontSize: 12, marginTop: 4, color: "#64748b" }}>Try adjusting your search term</div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    paginated.map((product) => {
+                      const configs = getConfigs(product.configurations);
+                      const isExpanded = expandedRow === product._id;
+
+                      return (
+                        <React.Fragment key={product._id}>
+                          <tr
+                            className={isExpanded ? "expanded" : ""}
+                            onClick={() => setExpandedRow(isExpanded ? null : product._id)}
+                          >
+                            {/* Ticket & Serial */}
+                            <td>
+                              <span className="ph-ticket">
+                                {product.ticketNumber || "—"}
+                              </span>
+                              {product.serialNumber && (
+                                <span className="ph-serial">
+                                  SN: {product.serialNumber}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Product Name */}
+                            <td>
+                              <span className="ph-product-name">
+                                {product.productName || "—"}
+                              </span>
+                              <span className="ph-expand-hint">
+                                {isExpanded ? "▲" : "▼"}
+                              </span>
+                            </td>
+
+                            {/* Category */}
+                            <td>
+                              <span className="ph-category">
+                                {product.category?.name || product.category || "—"}
+                              </span>
+                            </td>
+
+                            {/* Date */}
+                            <td className="ph-date">
+                              {product.createdAt
+                                ? new Date(product.createdAt).toLocaleDateString("en-IN", { 
+                                    day: "2-digit", 
+                                    month: "short", 
+                                    year: "numeric" 
+                                  })
+                                : "—"}
+                            </td>
+
+                            {/* Configs preview */}
+                            <td>
+                              {configs.length === 0 ? (
+                                <span className="ph-no-config">No configurations</span>
+                              ) : (
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                                  {configs.slice(0, 3).map(([k, v]) => (
+                                    <span key={k} className="ph-config-chip">
+                                      <span className="ph-config-key">{k}:</span>
+                                      <span className="ph-config-val">{String(v)}</span>
+                                    </span>
+                                  ))}
+                                  {configs.length > 3 && (
+                                    <span style={{ fontSize: 11, color: "#64748b", alignSelf: "center" }}>
+                                      +{configs.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+
+                          {/* Expanded row — all configs */}
+                          {isExpanded && configs.length > 0 && (
+                            <tr>
+                              <td colSpan={5} style={{ padding: "0 16px 20px", background: "#1a2639" }}>
+                                <div style={{ 
+                                  fontSize: 11, 
+                                  fontWeight: 700, 
+                                  color: "#38bdf8", 
+                                  textTransform: "uppercase", 
+                                  letterSpacing: "0.05em", 
+                                  marginBottom: 10,
+                                  paddingTop: 8
+                                }}>
+                                  ⚙️ Full Configuration
+                                </div>
+                                <div className="ph-configs">
+                                  {configs.map(([k, v]) => (
+                                    <span key={k} className="ph-config-chip">
+                                      <span className="ph-config-key">{k}:</span>
+                                      <span className="ph-config-val">{String(v)}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* Pagination */}
-          {filteredProducts.length > 0 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
-              <div className="text-xs text-gray-500">
-                Showing <span className="font-medium text-[#1F6E8C]">{indexOfFirstItem + 1}</span> to{" "}
-                <span className="font-medium text-[#1F6E8C]">{Math.min(indexOfLastItem, filteredProducts.length)}</span> of{" "}
-                <span className="font-medium text-[#1F6E8C]">{filteredProducts.length}</span> products
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+          {!loading && filtered.length > ITEMS_PER_PAGE && (
+            <div className="ph-pagination">
+              <span className="ph-page-info">
+                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length}
+              </span>
+              <div className="ph-page-btns">
+                <button 
+                  className="ph-page-btn" 
+                  disabled={currentPage === 1} 
+                  onClick={() => setCurrentPage(p => p - 1)}
                 >
-                  <ChevronLeftIcon className="h-3.5 w-3.5 mr-1" />
-                  Previous
-                </Button>
-                
-                <div className="flex items-center gap-1">
-                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <Button
-                        key={i}
-                        variant={currentPage === pageNum ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`h-8 w-8 p-0 text-xs ${
-                          currentPage === pageNum 
-                            ? 'bg-[#1F6E8C] hover:bg-[#184f66] text-white border-0' 
-                            : 'border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]'
-                        }`}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="h-8 px-3 text-xs border-gray-200 hover:border-[#6BA368] hover:text-[#6BA368]"
+                  ←
+                </button>
+                {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                  let p;
+                  if (totalPages <= 5) {
+                    p = i + 1;
+                  } else if (currentPage <= 3) {
+                    p = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    p = totalPages - 4 + i;
+                  } else {
+                    p = currentPage - 2 + i;
+                  }
+                  return (
+                    <button 
+                      key={i} 
+                      className={`ph-page-btn${currentPage === p ? " active" : ""}`} 
+                      onClick={() => setCurrentPage(p)}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+                <button 
+                  className="ph-page-btn" 
+                  disabled={currentPage === totalPages} 
+                  onClick={() => setCurrentPage(p => p + 1)}
                 >
-                  Next
-                  <ChevronRightIcon className="h-3.5 w-3.5 ml-1" />
-                </Button>
+                  →
+                </button>
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
 
-export default CustomerCareProductHistory;
+        </div>
+      </div>
+    </>
+  );
+}

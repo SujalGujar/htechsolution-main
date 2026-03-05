@@ -1330,55 +1330,978 @@
 // }
 
 
+// import { useState, useEffect } from "react";
+// import React from "react";
+// import axiosInstance from "../../Utils/axiosIntance";
+
+
+// const Icon = ({ d, size = 18, color = "currentColor" }) => (
+//   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+//     stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+//     <path d={d} />
+//   </svg>
+// );
+// const PlusIcon    = () => <Icon d="M12 5v14M5 12h14" />;
+// const TrashIcon   = () => <Icon d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />;
+// const ChevronRight= () => <Icon d="M9 18l6-6-6-6" />;
+// const SettingsIcon= () => <Icon d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />;
+// const TagIcon     = () => <Icon d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01" />;
+// const XIcon       = () => <Icon d="M18 6L6 18M6 6l12 12" />;
+// const CheckIcon   = () => <Icon d="M20 6L9 17l-5-5" />;
+// const EditIcon    = () => <Icon d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />;
+
+// // ─── TYPE COLORS (Tailwind can't do dynamic colors, so we keep these minimal inline) ──
+// const TYPE_COLORS = {
+//   String:  { bg: "#6C63FF22", text: "#6C63FF", border: "#6C63FF44" },
+//   Number:  { bg: "#00C89622", text: "#00C896", border: "#00C89644" },
+//   Boolean: { bg: "#FF6B6B22", text: "#FF6B6B", border: "#FF6B6B44" },
+//   Date:    { bg: "#FFB34722", text: "#FFB347", border: "#FFB34744" },
+// };
+
+// // ─── FIELD TYPE BADGE ─────────────────────────────────────────────────────────
+// const FieldTypeBadge = ({ type }) => {
+//   const c = TYPE_COLORS[type] || TYPE_COLORS.String;
+//   return (
+//     <span className="rounded px-2 py-0.5 text-xs font-bold tracking-wide"
+//       style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }}>
+//       {type}
+//     </span>
+//   );
+// };
+
+// // ─── TOAST ───────────────────────────────────────────────────────────────────
+// const Toast = ({ toasts, removeToast }) => (
+//   <div className="fixed top-6 right-6 z-50 flex flex-col gap-2">
+//     {toasts.map(t => (
+//       <div key={t.id}
+//         className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border border-black/10 min-w-64 animate-bounce-in font-semibold text-sm text-gray-900
+//           ${t.type === "success" ? "bg-emerald-400" : t.type === "error" ? "bg-red-400" : "bg-white"}`}>
+//         {t.type === "success" ? <CheckIcon /> : <XIcon />}
+//         <span className="flex-1">{t.message}</span>
+//         <button onClick={() => removeToast(t.id)} className="opacity-60 hover:opacity-100 bg-transparent border-none cursor-pointer">
+//           <XIcon />
+//         </button>
+//       </div>
+//     ))}
+//   </div>
+// );
+
+// // ─── MODAL ───────────────────────────────────────────────────────────────────
+// const Modal = ({ open, onClose, title, children }) => {
+//   if (!open) return null;
+//   return (
+//     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-5"
+//       onClick={onClose}>
+//       <div onClick={e => e.stopPropagation()}
+//         className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+//         {/* Modal Header */}
+//         <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100">
+//           <h3 className="text-lg font-bold text-gray-900 tracking-tight"
+//             style={{ fontFamily: "'Syne', sans-serif" }}>
+//             {title}
+//           </h3>
+//           <button onClick={onClose}
+//             className="bg-gray-100 hover:bg-gray-200 border-none rounded-lg p-2 cursor-pointer transition-colors">
+//             <XIcon />
+//           </button>
+//         </div>
+//         {/* Modal Body */}
+//         <div className="px-7 py-6">{children}</div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // ─── INPUT ───────────────────────────────────────────────────────────────────
+// const Input = ({ label, required, className = "", ...props }) => (
+//   <div className="flex flex-col gap-1.5">
+//     {label && (
+//       <label className="text-xs font-bold text-gray-500 tracking-wide uppercase">
+//         {label}{required && <span className="text-red-500"> *</span>}
+//       </label>
+//     )}
+//     <input
+//       {...props}
+//       className={`border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50 text-gray-900 outline-none
+//         focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all placeholder:text-gray-400 ${className}`}
+//     />
+//   </div>
+// );
+
+// // ─── SELECT ──────────────────────────────────────────────────────────────────
+// const Select = ({ label, required, children, className = "", ...props }) => (
+//   <div className="flex flex-col gap-1.5">
+//     {label && (
+//       <label className="text-xs font-bold text-gray-500 tracking-wide uppercase">
+//         {label}{required && <span className="text-red-500"> *</span>}
+//       </label>
+//     )}
+//     <select
+//       {...props}
+//       className={`border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50 text-gray-900 outline-none
+//         focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all cursor-pointer ${className}`}>
+//       {children}
+//     </select>
+//   </div>
+// );
+
+// // ─── BUTTON ──────────────────────────────────────────────────────────────────
+// const variantClasses = {
+//   primary:   "bg-gray-900 text-white border-transparent hover:bg-gray-700",
+//   secondary: "bg-gray-100 text-gray-900 border-transparent hover:bg-gray-200",
+//   danger:    "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100",
+//   ghost:     "bg-transparent text-violet-600 border border-violet-200 hover:bg-violet-50",
+// };
+
+// const Btn = ({ variant = "primary", children, loading, className = "", ...props }) => (
+//   <button
+//     {...props}
+//     className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold
+//       transition-all whitespace-nowrap border
+//       disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
+//       ${variantClasses[variant]} ${className}`}>
+//     {loading ? "⏳" : children}
+//   </button>
+// );
+
+// // ─── AVATAR (category color from name) ───────────────────────────────────────
+// // Tailwind can't do dynamic hsl, so we keep this one inline
+// const CategoryAvatar = ({ name }) => {
+//   const hue = (name.charCodeAt(0) * 37) % 360;
+//   return (
+//     <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-extrabold flex-shrink-0"
+//       style={{ background: `hsl(${hue},70%,94%)`, color: `hsl(${hue},60%,40%)` }}>
+//       {name[0].toUpperCase()}
+//     </div>
+//   );
+// };
+
+// // ═══════════════════════════════════════════════════════════════════════════════
+// // MAIN COMPONENT
+// // ═══════════════════════════════════════════════════════════════════════════════
+// export default function CustomerCareHome() {
+//   const [categories, setCategories]           = useState([]);
+//   const [configs, setConfigs]                 = useState({});
+//   const [expandedCategory, setExpandedCategory] = useState(null);
+//   const [loading, setLoading]                 = useState(false);
+//   const [toasts, setToasts]                   = useState([]);
+
+//   // Modals
+//   const [showCatModal, setShowCatModal]         = useState(false);
+//   const [showConfigModal, setShowConfigModal]   = useState(false);
+//   const [showFieldModal, setShowFieldModal]     = useState(false);
+//   const [activeCategoryForConfig, setActiveCategoryForConfig] = useState(null);
+  
+//   // ✅ STEP 1 — Add State for Product Registration
+//   const [showRegisterModal, setShowRegisterModal] = useState(false);
+//   const [registerCategory, setRegisterCategory] = useState(null);
+//   const [registerForm, setRegisterForm] = useState({});
+//   const [quantity, setQuantity] = useState(1);
+
+//   // Forms
+//   const [catForm, setCatForm]       = useState({ name: "", description: "" });
+//   const [configFields, setConfigFields] = useState([]);
+//   const [editCat, setEditCat]       = useState(null);
+//   const [newField, setNewField]     = useState({
+//     fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: ""
+//   });
+//   const [addingField, setAddingField] = useState({
+//     categoryId: null,
+//     field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" }
+//   });
+
+//   // ── TOAST HELPERS ──────────────────────────────────────────────────────────
+//   const addToast = (message, type = "success") => {
+//     const id = Date.now();
+//     setToasts(p => [...p, { id, message, type }]);
+//     setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3500);
+//   };
+//   const removeToast = (id) => setToasts(p => p.filter(t => t.id !== id));
+
+//   // ── API ────────────────────────────────────────────────────────────────────
+//   const fetchCategories = async () => {
+//     setLoading(true);
+//     try {
+//       const { data } = await axiosInstance.get("/category/allproducts");
+//       setCategories(data.data || []);
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed to load categories", "error");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const fetchConfig = async (categoryId) => {
+//     if (configs[categoryId] !== undefined) return;
+//     try {
+//       const { data } = await axiosInstance.get(`/product/${categoryId}/configurations`);
+//       setConfigs(p => ({ ...p, [categoryId]: data.data }));
+//     } catch (e) {
+//       setConfigs(p => ({ ...p, [categoryId]: null }));
+//       addToast(e.response?.data?.message || "Failed to load configuration", "error");
+//     }
+//   };
+
+//   useEffect(() => { fetchCategories(); }, []);
+
+  
+//   const handleSaveCategory = async () => {
+//     if (!catForm.name.trim()) return addToast("Category name is required", "error");
+//     try {
+//       if (editCat) {
+//         await axiosInstance.put(`/category/updateProduct/${editCat._id}`, catForm);
+//         addToast("Category updated!");
+//       } else {
+//         await axiosInstance.post("/category/createCategory", catForm);
+//         addToast("Category created!");
+//       }
+//       setShowCatModal(false);
+//       setCatForm({ name: "", description: "" });
+//       setEditCat(null);
+//       fetchCategories();
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   };
+
+//   const handleDeleteCategory = async (id) => {
+//     if (!confirm("Deactivate this category?")) return;
+//     try {
+//       await axiosInstance.delete(`/category/${id}`);
+//       addToast("Category deactivated");
+//       fetchCategories();
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   };
+
+//   // ── CONFIG ─────────────────────────────────────────────────────────────────
+//   const openCreateConfig = (cat) => {
+//     setActiveCategoryForConfig(cat);
+//     setConfigFields([]);
+//     setShowConfigModal(true);
+//   };
+
+//   const toFieldKey = (name) =>
+//     name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+
+//   const addFieldToForm = () => {
+//     if (!newField.fieldName || !newField.fieldKey)
+//       return addToast("Field name & key required", "error");
+//     const options = newField.options
+//       ? newField.options.split(",").map(o => o.trim()).filter(Boolean)
+//       : [];
+//     setConfigFields(p => [...p, { ...newField, options, _tempId: Date.now() }]);
+//     setNewField({ fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" });
+//   };
+
+//   const handleCreateConfig = async () => {
+//     if (!configFields.length) return addToast("Add at least one field", "error");
+//     try {
+//       await axiosInstance.post("/product/configuration", {
+//         category: activeCategoryForConfig._id,
+//         fields: configFields.map(({ _tempId, ...f }) => f),
+//       });
+//       addToast("Configuration created!");
+//       setShowConfigModal(false);
+//       setConfigs(p => ({ ...p, [activeCategoryForConfig._id]: undefined }));
+//       fetchConfig(activeCategoryForConfig._id);
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   };
+
+//   const handleAddFieldToExisting = async () => {
+//     const { categoryId, field } = addingField;
+//     if (!field.fieldName || !field.fieldKey)
+//       return addToast("Field name & key required", "error");
+//     const options = field.options
+//       ? field.options.split(",").map(o => o.trim()).filter(Boolean)
+//       : [];
+//     try {
+//       await axiosInstance.post(`/product/addconfigration/${categoryId}/add-field`, { ...field, options });
+//       addToast("Field added!");
+//       setShowFieldModal(false);
+//       setConfigs(p => ({ ...p, [categoryId]: undefined }));
+//       fetchConfig(categoryId);
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   };
+
+//   const handleRemoveField = async (categoryId, fieldKey) => {
+//     if (!confirm(`Remove field "${fieldKey}"?`)) return;
+//     try {
+//       await axiosInstance.delete(`/product/removeconfigration/${categoryId}/remove-field/${fieldKey}`);
+//       addToast("Field removed");
+//       setConfigs(p => ({ ...p, [categoryId]: undefined }));
+//       fetchConfig(categoryId);
+//     } catch (e) {
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   };
+
+//   const toggleExpand = (catId) => {
+//     if (expandedCategory === catId) {
+//       setExpandedCategory(null);
+//     } else {
+//       setExpandedCategory(catId);
+//       fetchConfig(catId);
+//     }
+//   };
+
+  
+//   return (
+//     <>
+//       {/* Global font injection */}
+//       <style>{`
+//         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap');
+//         body { font-family: 'DM Sans', sans-serif; background: #f7f7fa; }
+//         @keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+//         @keyframes fadeUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+//         .animate-slide-in { animation: slideInRight 0.3s ease; }
+//         .animate-fade-up   { animation: fadeUp 0.3s ease both; }
+//       `}</style>
+
+//       <Toast toasts={toasts} removeToast={removeToast} />
+
+//       <div className="min-h-screen bg-gray-50">
+
+//         {/* ── HEADER ────────────────────────────────────────────────────────── */}
+//         <header className="bg-gray-900 text-white h-16 px-10 flex items-center justify-between border-b-2 border-gray-800">
+//           <div className="flex items-center gap-3">
+//             <div className="bg-violet-600 rounded-xl p-2 flex items-center justify-center">
+//               <TagIcon />
+//             </div>
+//             <div>
+//               <div className="font-extrabold text-lg tracking-tight leading-none">
+//                 Category Manager
+//               </div>
+//               <div className="text-xs text-gray-500 mt-0.5">Customer Care Portal</div>
+//             </div>
+//           </div>
+//           <Btn onClick={() => {
+//             setEditCat(null);
+//             setCatForm({ name: "", description: "" });
+//             setShowCatModal(true);
+//           }}>
+//             <PlusIcon /> New Category
+//           </Btn>
+//         </header>
+
+//         {/* ── BODY ──────────────────────────────────────────────────────────── */}
+//         <main className="max-w-3xl mx-auto px-5 py-9">
+
+//           {/* Stats Row */}
+//           <div className="grid grid-cols-3 gap-4 mb-8">
+//             {[
+//               { label: "Total Categories", value: categories.length,                                        color: "text-violet-600" },
+//               { label: "With Config",      value: Object.values(configs).filter(Boolean).length,            color: "text-emerald-500" },
+//               { label: "Active",           value: categories.filter(c => c.isActive !== false).length,      color: "text-amber-500"   },
+//             ].map(s => (
+//               <div key={s.label}
+//                 className="bg-white rounded-2xl px-6 py-5 shadow-sm border border-gray-100">
+//                 <div className={`text-3xl font-extrabold ${s.color}`}
+//                   style={{ fontFamily: "'Syne', sans-serif" }}>
+//                   {s.value}
+//                 </div>
+//                 <div className="text-sm text-gray-400 mt-1">{s.label}</div>
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* Section title */}
+//           <div className="flex items-center justify-between mb-5">
+//             <h2 className="text-xl font-extrabold text-gray-900 tracking-tight"
+//               style={{ fontFamily: "'Syne', sans-serif" }}>
+//               All Categories
+//             </h2>
+//             <span className="text-xs text-gray-400">Click a category to manage its configuration</span>
+//           </div>
+
+//           {/* ── CATEGORY LIST ────────────────────────────────────────────────── */}
+//           {loading ? (
+//             <div className="text-center py-16 text-gray-400">Loading categories...</div>
+//           ) : categories.length === 0 ? (
+//             <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+//               <div className="text-4xl mb-3">📂</div>
+//               <div className="font-bold text-gray-600 text-base">No categories yet</div>
+//               <div className="text-sm text-gray-400 mt-1">Create your first category to get started</div>
+//             </div>
+//           ) : (
+//             <div className="flex flex-col gap-3">
+//               {categories.map((cat, i) => {
+//                 const isOpen  = expandedCategory === cat._id;
+//                 const config  = configs[cat._id];
+
+//                 return (
+//                   <div key={cat._id}
+//                     className={`bg-white rounded-2xl overflow-hidden shadow-sm border transition-all duration-200
+//                       hover:shadow-lg hover:-translate-y-0.5 animate-fade-up
+//                       ${isOpen ? "border-violet-300" : "border-gray-100"}`}
+//                     style={{ animationDelay: `${i * 0.05}s` }}>
+
+//                     {/* ── Category Row ── */}
+//                     <div
+//                       className="flex items-center gap-4 px-5 py-4 cursor-pointer"
+//                       onClick={() => toggleExpand(cat._id)}>
+
+//                       <CategoryAvatar name={cat.name} />
+
+//                       <div className="flex-1 min-w-0">
+//                         <div className="font-bold text-base text-gray-900 truncate">{cat.name}</div>
+//                         {cat.description && (
+//                           <div className="text-sm text-gray-400 mt-0.5 truncate">{cat.description}</div>
+//                         )}
+//                       </div>
+
+//                       {/* Field count badge */}
+//                       {config?.fields?.length > 0 && (
+//                         <span className="bg-violet-50 text-violet-600 border border-violet-200 rounded-full px-3 py-0.5 text-xs font-bold whitespace-nowrap">
+//                           {config.fields.length} fields
+//                         </span>
+//                       )}
+
+//                       {/* Edit / Delete buttons */}
+//                       <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+//                         <button
+//                           onClick={() => {
+//                             setEditCat(cat);
+//                             setCatForm({ name: cat.name, description: cat.description || "" });
+//                             setShowCatModal(true);
+//                           }}
+//                           className="bg-gray-100 hover:bg-gray-200 border-none rounded-lg p-2 cursor-pointer transition-colors">
+//                           <EditIcon />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDeleteCategory(cat._id)}
+//                           className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-2 cursor-pointer transition-colors text-red-500">
+//                           <TrashIcon />
+//                         </button>
+//                       </div>
+
+//                       {/* Expand chevron */}
+//                       <div className={`text-gray-300 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}>
+//                         <ChevronRight />
+//                       </div>
+//                     </div>
+
+//                     {/* ── Config Panel ── */}
+//                     {isOpen && (
+//                       <div className="border-t border-gray-100 bg-slate-50 px-5 py-5">
+
+//                         {/* Config panel header */}
+//                         <div className="flex items-center justify-between mb-4">
+//                           <div className="flex items-center gap-2 text-gray-700 font-bold text-sm">
+//                             <SettingsIcon />
+//                             Configuration Fields
+//                           </div>
+//                           <div className="flex gap-2">
+//                             {/* ✅ STEP 2 — Add Register Button */}
+//                             {config && (
+//                               <Btn
+//                                 variant="secondary"
+//                                 onClick={() => {
+//                                   setRegisterCategory(cat);
+//                                   setRegisterForm({});
+//                                   setQuantity(1);
+//                                   setShowRegisterModal(true);
+//                                 }}
+//                               >
+//                                 Register Product
+//                               </Btn>
+//                             )}
+                            
+//                             {config === null ? (
+//                               <Btn onClick={() => openCreateConfig(cat)}>
+//                                 <PlusIcon /> Create Config
+//                               </Btn>
+//                             ) : config ? (
+//                               <Btn variant="ghost" onClick={() => {
+//                                 setAddingField({
+//                                   categoryId: cat._id,
+//                                   field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" }
+//                                 });
+//                                 setShowFieldModal(true);
+//                               }}>
+//                                 <PlusIcon /> Add Field
+//                               </Btn>
+//                             ) : null}
+//                           </div>
+//                         </div>
+
+//                         {/* States */}
+//                         {config === undefined ? (
+//                           <div className="text-center py-5 text-sm text-gray-400">Loading config...</div>
+//                         ) : config === null ? (
+//                           <div className="text-center py-7 border-2 border-dashed border-indigo-100 rounded-xl">
+//                             <div className="text-3xl mb-2">⚙️</div>
+//                             <div className="font-semibold text-gray-500 text-sm">No configuration yet</div>
+//                             <div className="text-xs text-gray-400 mt-1">
+//                               Create a config to define fields for <b>{cat.name}</b>
+//                             </div>
+//                           </div>
+//                         ) : config.fields?.length === 0 ? (
+//                           <div className="text-center py-4 text-sm text-gray-400">No fields yet. Add one!</div>
+//                         ) : (
+//                           <div className="flex flex-col gap-2">
+//                             {/* Table header */}
+//                             <div className="grid grid-cols-12 gap-3 px-3.5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wide">
+//                               <span className="col-span-4">Field / Key</span>
+//                               <span className="col-span-3">Type</span>
+//                               <span className="col-span-2">Unit</span>
+//                               <span className="col-span-2">Required</span>
+//                               <span className="col-span-1"></span>
+//                             </div>
+
+//                             {/* Field rows */}
+//                             {config.fields.map((field, fi) => (
+//                               <div key={fi}
+//                                 className="grid grid-cols-12 gap-3 px-3.5 py-3 bg-white rounded-xl border border-gray-100 items-center hover:bg-violet-50/30 transition-colors">
+
+//                                 {/* Name + key */}
+//                                 <div className="col-span-4">
+//                                   <div className="font-bold text-sm text-gray-900">{field.fieldName}</div>
+//                                   <div className="text-xs text-gray-400 font-mono mt-0.5">{field.fieldKey}</div>
+//                                   {field.options?.length > 0 && (
+//                                     <div className="flex flex-wrap gap-1 mt-1.5">
+//                                       {field.options.map(o => (
+//                                         <span key={o} className="bg-gray-100 text-gray-500 rounded px-1.5 py-0.5 text-xs">
+//                                           {o}
+//                                         </span>
+//                                       ))}
+//                                     </div>
+//                                   )}
+//                                 </div>
+
+//                                 {/* Type badge */}
+//                                 <div className="col-span-3">
+//                                   <FieldTypeBadge type={field.fieldType} />
+//                                 </div>
+
+//                                 {/* Unit */}
+//                                 <div className="col-span-2 text-sm text-gray-400">{field.unit || "—"}</div>
+
+//                                 {/* Required */}
+//                                 <div className="col-span-2">
+//                                   {field.isRequired
+//                                     ? <span className="text-emerald-500 text-xs font-bold">✓ Yes</span>
+//                                     : <span className="text-gray-300 text-xs">No</span>}
+//                                 </div>
+
+//                                 {/* Delete field */}
+//                                 <div className="col-span-1 flex justify-end">
+//                                   <button
+//                                     onClick={() => handleRemoveField(cat._id, field.fieldKey)}
+//                                     className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-1.5 cursor-pointer text-red-400 transition-colors">
+//                                     <TrashIcon />
+//                                   </button>
+//                                 </div>
+//                               </div>
+//                             ))}
+//                           </div>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           )}
+//         </main>
+//       </div>
+
+//       {/* ══════════ MODAL: CREATE / EDIT CATEGORY ══════════ */}
+//       <Modal
+//         open={showCatModal}
+//         onClose={() => { setShowCatModal(false); setEditCat(null); }}
+//         title={editCat ? "Edit Category" : "New Category"}>
+//         <div className="flex flex-col gap-4">
+//           <Input
+//             label="Category Name" required
+//             placeholder="e.g. Laptop, Printer, AC"
+//             value={catForm.name}
+//             onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))}
+//           />
+//           <Input
+//             label="Description"
+//             placeholder="Optional description"
+//             value={catForm.description}
+//             onChange={e => setCatForm(p => ({ ...p, description: e.target.value }))}
+//           />
+//           <div className="flex gap-3 justify-end mt-2">
+//             <Btn variant="secondary" onClick={() => { setShowCatModal(false); setEditCat(null); }}>
+//               Cancel
+//             </Btn>
+//             <Btn onClick={handleSaveCategory}>
+//               {editCat ? "Update" : "Create Category"}
+//             </Btn>
+//           </div>
+//         </div>
+//       </Modal>
+
+//       {/* ══════════ MODAL: CREATE CONFIG ══════════ */}
+//       <Modal
+//         open={showConfigModal}
+//         onClose={() => setShowConfigModal(false)}
+//         title={`Config for "${activeCategoryForConfig?.name}"`}>
+//         <div className="flex flex-col gap-4">
+//           <p className="text-sm text-gray-400 -mt-2">
+//             Define the fields that will appear when registering a{" "}
+//             <b className="text-gray-700">{activeCategoryForConfig?.name}</b>.
+//           </p>
+
+//           {/* Field builder box */}
+//           <div className="bg-gray-50 rounded-xl p-4 flex flex-col gap-3 border border-gray-100">
+//             <div className="text-xs font-bold text-gray-500 uppercase tracking-wide">Add a field</div>
+//             <div className="grid grid-cols-2 gap-3">
+//               <Input
+//                 label="Field Name" placeholder="e.g. RAM"
+//                 value={newField.fieldName}
+//                 onChange={e => setNewField(p => ({
+//                   ...p, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value)
+//                 }))}
+//               />
+//               <Input
+//                 label="Field Key" placeholder="auto-filled"
+//                 value={newField.fieldKey}
+//                 onChange={e => setNewField(p => ({ ...p, fieldKey: e.target.value }))}
+//               />
+//               <Select
+//                 label="Type" value={newField.fieldType}
+//                 onChange={e => setNewField(p => ({ ...p, fieldType: e.target.value }))}>
+//                 {["String", "Number", "Boolean", "Date"].map(t => <option key={t}>{t}</option>)}
+//               </Select>
+//               <Input
+//                 label="Unit (optional)" placeholder="GB, inch..."
+//                 value={newField.unit}
+//                 onChange={e => setNewField(p => ({ ...p, unit: e.target.value }))}
+//               />
+//             </div>
+//             <Input
+//               label="Options (comma separated, optional)"
+//               placeholder="8GB, 16GB, 32GB"
+//               value={newField.options}
+//               onChange={e => setNewField(p => ({ ...p, options: e.target.value }))}
+//             />
+//             <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+//               <input
+//                 type="checkbox" checked={newField.isRequired}
+//                 onChange={e => setNewField(p => ({ ...p, isRequired: e.target.checked }))}
+//                 className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+//               />
+//               Required field
+//             </label>
+//             <Btn variant="ghost" onClick={addFieldToForm}>
+//               <PlusIcon /> Add to list
+//             </Btn>
+//           </div>
+
+//           {/* Queued fields */}
+//           {configFields.length > 0 && (
+//             <div className="flex flex-col gap-2">
+//               <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">
+//                 Fields to create ({configFields.length})
+//               </div>
+//               {configFields.map(f => (
+//                 <div key={f._tempId}
+//                   className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3">
+//                   <div>
+//                     <span className="font-bold text-sm text-gray-900">{f.fieldName}</span>
+//                     <span className="text-gray-400 text-xs ml-2">({f.fieldKey})</span>
+//                   </div>
+//                   <div className="flex items-center gap-2">
+//                     <FieldTypeBadge type={f.fieldType} />
+//                     {f.isRequired && (
+//                       <span className="text-emerald-500 text-xs font-bold">REQUIRED</span>
+//                     )}
+//                     <button
+//                       onClick={() => setConfigFields(p => p.filter(x => x._tempId !== f._tempId))}
+//                       className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-1 cursor-pointer text-red-400 transition-colors">
+//                       <XIcon />
+//                     </button>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+
+//           <div className="flex gap-3 justify-end mt-1">
+//             <Btn variant="secondary" onClick={() => setShowConfigModal(false)}>Cancel</Btn>
+//             <Btn onClick={handleCreateConfig} disabled={configFields.length === 0}>
+//               <CheckIcon /> Save Configuration
+//             </Btn>
+//           </div>
+//         </div>
+//       </Modal>
+
+//       {/* ══════════ MODAL: ADD FIELD TO EXISTING CONFIG ══════════ */}
+//       <Modal
+//         open={showFieldModal}
+//         onClose={() => setShowFieldModal(false)}
+//         title="Add New Field">
+//         <div className="flex flex-col gap-4">
+//           <div className="grid grid-cols-2 gap-3">
+//             <Input
+//               label="Field Name" required placeholder="e.g. Screen Size"
+//               value={addingField.field.fieldName}
+//               onChange={e => setAddingField(p => ({
+//                 ...p, field: { ...p.field, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) }
+//               }))}
+//             />
+//             <Input
+//               label="Field Key" placeholder="auto-filled"
+//               value={addingField.field.fieldKey}
+//               onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldKey: e.target.value } }))}
+//             />
+//             <Select
+//               label="Type" value={addingField.field.fieldType}
+//               onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldType: e.target.value } }))}>
+//               {["String", "Number", "Boolean", "Date"].map(t => <option key={t}>{t}</option>)}
+//             </Select>
+//             <Input
+//               label="Unit (optional)" placeholder="GB, inch..."
+//               value={addingField.field.unit}
+//               onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, unit: e.target.value } }))}
+//             />
+//           </div>
+//           <Input
+//             label="Options (comma separated)"
+//             placeholder="8GB, 16GB, 32GB"
+//             value={addingField.field.options}
+//             onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, options: e.target.value } }))}
+//           />
+//           <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+//             <input
+//               type="checkbox" checked={addingField.field.isRequired}
+//               onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, isRequired: e.target.checked } }))}
+//               className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+//             />
+//             Required field
+//           </label>
+//           <div className="flex gap-3 justify-end mt-1">
+//             <Btn variant="secondary" onClick={() => setShowFieldModal(false)}>Cancel</Btn>
+//             <Btn onClick={handleAddFieldToExisting}><PlusIcon /> Add Field</Btn>
+//           </div>
+//         </div>
+//       </Modal>
+
+//       {/* ══════════ MODAL: REGISTER PRODUCT ══════════ */}
+//       <Modal
+//         open={showRegisterModal}
+//         onClose={() => setShowRegisterModal(false)}
+//         title={`Register ${registerCategory?.name}`}
+//       >
+//         <div className="flex flex-col gap-4">
+
+//           <Input
+//             label="Product Name"
+//             required
+//             placeholder="Enter product name"
+//             value={registerForm.productName || ""}
+//             onChange={e =>
+//               setRegisterForm(p => ({ ...p, productName: e.target.value }))
+//             }
+//           />
+
+//           {/* Dynamic Configuration Fields */}
+//           {configs[registerCategory?._id]?.fields?.map(field => (
+//             <div key={field.fieldKey}>
+//               {field.fieldType === "Boolean" ? (
+//                 <label className="flex items-center gap-2 text-sm cursor-pointer">
+//                   <input
+//                     type="checkbox"
+//                     checked={registerForm[field.fieldKey] || false}
+//                     onChange={e =>
+//                       setRegisterForm(p => ({
+//                         ...p,
+//                         [field.fieldKey]: e.target.checked
+//                       }))
+//                     }
+//                   />
+//                   {field.fieldName}
+//                 </label>
+//               ) : (
+//                 <Input
+//                   label={field.fieldName}
+//                   required={field.isRequired}
+//                   type={
+//                     field.fieldType === "Number"
+//                       ? "number"
+//                       : field.fieldType === "Date"
+//                       ? "date"
+//                       : "text"
+//                   }
+//                   value={registerForm[field.fieldKey] || ""}
+//                   onChange={e =>
+//                     setRegisterForm(p => ({
+//                       ...p,
+//                       [field.fieldKey]: e.target.value
+//                     }))
+//                   }
+//                 />
+//               )}
+//             </div>
+//           ))}
+
+//           <Input
+//             label="Quantity"
+//             type="number"
+//             min="1"
+//             value={quantity}
+//             onChange={e => setQuantity(Number(e.target.value))}
+//           />
+
+//           <div className="flex gap-3 justify-end mt-2">
+//             <Btn variant="secondary" onClick={() => setShowRegisterModal(false)}>
+//               Cancel
+//             </Btn>
+
+//             {/* <Btn
+//               onClick={async () => {
+//                 try {
+//                   await axiosInstance.post("/category/register", {
+//                     category: registerCategory._id,
+//                     productName: registerForm.productName,
+//                     configurations: registerForm,
+//                     quantity,
+//                     batch: registerForm.batch 
+//                   });
+
+//                   addToast("Product registered successfully!");
+//                   setShowRegisterModal(false);
+//                 } catch (e) {
+//                   addToast(e.response?.data?.message || "Failed", "error");
+//                 }
+//               }}
+//             >
+//               Register
+//             </Btn> */}
+//            <Btn
+//   onClick={async () => {
+//     try {
+//       const { productName, ...configFields } = registerForm;
+      
+//       // 👇 ADD THIS - see exactly what you're sending
+//       console.log("📤 Sending to backend:", {
+//         category: registerCategory._id,
+//         productName,
+//         configurations: configFields,
+//         quantity
+//       });
+
+//       await axiosInstance.post("/category/register", {
+//         category: registerCategory._id,
+//         productName,
+//         configurations: configFields,
+//         quantity
+//       });
+
+//       addToast("Product registered successfully!");
+//       setShowRegisterModal(false);
+//     } catch (e) {
+//       console.log("❌ Full error:", e.response?.data); // 👈 ADD THIS
+//       addToast(e.response?.data?.message || "Failed", "error");
+//     }
+//   }}
+// >
+//   Register
+// </Btn>
+//           </div>
+//         </div>
+//       </Modal>
+//     </>
+//   );
+// }
+
 import { useState, useEffect } from "react";
 import React from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
-
-const Icon = ({ d, size = 18, color = "currentColor" }) => (
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+const Icon = ({ d, size = 16, color = "currentColor", strokeWidth = 2 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
     <path d={d} />
   </svg>
 );
-const PlusIcon    = () => <Icon d="M12 5v14M5 12h14" />;
-const TrashIcon   = () => <Icon d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />;
-const ChevronRight= () => <Icon d="M9 18l6-6-6-6" />;
-const SettingsIcon= () => <Icon d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />;
-const TagIcon     = () => <Icon d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01" />;
-const XIcon       = () => <Icon d="M18 6L6 18M6 6l12 12" />;
-const CheckIcon   = () => <Icon d="M20 6L9 17l-5-5" />;
-const EditIcon    = () => <Icon d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />;
+const PlusIcon     = () => <Icon d="M12 5v14M5 12h14" />;
+const TrashIcon    = () => <Icon d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />;
+const ChevronDown  = () => <Icon d="M6 9l6 6 6-6" />;
+const SettingsIcon = () => <Icon d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />;
+const XIcon        = () => <Icon d="M18 6L6 18M6 6l12 12" />;
+const CheckIcon    = () => <Icon d="M20 6L9 17l-5-5" />;
+const EditIcon     = () => <Icon d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />;
+const BoxIcon      = () => <Icon d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />;
+const CalendarIcon = () => <Icon d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" />;
 
-// ─── TYPE COLORS (Tailwind can't do dynamic colors, so we keep these minimal inline) ──
-const TYPE_COLORS = {
-  String:  { bg: "#6C63FF22", text: "#6C63FF", border: "#6C63FF44" },
-  Number:  { bg: "#00C89622", text: "#00C896", border: "#00C89644" },
-  Boolean: { bg: "#FF6B6B22", text: "#FF6B6B", border: "#FF6B6B44" },
-  Date:    { bg: "#FFB34722", text: "#FFB347", border: "#FFB34744" },
+// ─── COLOR TOKENS ─────────────────────────────────────────────────────────────
+const C = {
+  pageBg:        "#eef2f5",
+  cardBg:        "#ffffff",
+  headerBg:      "linear-gradient(135deg, #1a3a4f 0%, #1F6E8C 100%)",
+  panelBg:       "#e8f4f9",
+  inputBg:       "#f4f9fc",
+  border:        "#d0e8f2",
+  borderMid:     "#b3d4e2",
+  textPrimary:   "#0e2535",
+  textSecondary: "#3d7a90",
+  textMuted:     "#85afc0",
+  teal:          "#1F6E8C",
+  tealLight:     "#2a8faf",
+  tealPale:      "#dbedf5",
+  green:         "#6BA368",
+  greenPale:     "#e6f3e5",
+  amber:         "#D9A441",
+  amberPale:     "#fdf3de",
+  red:           "#d95555",
+  redPale:       "#fce8e8",
 };
 
-// ─── FIELD TYPE BADGE ─────────────────────────────────────────────────────────
+// ─── FIELD TYPES — Boolean removed ───────────────────────────────────────────
+const FIELD_TYPES = ["String", "Number", "Date"];
+
+const TYPE_META = {
+  String: { color: "#1F6E8C", bg: "#dbedf5", label: "STR"  },
+  Number: { color: "#6BA368", bg: "#e6f3e5", label: "NUM"  },
+  Date:   { color: "#D9A441", bg: "#fdf3de", label: "DATE" },
+};
+
 const FieldTypeBadge = ({ type }) => {
-  const c = TYPE_COLORS[type] || TYPE_COLORS.String;
+  const m = TYPE_META[type] || TYPE_META.String;
   return (
-    <span className="rounded px-2 py-0.5 text-xs font-bold tracking-wide"
-      style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }}>
-      {type}
-    </span>
+    <span style={{
+      background: m.bg, color: m.color,
+      border: `1px solid ${m.color}44`,
+      padding: "2px 8px", borderRadius: 4,
+      fontSize: 10, fontWeight: 700,
+      fontFamily: "'DM Mono', monospace", letterSpacing: "0.05em"
+    }}>{m.label}</span>
   );
 };
 
-// ─── TOAST ───────────────────────────────────────────────────────────────────
+// ─── TOAST ────────────────────────────────────────────────────────────────────
 const Toast = ({ toasts, removeToast }) => (
-  <div className="fixed top-6 right-6 z-50 flex flex-col gap-2">
+  <div style={{ position: "fixed", top: 20, right: 20, zIndex: 9999,
+    display: "flex", flexDirection: "column", gap: 10 }}>
     {toasts.map(t => (
-      <div key={t.id}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border border-black/10 min-w-64 animate-bounce-in font-semibold text-sm text-gray-900
-          ${t.type === "success" ? "bg-emerald-400" : t.type === "error" ? "bg-red-400" : "bg-white"}`}>
-        {t.type === "success" ? <CheckIcon /> : <XIcon />}
-        <span className="flex-1">{t.message}</span>
-        <button onClick={() => removeToast(t.id)} className="opacity-60 hover:opacity-100 bg-transparent border-none cursor-pointer">
+      <div key={t.id} style={{
+        display: "flex", alignItems: "center", gap: 12,
+        padding: "12px 16px", background: "#fff",
+        border: `1px solid ${t.type === "success" ? "#6BA36844" : "#d9555544"}`,
+        borderLeft: `3px solid ${t.type === "success" ? "#6BA368" : "#d95555"}`,
+        borderRadius: 10, minWidth: 280,
+        boxShadow: "0 4px 20px rgba(31,110,140,0.13)",
+        animation: "toastIn 0.25s ease",
+      }}>
+        <span style={{ color: t.type === "success" ? "#6BA368" : "#d95555", fontWeight: 700, fontSize: 15 }}>
+          {t.type === "success" ? "✓" : "✕"}
+        </span>
+        <span style={{ flex: 1, color: C.textPrimary, fontSize: 13, fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+          {t.message}
+        </span>
+        <button onClick={() => removeToast(t.id)}
+          style={{ background: "none", border: "none", color: C.textMuted, cursor: "pointer" }}>
           <XIcon />
         </button>
       </div>
@@ -1386,149 +2309,207 @@ const Toast = ({ toasts, removeToast }) => (
   </div>
 );
 
-// ─── MODAL ───────────────────────────────────────────────────────────────────
+// ─── MODAL ────────────────────────────────────────────────────────────────────
 const Modal = ({ open, onClose, title, children }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-5"
-      onClick={onClose}>
-      <div onClick={e => e.stopPropagation()}
-        className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900 tracking-tight"
-            style={{ fontFamily: "'Syne', sans-serif" }}>
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0,
+      background: "rgba(10,28,40,0.55)", backdropFilter: "blur(4px)",
+      zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+      // FIX: ensure modal scrolls internally on small screens
+      overflowY: "auto",
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#fff", borderRadius: 16, width: "100%", maxWidth: 520,
+        boxShadow: "0 24px 64px rgba(31,110,140,0.2)",
+        animation: "modalIn 0.2s ease", overflow: "hidden",
+        border: `1px solid ${C.border}`,
+        // FIX: allow modal body to scroll if content is tall
+        maxHeight: "90vh", display: "flex", flexDirection: "column",
+      }}>
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "18px 24px", background: C.headerBg, flexShrink: 0,
+        }}>
+          <h3 style={{ margin: 0, color: "#fff", fontSize: 15, fontWeight: 700,
+            fontFamily: "'Syne', sans-serif", letterSpacing: "-0.3px" }}>
             {title}
           </h3>
-          <button onClick={onClose}
-            className="bg-gray-100 hover:bg-gray-200 border-none rounded-lg p-2 cursor-pointer transition-colors">
+          <button onClick={onClose} style={{
+            background: "rgba(255,255,255,0.18)", border: "none", borderRadius: 8,
+            padding: 7, cursor: "pointer", color: "#fff",
+            display: "flex", alignItems: "center",
+          }}>
             <XIcon />
           </button>
         </div>
-        {/* Modal Body */}
-        <div className="px-7 py-6">{children}</div>
+        {/* FIX: scrollable modal body */}
+        <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>{children}</div>
       </div>
     </div>
   );
 };
 
-// ─── INPUT ───────────────────────────────────────────────────────────────────
-const Input = ({ label, required, className = "", ...props }) => (
-  <div className="flex flex-col gap-1.5">
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+const Input = ({ label, required, ...props }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
     {label && (
-      <label className="text-xs font-bold text-gray-500 tracking-wide uppercase">
-        {label}{required && <span className="text-red-500"> *</span>}
+      <label style={{ fontSize: 11, fontWeight: 600, color: C.textSecondary,
+        letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+        {label}{required && <span style={{ color: C.red }}> *</span>}
       </label>
     )}
-    <input
-      {...props}
-      className={`border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50 text-gray-900 outline-none
-        focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all placeholder:text-gray-400 ${className}`}
+    <input {...props} style={{
+      background: C.inputBg, border: `1.5px solid ${C.border}`,
+      borderRadius: 8, padding: "9px 13px",
+      fontSize: 13, color: C.textPrimary, outline: "none",
+      fontFamily: "'DM Sans', sans-serif", transition: "border-color 0.15s",
+      width: "100%",
+      ...(props.style || {})
+    }}
+      onFocus={e => e.target.style.borderColor = C.teal}
+      onBlur={e => e.target.style.borderColor = C.border}
     />
   </div>
 );
 
-// ─── SELECT ──────────────────────────────────────────────────────────────────
-const Select = ({ label, required, children, className = "", ...props }) => (
-  <div className="flex flex-col gap-1.5">
+// ─── DATE INPUT — styled calendar picker ──────────────────────────────────────
+const DateInput = ({ label, required, ...props }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
     {label && (
-      <label className="text-xs font-bold text-gray-500 tracking-wide uppercase">
-        {label}{required && <span className="text-red-500"> *</span>}
+      <label style={{ fontSize: 11, fontWeight: 600, color: C.textSecondary,
+        letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
+        display: "flex", alignItems: "center", gap: 5 }}>
+        <CalendarIcon size={11} color={C.textSecondary} />
+        {label}{required && <span style={{ color: C.red }}> *</span>}
       </label>
     )}
-    <select
-      {...props}
-      className={`border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50 text-gray-900 outline-none
-        focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all cursor-pointer ${className}`}>
-      {children}
-    </select>
+    <div style={{ position: "relative" }}>
+      <input
+        type="date"
+        {...props}
+        style={{
+          background: C.inputBg,
+          border: `1.5px solid ${C.border}`,
+          borderRadius: 8,
+          padding: "9px 13px",
+          fontSize: 13,
+          color: props.value ? C.textPrimary : C.textMuted,
+          outline: "none",
+          fontFamily: "'DM Sans', sans-serif",
+          transition: "border-color 0.15s",
+          width: "100%",
+          cursor: "pointer",
+          // Make the calendar icon teal-tinted on webkit
+          colorScheme: "light",
+          ...(props.style || {})
+        }}
+        onFocus={e => e.target.style.borderColor = C.teal}
+        onBlur={e => e.target.style.borderColor = C.border}
+      />
+    </div>
+  </div>
+);
+
+// ─── SELECT ──────────────────────────────────────────────────────────────────
+const Select = ({ label, required, children, ...props }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+    {label && (
+      <label style={{ fontSize: 11, fontWeight: 600, color: C.textSecondary,
+        letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+        {label}{required && <span style={{ color: C.red }}> *</span>}
+      </label>
+    )}
+    <select {...props} style={{
+      background: C.inputBg, border: `1.5px solid ${C.border}`,
+      borderRadius: 8, padding: "9px 13px",
+      fontSize: 13, color: C.textPrimary, outline: "none",
+      fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+    }}>{children}</select>
   </div>
 );
 
 // ─── BUTTON ──────────────────────────────────────────────────────────────────
-const variantClasses = {
-  primary:   "bg-gray-900 text-white border-transparent hover:bg-gray-700",
-  secondary: "bg-gray-100 text-gray-900 border-transparent hover:bg-gray-200",
-  danger:    "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100",
-  ghost:     "bg-transparent text-violet-600 border border-violet-200 hover:bg-violet-50",
+const BVARS = {
+  primary:   { bg: C.teal,       color: "#fff",          border: C.teal,       hover: "#174f68" },
+  secondary: { bg: C.tealPale,   color: C.textSecondary, border: C.border,     hover: "#cde6f0" },
+  danger:    { bg: C.redPale,    color: C.red,           border: "#f0c8c8",    hover: "#f8d8d8" },
+  ghost:     { bg: "transparent",color: C.teal,          border: C.tealPale,   hover: C.tealPale },
+  success:   { bg: C.greenPale,  color: C.green,         border: "#c0dab8",    hover: "#d2ecce" },
+  white:     { bg: "rgba(255,255,255,0.18)", color: "#fff", border: "rgba(255,255,255,0.3)", hover: "rgba(255,255,255,0.28)" },
+};
+const Btn = ({ variant = "primary", children, loading, style = {}, ...props }) => {
+  const v = BVARS[variant] || BVARS.primary;
+  return (
+    <button {...props} style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      padding: "8px 16px", borderRadius: 8,
+      background: v.bg, color: v.color, border: `1px solid ${v.border}`,
+      fontSize: 12, fontWeight: 700, cursor: "pointer",
+      fontFamily: "'DM Sans', sans-serif",
+      whiteSpace: "nowrap", transition: "all 0.15s", ...style
+    }}
+      onMouseOver={e => e.currentTarget.style.background = v.hover}
+      onMouseOut={e => e.currentTarget.style.background = v.bg}>
+      {loading ? "⏳" : children}
+    </button>
+  );
 };
 
-const Btn = ({ variant = "primary", children, loading, className = "", ...props }) => (
-  <button
-    {...props}
-    className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold
-      transition-all whitespace-nowrap border
-      disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
-      ${variantClasses[variant]} ${className}`}>
-    {loading ? "⏳" : children}
-  </button>
-);
-
-// ─── AVATAR (category color from name) ───────────────────────────────────────
-// Tailwind can't do dynamic hsl, so we keep this one inline
+// ─── AVATAR ──────────────────────────────────────────────────────────────────
 const CategoryAvatar = ({ name }) => {
-  const hue = (name.charCodeAt(0) * 37) % 360;
+  const hue = (name.charCodeAt(0) * 53 + name.charCodeAt(name.length - 1) * 17) % 360;
   return (
-    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-extrabold flex-shrink-0"
-      style={{ background: `hsl(${hue},70%,94%)`, color: `hsl(${hue},60%,40%)` }}>
+    <div style={{
+      width: 42, height: 42, borderRadius: 10, flexShrink: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: 17, fontWeight: 800,
+      background: `hsl(${hue},50%,92%)`,
+      color: `hsl(${hue},50%,32%)`,
+      border: `1.5px solid hsl(${hue},40%,80%)`,
+      fontFamily: "'Syne', sans-serif",
+    }}>
       {name[0].toUpperCase()}
     </div>
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
 export default function CustomerCareHome() {
-  const [categories, setCategories]           = useState([]);
-  const [configs, setConfigs]                 = useState({});
+  const [categories, setCategories]             = useState([]);
+  const [configs, setConfigs]                   = useState({});
   const [expandedCategory, setExpandedCategory] = useState(null);
-  const [loading, setLoading]                 = useState(false);
-  const [toasts, setToasts]                   = useState([]);
-
-  // Modals
+  const [loading, setLoading]                   = useState(false);
+  const [toasts, setToasts]                     = useState([]);
   const [showCatModal, setShowCatModal]         = useState(false);
   const [showConfigModal, setShowConfigModal]   = useState(false);
   const [showFieldModal, setShowFieldModal]     = useState(false);
   const [activeCategoryForConfig, setActiveCategoryForConfig] = useState(null);
-  
-  // ✅ STEP 1 — Add State for Product Registration
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [registerCategory, setRegisterCategory] = useState(null);
-  const [registerForm, setRegisterForm] = useState({});
-  const [quantity, setQuantity] = useState(1);
-
-  // Forms
-  const [catForm, setCatForm]       = useState({ name: "", description: "" });
+  const [registerCategory, setRegisterCategory]   = useState(null);
+  const [registerForm, setRegisterForm]           = useState({});
+  const [quantity, setQuantity]                   = useState(1);
+  const [catForm, setCatForm]     = useState({ name: "", description: "" });
   const [configFields, setConfigFields] = useState([]);
-  const [editCat, setEditCat]       = useState(null);
-  const [newField, setNewField]     = useState({
-    fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: ""
-  });
-  const [addingField, setAddingField] = useState({
-    categoryId: null,
-    field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" }
-  });
+  const [editCat, setEditCat]     = useState(null);
+  const [newField, setNewField]   = useState({ fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" });
+  const [addingField, setAddingField] = useState({ categoryId: null, field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" } });
 
-  // ── TOAST HELPERS ──────────────────────────────────────────────────────────
   const addToast = (message, type = "success") => {
     const id = Date.now();
     setToasts(p => [...p, { id, message, type }]);
     setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3500);
   };
-  const removeToast = (id) => setToasts(p => p.filter(t => t.id !== id));
+  const removeToast = id => setToasts(p => p.filter(t => t.id !== id));
 
-  // ── API ────────────────────────────────────────────────────────────────────
   const fetchCategories = async () => {
     setLoading(true);
     try {
       const { data } = await axiosInstance.get("/category/allproducts");
       setCategories(data.data || []);
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed to load categories", "error");
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { addToast(e.response?.data?.message || "Failed to load categories", "error"); }
+    finally { setLoading(false); }
   };
 
   const fetchConfig = async (categoryId) => {
@@ -1536,61 +2517,32 @@ export default function CustomerCareHome() {
     try {
       const { data } = await axiosInstance.get(`/product/${categoryId}/configurations`);
       setConfigs(p => ({ ...p, [categoryId]: data.data }));
-    } catch (e) {
-      setConfigs(p => ({ ...p, [categoryId]: null }));
-      addToast(e.response?.data?.message || "Failed to load configuration", "error");
-    }
+    } catch (e) { setConfigs(p => ({ ...p, [categoryId]: null })); }
   };
 
   useEffect(() => { fetchCategories(); }, []);
 
-  
   const handleSaveCategory = async () => {
     if (!catForm.name.trim()) return addToast("Category name is required", "error");
     try {
-      if (editCat) {
-        await axiosInstance.put(`/category/updateProduct/${editCat._id}`, catForm);
-        addToast("Category updated!");
-      } else {
-        await axiosInstance.post("/category/createCategory", catForm);
-        addToast("Category created!");
-      }
-      setShowCatModal(false);
-      setCatForm({ name: "", description: "" });
-      setEditCat(null);
-      fetchCategories();
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
+      if (editCat) { await axiosInstance.put(`/category/updateProduct/${editCat._id}`, catForm); addToast("Category updated!"); }
+      else { await axiosInstance.post("/category/createCategory", catForm); addToast("Category created!"); }
+      setShowCatModal(false); setCatForm({ name: "", description: "" }); setEditCat(null); fetchCategories();
+    } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
   };
 
   const handleDeleteCategory = async (id) => {
     if (!confirm("Deactivate this category?")) return;
-    try {
-      await axiosInstance.delete(`/category/${id}`);
-      addToast("Category deactivated");
-      fetchCategories();
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
+    try { await axiosInstance.delete(`/category/${id}`); addToast("Category deactivated"); fetchCategories(); }
+    catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
   };
 
-  // ── CONFIG ─────────────────────────────────────────────────────────────────
-  const openCreateConfig = (cat) => {
-    setActiveCategoryForConfig(cat);
-    setConfigFields([]);
-    setShowConfigModal(true);
-  };
-
-  const toFieldKey = (name) =>
-    name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+  const openCreateConfig = (cat) => { setActiveCategoryForConfig(cat); setConfigFields([]); setShowConfigModal(true); };
+  const toFieldKey = (name) => name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
 
   const addFieldToForm = () => {
-    if (!newField.fieldName || !newField.fieldKey)
-      return addToast("Field name & key required", "error");
-    const options = newField.options
-      ? newField.options.split(",").map(o => o.trim()).filter(Boolean)
-      : [];
+    if (!newField.fieldName || !newField.fieldKey) return addToast("Field name & key required", "error");
+    const options = newField.options ? newField.options.split(",").map(o => o.trim()).filter(Boolean) : [];
     setConfigFields(p => [...p, { ...newField, options, _tempId: Date.now() }]);
     setNewField({ fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" });
   };
@@ -1598,302 +2550,342 @@ export default function CustomerCareHome() {
   const handleCreateConfig = async () => {
     if (!configFields.length) return addToast("Add at least one field", "error");
     try {
-      await axiosInstance.post("/product/configuration", {
-        category: activeCategoryForConfig._id,
-        fields: configFields.map(({ _tempId, ...f }) => f),
-      });
-      addToast("Configuration created!");
-      setShowConfigModal(false);
-      setConfigs(p => ({ ...p, [activeCategoryForConfig._id]: undefined }));
-      fetchConfig(activeCategoryForConfig._id);
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
+      await axiosInstance.post("/product/configuration", { category: activeCategoryForConfig._id, fields: configFields.map(({ _tempId, ...f }) => f) });
+      addToast("Configuration created!"); setShowConfigModal(false);
+      setConfigs(p => ({ ...p, [activeCategoryForConfig._id]: undefined })); fetchConfig(activeCategoryForConfig._id);
+    } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
   };
 
   const handleAddFieldToExisting = async () => {
     const { categoryId, field } = addingField;
-    if (!field.fieldName || !field.fieldKey)
-      return addToast("Field name & key required", "error");
-    const options = field.options
-      ? field.options.split(",").map(o => o.trim()).filter(Boolean)
-      : [];
+    if (!field.fieldName || !field.fieldKey) return addToast("Field name & key required", "error");
+    const options = field.options ? field.options.split(",").map(o => o.trim()).filter(Boolean) : [];
     try {
       await axiosInstance.post(`/product/addconfigration/${categoryId}/add-field`, { ...field, options });
-      addToast("Field added!");
-      setShowFieldModal(false);
-      setConfigs(p => ({ ...p, [categoryId]: undefined }));
-      fetchConfig(categoryId);
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
+      addToast("Field added!"); setShowFieldModal(false);
+      setConfigs(p => ({ ...p, [categoryId]: undefined })); fetchConfig(categoryId);
+    } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
   };
 
   const handleRemoveField = async (categoryId, fieldKey) => {
     if (!confirm(`Remove field "${fieldKey}"?`)) return;
     try {
       await axiosInstance.delete(`/product/removeconfigration/${categoryId}/remove-field/${fieldKey}`);
-      addToast("Field removed");
-      setConfigs(p => ({ ...p, [categoryId]: undefined }));
-      fetchConfig(categoryId);
-    } catch (e) {
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
+      addToast("Field removed"); setConfigs(p => ({ ...p, [categoryId]: undefined })); fetchConfig(categoryId);
+    } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
   };
 
   const toggleExpand = (catId) => {
-    if (expandedCategory === catId) {
-      setExpandedCategory(null);
-    } else {
-      setExpandedCategory(catId);
-      fetchConfig(catId);
-    }
+    if (expandedCategory === catId) { setExpandedCategory(null); }
+    else { setExpandedCategory(catId); fetchConfig(catId); }
   };
 
-  
+  const activeCount = categories.filter(c => c.isActive !== false).length;
+  const configCount = Object.values(configs).filter(Boolean).length;
+
+  // ── Helper: render correct input for a field type in Register modal ──
+  const renderRegisterField = (field) => {
+    if (field.fieldType === "Date") {
+      return (
+        <DateInput
+          key={field.fieldKey}
+          label={field.fieldName}
+          required={field.isRequired}
+          value={registerForm[field.fieldKey] || ""}
+          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
+        />
+      );
+    }
+    if (field.options?.length > 0) {
+      return (
+        <Select
+          key={field.fieldKey}
+          label={field.fieldName}
+          required={field.isRequired}
+          value={registerForm[field.fieldKey] || ""}
+          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
+        >
+          <option value="">— Select —</option>
+          {field.options.map(o => <option key={o} value={o}>{o}</option>)}
+        </Select>
+      );
+    }
+    return (
+      <Input
+        key={field.fieldKey}
+        label={field.fieldName}
+        required={field.isRequired}
+        type={field.fieldType === "Number" ? "number" : "text"}
+        value={registerForm[field.fieldKey] || ""}
+        onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
+      />
+    );
+  };
+
   return (
     <>
-      {/* Global font injection */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap');
-        body { font-family: 'DM Sans', sans-serif; background: #f7f7fa; }
-        @keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-slide-in { animation: slideInRight 0.3s ease; }
-        .animate-fade-up   { animation: fadeUp 0.3s ease both; }
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── FIX: page scroll — html/body must fill viewport and scroll naturally ── */
+        html, body { height: 100%; }
+        body { background: #eef2f5 !important; overflow-y: auto !important; }
+
+        @keyframes toastIn { from { transform: translateX(20px); opacity:0 } to { transform:none; opacity:1 } }
+        @keyframes modalIn { from { transform: scale(0.97) translateY(-6px); opacity:0 } to { transform:none; opacity:1 } }
+        @keyframes fadeUp  { from { transform: translateY(10px); opacity:0 } to { transform:none; opacity:1 } }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .cat-card { animation: fadeUp 0.28s ease both; }
+        .cat-card:hover { box-shadow: 0 6px 24px rgba(31,110,140,0.12) !important; transform: translateY(-1px); }
+        .cat-row:hover  { background: #f0f9fc !important; }
+        .field-row:hover { background: #f0f9fc !important; }
+        input::placeholder { color: #a8c8d8; }
+        /* Date input calendar icon color */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          filter: invert(35%) sepia(60%) saturate(400%) hue-rotate(165deg);
+          cursor: pointer;
+          opacity: 0.8;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #b3d4e2; border-radius: 2px; }
       `}</style>
 
       <Toast toasts={toasts} removeToast={removeToast} />
 
-      <div className="min-h-screen bg-gray-50">
+      {/* ── FIX: wrapper uses minHeight instead of height so it grows with content ── */}
+      <div style={{ minHeight: "100vh", background: C.pageBg, fontFamily: "'DM Sans', sans-serif" }}>
 
-        {/* ── HEADER ────────────────────────────────────────────────────────── */}
-        <header className="bg-gray-900 text-white h-16 px-10 flex items-center justify-between border-b-2 border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="bg-violet-600 rounded-xl p-2 flex items-center justify-center">
-              <TagIcon />
+        {/* ── HEADER — sticky, 64px tall ── */}
+        <header style={{
+          background: C.headerBg,
+          padding: "0 40px", height: 64,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          position: "sticky", top: 0, zIndex: 100,
+          boxShadow: "0 2px 16px rgba(26,58,79,0.25)",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 9,
+              background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <BoxIcon size={17} color="#fff" />
             </div>
             <div>
-              <div className="font-extrabold text-lg tracking-tight leading-none">
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff",
+                fontFamily: "'Syne', sans-serif", letterSpacing: "-0.4px", lineHeight: 1 }}>
                 Category Manager
               </div>
-              <div className="text-xs text-gray-500 mt-0.5">Customer Care Portal</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>
+                Customer Care Portal
+              </div>
             </div>
           </div>
-          <Btn onClick={() => {
-            setEditCat(null);
-            setCatForm({ name: "", description: "" });
-            setShowCatModal(true);
-          }}>
+          <Btn variant="white" onClick={() => { setEditCat(null); setCatForm({ name: "", description: "" }); setShowCatModal(true); }}>
             <PlusIcon /> New Category
           </Btn>
         </header>
 
-        {/* ── BODY ──────────────────────────────────────────────────────────── */}
-        <main className="max-w-3xl mx-auto px-5 py-9">
+        {/* ── MAIN — padding-top ensures content starts below sticky header ── */}
+        <main style={{ maxWidth: 860, margin: "0 auto", padding: "32px 20px" }}>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          {/* Stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 30 }}>
             {[
-              { label: "Total Categories", value: categories.length,                                        color: "text-violet-600" },
-              { label: "With Config",      value: Object.values(configs).filter(Boolean).length,            color: "text-emerald-500" },
-              { label: "Active",           value: categories.filter(c => c.isActive !== false).length,      color: "text-amber-500"   },
+              { label: "Total Categories", value: categories.length, color: C.teal,  accent: "#1a5e7a" },
+              { label: "With Config",       value: configCount,       color: C.green, accent: "#4e8a4b" },
+              { label: "Active",            value: activeCount,       color: C.amber, accent: "#b8862e" },
             ].map(s => (
-              <div key={s.label}
-                className="bg-white rounded-2xl px-6 py-5 shadow-sm border border-gray-100">
-                <div className={`text-3xl font-extrabold ${s.color}`}
-                  style={{ fontFamily: "'Syne', sans-serif" }}>
+              <div key={s.label} style={{
+                background: "#fff", border: `1px solid ${C.border}`,
+                borderRadius: 14, padding: "20px 22px",
+                boxShadow: "0 2px 8px rgba(31,110,140,0.07)",
+                position: "relative", overflow: "hidden",
+              }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: s.color, borderRadius: "14px 14px 0 0" }} />
+                <div style={{ fontSize: 11, color: C.textSecondary, fontWeight: 600, letterSpacing: "0.04em", marginBottom: 10, marginTop: 4 }}>
+                  {s.label}
+                </div>
+                <div style={{ fontSize: 34, fontWeight: 800, color: s.color, fontFamily: "'Syne', sans-serif", lineHeight: 1 }}>
                   {s.value}
                 </div>
-                <div className="text-sm text-gray-400 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
 
-          {/* Section title */}
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-xl font-extrabold text-gray-900 tracking-tight"
-              style={{ fontFamily: "'Syne', sans-serif" }}>
-              All Categories
-            </h2>
-            <span className="text-xs text-gray-400">Click a category to manage its configuration</span>
+          {/* Section Header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 3, height: 20, background: C.teal, borderRadius: 2 }} />
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: C.textPrimary, fontFamily: "'Syne', sans-serif", letterSpacing: "-0.4px" }}>
+                All Categories
+              </h2>
+            </div>
+            <span style={{ fontSize: 11, color: C.textMuted }}>Click a category to manage configuration</span>
           </div>
 
-          {/* ── CATEGORY LIST ────────────────────────────────────────────────── */}
+          {/* List */}
           {loading ? (
-            <div className="text-center py-16 text-gray-400">Loading categories...</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[...Array(4)].map((_, i) => (
+                <div key={i} style={{
+                  height: 66, borderRadius: 14,
+                  background: "linear-gradient(90deg, #e4eff4 25%, #d4e9f0 50%, #e4eff4 75%)",
+                  backgroundSize: "200% 100%",
+                  animation: `shimmer 1.4s infinite`, animationDelay: `${i * 0.1}s`,
+                  border: `1px solid ${C.border}`,
+                }} />
+              ))}
+            </div>
           ) : categories.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
-              <div className="text-4xl mb-3">📂</div>
-              <div className="font-bold text-gray-600 text-base">No categories yet</div>
-              <div className="text-sm text-gray-400 mt-1">Create your first category to get started</div>
+            <div style={{
+              textAlign: "center", padding: "64px 24px", background: "#fff",
+              borderRadius: 16, border: `2px dashed ${C.border}`,
+              boxShadow: "0 2px 8px rgba(31,110,140,0.05)",
+            }}>
+              <div style={{ fontSize: 40, marginBottom: 14 }}>📦</div>
+              <div style={{ fontWeight: 700, color: C.textSecondary, fontSize: 15 }}>No categories yet</div>
+              <div style={{ fontSize: 12, color: C.textMuted, marginTop: 6 }}>Create your first category to get started</div>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {categories.map((cat, i) => {
-                const isOpen  = expandedCategory === cat._id;
-                const config  = configs[cat._id];
-
+                const isOpen = expandedCategory === cat._id;
+                const config = configs[cat._id];
                 return (
-                  <div key={cat._id}
-                    className={`bg-white rounded-2xl overflow-hidden shadow-sm border transition-all duration-200
-                      hover:shadow-lg hover:-translate-y-0.5 animate-fade-up
-                      ${isOpen ? "border-violet-300" : "border-gray-100"}`}
-                    style={{ animationDelay: `${i * 0.05}s` }}>
-
-                    {/* ── Category Row ── */}
-                    <div
-                      className="flex items-center gap-4 px-5 py-4 cursor-pointer"
-                      onClick={() => toggleExpand(cat._id)}>
-
+                  <div key={cat._id} className="cat-card" style={{
+                    background: "#fff",
+                    border: `1px solid ${isOpen ? C.teal + "66" : C.border}`,
+                    borderRadius: 14, overflow: "hidden",
+                    boxShadow: isOpen ? `0 0 0 3px ${C.teal}14, 0 4px 20px rgba(31,110,140,0.1)` : "0 1px 4px rgba(31,110,140,0.06)",
+                    transition: "all 0.2s ease", animationDelay: `${i * 0.05}s`,
+                  }}>
+                    {/* Row */}
+                    <div className="cat-row" onClick={() => toggleExpand(cat._id)} style={{
+                      display: "flex", alignItems: "center", gap: 14,
+                      padding: "13px 18px", cursor: "pointer",
+                      background: isOpen ? "#f0f9fc" : "#fff",
+                      transition: "background 0.15s",
+                      borderBottom: isOpen ? `1px solid ${C.border}` : "none",
+                    }}>
                       <CategoryAvatar name={cat.name} />
-
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-base text-gray-900 truncate">{cat.name}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: C.textPrimary, fontFamily: "'Syne', sans-serif" }}>
+                          {cat.name}
+                        </div>
                         {cat.description && (
-                          <div className="text-sm text-gray-400 mt-0.5 truncate">{cat.description}</div>
+                          <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {cat.description}
+                          </div>
                         )}
                       </div>
-
-                      {/* Field count badge */}
                       {config?.fields?.length > 0 && (
-                        <span className="bg-violet-50 text-violet-600 border border-violet-200 rounded-full px-3 py-0.5 text-xs font-bold whitespace-nowrap">
-                          {config.fields.length} fields
-                        </span>
+                        <span style={{
+                          background: C.tealPale, color: C.teal, border: `1px solid ${C.borderMid}`,
+                          borderRadius: 20, padding: "3px 11px", fontSize: 11, fontWeight: 700,
+                        }}>{config.fields.length} fields</span>
                       )}
-
-                      {/* Edit / Delete buttons */}
-                      <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-                        <button
-                          onClick={() => {
-                            setEditCat(cat);
-                            setCatForm({ name: cat.name, description: cat.description || "" });
-                            setShowCatModal(true);
-                          }}
-                          className="bg-gray-100 hover:bg-gray-200 border-none rounded-lg p-2 cursor-pointer transition-colors">
+                      <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => { setEditCat(cat); setCatForm({ name: cat.name, description: cat.description || "" }); setShowCatModal(true); }}
+                          style={{ background: C.tealPale, border: "none", borderRadius: 7, padding: 7, cursor: "pointer", color: C.textSecondary, display: "flex", transition: "all 0.15s" }}
+                          onMouseOver={e => { e.currentTarget.style.background = "#cde6f0"; e.currentTarget.style.color = C.teal; }}
+                          onMouseOut={e => { e.currentTarget.style.background = C.tealPale; e.currentTarget.style.color = C.textSecondary; }}>
                           <EditIcon />
                         </button>
-                        <button
-                          onClick={() => handleDeleteCategory(cat._id)}
-                          className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-2 cursor-pointer transition-colors text-red-500">
+                        <button onClick={() => handleDeleteCategory(cat._id)}
+                          style={{ background: C.redPale, border: "none", borderRadius: 7, padding: 7, cursor: "pointer", color: C.red, display: "flex", transition: "all 0.15s" }}
+                          onMouseOver={e => e.currentTarget.style.background = "#f8d8d8"}
+                          onMouseOut={e => e.currentTarget.style.background = C.redPale}>
                           <TrashIcon />
                         </button>
                       </div>
-
-                      {/* Expand chevron */}
-                      <div className={`text-gray-300 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}>
-                        <ChevronRight />
+                      <div style={{ color: isOpen ? C.teal : C.textMuted, transform: isOpen ? "rotate(180deg)" : "none", transition: "all 0.2s ease", display: "flex" }}>
+                        <ChevronDown />
                       </div>
                     </div>
 
                     {/* ── Config Panel ── */}
                     {isOpen && (
-                      <div className="border-t border-gray-100 bg-slate-50 px-5 py-5">
-
-                        {/* Config panel header */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2 text-gray-700 font-bold text-sm">
-                            <SettingsIcon />
-                            Configuration Fields
+                      <div style={{ background: C.panelBg, padding: "16px 18px 20px", borderTop: `1px solid ${C.tealPale}` }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 7, color: C.textSecondary,
+                            fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>
+                            <SettingsIcon /> CONFIGURATION FIELDS
                           </div>
-                          <div className="flex gap-2">
-                            {/* ✅ STEP 2 — Add Register Button */}
+                          <div style={{ display: "flex", gap: 8 }}>
                             {config && (
-                              <Btn
-                                variant="secondary"
-                                onClick={() => {
-                                  setRegisterCategory(cat);
-                                  setRegisterForm({});
-                                  setQuantity(1);
-                                  setShowRegisterModal(true);
-                                }}
-                              >
-                                Register Product
+                              <Btn variant="success" onClick={() => { setRegisterCategory(cat); setRegisterForm({}); setQuantity(1); setShowRegisterModal(true); }}>
+                                <BoxIcon /> Register Product
                               </Btn>
                             )}
-                            
                             {config === null ? (
-                              <Btn onClick={() => openCreateConfig(cat)}>
-                                <PlusIcon /> Create Config
-                              </Btn>
+                              <Btn onClick={() => openCreateConfig(cat)}><PlusIcon /> Create Config</Btn>
                             ) : config ? (
-                              <Btn variant="ghost" onClick={() => {
-                                setAddingField({
-                                  categoryId: cat._id,
-                                  field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" }
-                                });
-                                setShowFieldModal(true);
-                              }}>
+                              <Btn variant="ghost" onClick={() => { setAddingField({ categoryId: cat._id, field: { fieldName: "", fieldKey: "", fieldType: "String", unit: "", isRequired: false, options: "" } }); setShowFieldModal(true); }}>
                                 <PlusIcon /> Add Field
                               </Btn>
                             ) : null}
                           </div>
                         </div>
 
-                        {/* States */}
                         {config === undefined ? (
-                          <div className="text-center py-5 text-sm text-gray-400">Loading config...</div>
+                          <div style={{ textAlign: "center", padding: "20px", color: C.textMuted, fontSize: 13 }}>Loading config...</div>
                         ) : config === null ? (
-                          <div className="text-center py-7 border-2 border-dashed border-indigo-100 rounded-xl">
-                            <div className="text-3xl mb-2">⚙️</div>
-                            <div className="font-semibold text-gray-500 text-sm">No configuration yet</div>
-                            <div className="text-xs text-gray-400 mt-1">
-                              Create a config to define fields for <b>{cat.name}</b>
+                          <div style={{ textAlign: "center", padding: "28px", border: `2px dashed ${C.borderMid}`, borderRadius: 10, background: "#fff" }}>
+                            <div style={{ fontSize: 26, marginBottom: 8 }}>⚙️</div>
+                            <div style={{ fontWeight: 600, color: C.textSecondary, fontSize: 13 }}>No configuration yet</div>
+                            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>
+                              Create a config for <b style={{ color: C.teal }}>{cat.name}</b>
                             </div>
                           </div>
                         ) : config.fields?.length === 0 ? (
-                          <div className="text-center py-4 text-sm text-gray-400">No fields yet. Add one!</div>
+                          <div style={{ textAlign: "center", padding: "16px", fontSize: 12, color: C.textMuted }}>No fields yet. Add one!</div>
                         ) : (
-                          <div className="flex flex-col gap-2">
-                            {/* Table header */}
-                            <div className="grid grid-cols-12 gap-3 px-3.5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wide">
-                              <span className="col-span-4">Field / Key</span>
-                              <span className="col-span-3">Type</span>
-                              <span className="col-span-2">Unit</span>
-                              <span className="col-span-2">Required</span>
-                              <span className="col-span-1"></span>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 32px", gap: 12, padding: "5px 12px",
+                              fontSize: 10, fontWeight: 700, color: C.textMuted, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                              <span>Field / Key</span><span>Type</span><span>Unit</span><span>Required</span><span></span>
                             </div>
-
-                            {/* Field rows */}
                             {config.fields.map((field, fi) => (
-                              <div key={fi}
-                                className="grid grid-cols-12 gap-3 px-3.5 py-3 bg-white rounded-xl border border-gray-100 items-center hover:bg-violet-50/30 transition-colors">
-
-                                {/* Name + key */}
-                                <div className="col-span-4">
-                                  <div className="font-bold text-sm text-gray-900">{field.fieldName}</div>
-                                  <div className="text-xs text-gray-400 font-mono mt-0.5">{field.fieldKey}</div>
+                              <div key={fi} className="field-row" style={{
+                                display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 32px",
+                                gap: 12, padding: "10px 12px",
+                                background: "#fff", border: `1px solid ${C.border}`,
+                                borderRadius: 9, alignItems: "center", transition: "background 0.15s",
+                              }}>
+                                <div>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <span style={{ fontWeight: 600, fontSize: 13, color: C.textPrimary }}>{field.fieldName}</span>
+                                    {field.fieldType === "Date" && (
+                                      <span title="Date field — calendar picker in register form"
+                                        style={{ color: C.amber, display: "flex" }}>
+                                        <CalendarIcon size={12} color={C.amber} />
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'DM Mono', monospace", marginTop: 2 }}>{field.fieldKey}</div>
                                   {field.options?.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 5 }}>
                                       {field.options.map(o => (
-                                        <span key={o} className="bg-gray-100 text-gray-500 rounded px-1.5 py-0.5 text-xs">
-                                          {o}
-                                        </span>
+                                        <span key={o} style={{ background: C.tealPale, color: C.textSecondary, borderRadius: 4, padding: "1px 6px", fontSize: 10, fontFamily: "'DM Mono', monospace" }}>{o}</span>
                                       ))}
                                     </div>
                                   )}
                                 </div>
-
-                                {/* Type badge */}
-                                <div className="col-span-3">
-                                  <FieldTypeBadge type={field.fieldType} />
-                                </div>
-
-                                {/* Unit */}
-                                <div className="col-span-2 text-sm text-gray-400">{field.unit || "—"}</div>
-
-                                {/* Required */}
-                                <div className="col-span-2">
+                                <div><FieldTypeBadge type={field.fieldType} /></div>
+                                <div style={{ fontSize: 12, color: C.textMuted }}>{field.unit || "—"}</div>
+                                <div>
                                   {field.isRequired
-                                    ? <span className="text-emerald-500 text-xs font-bold">✓ Yes</span>
-                                    : <span className="text-gray-300 text-xs">No</span>}
+                                    ? <span style={{ color: C.green, fontSize: 11, fontWeight: 700 }}>✓ Yes</span>
+                                    : <span style={{ color: C.textMuted, fontSize: 11 }}>No</span>}
                                 </div>
-
-                                {/* Delete field */}
-                                <div className="col-span-1 flex justify-end">
-                                  <button
-                                    onClick={() => handleRemoveField(cat._id, field.fieldKey)}
-                                    className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-1.5 cursor-pointer text-red-400 transition-colors">
+                                <div>
+                                  <button onClick={() => handleRemoveField(cat._id, field.fieldKey)}
+                                    style={{ background: "transparent", border: "none", borderRadius: 6, padding: 5, cursor: "pointer", color: C.textMuted, display: "flex", transition: "all 0.15s" }}
+                                    onMouseOver={e => { e.currentTarget.style.background = C.redPale; e.currentTarget.style.color = C.red; }}
+                                    onMouseOut={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = C.textMuted; }}>
                                     <TrashIcon />
                                   </button>
                                 </div>
@@ -1911,302 +2903,126 @@ export default function CustomerCareHome() {
         </main>
       </div>
 
-      {/* ══════════ MODAL: CREATE / EDIT CATEGORY ══════════ */}
-      <Modal
-        open={showCatModal}
-        onClose={() => { setShowCatModal(false); setEditCat(null); }}
-        title={editCat ? "Edit Category" : "New Category"}>
-        <div className="flex flex-col gap-4">
-          <Input
-            label="Category Name" required
-            placeholder="e.g. Laptop, Printer, AC"
-            value={catForm.name}
-            onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))}
-          />
-          <Input
-            label="Description"
-            placeholder="Optional description"
-            value={catForm.description}
-            onChange={e => setCatForm(p => ({ ...p, description: e.target.value }))}
-          />
-          <div className="flex gap-3 justify-end mt-2">
-            <Btn variant="secondary" onClick={() => { setShowCatModal(false); setEditCat(null); }}>
-              Cancel
-            </Btn>
-            <Btn onClick={handleSaveCategory}>
-              {editCat ? "Update" : "Create Category"}
-            </Btn>
+      {/* ══ MODAL: CREATE / EDIT CATEGORY ══ */}
+      <Modal open={showCatModal} onClose={() => { setShowCatModal(false); setEditCat(null); }} title={editCat ? "Edit Category" : "New Category"}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Input label="Category Name" required placeholder="e.g. Laptop, Printer, AC" value={catForm.name} onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))} />
+          <Input label="Description" placeholder="Optional description" value={catForm.description} onChange={e => setCatForm(p => ({ ...p, description: e.target.value }))} />
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+            <Btn variant="secondary" onClick={() => { setShowCatModal(false); setEditCat(null); }}>Cancel</Btn>
+            <Btn onClick={handleSaveCategory}>{editCat ? "Update" : "Create Category"}</Btn>
           </div>
         </div>
       </Modal>
 
-      {/* ══════════ MODAL: CREATE CONFIG ══════════ */}
-      <Modal
-        open={showConfigModal}
-        onClose={() => setShowConfigModal(false)}
-        title={`Config for "${activeCategoryForConfig?.name}"`}>
-        <div className="flex flex-col gap-4">
-          <p className="text-sm text-gray-400 -mt-2">
-            Define the fields that will appear when registering a{" "}
-            <b className="text-gray-700">{activeCategoryForConfig?.name}</b>.
+      {/* ══ MODAL: CREATE CONFIG ══ */}
+      <Modal open={showConfigModal} onClose={() => setShowConfigModal(false)} title={`Config — ${activeCategoryForConfig?.name}`}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <p style={{ fontSize: 12, color: C.textSecondary, margin: 0 }}>
+            Define fields for <b style={{ color: C.teal }}>{activeCategoryForConfig?.name}</b>.
           </p>
-
-          {/* Field builder box */}
-          <div className="bg-gray-50 rounded-xl p-4 flex flex-col gap-3 border border-gray-100">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wide">Add a field</div>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Field Name" placeholder="e.g. RAM"
-                value={newField.fieldName}
-                onChange={e => setNewField(p => ({
-                  ...p, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value)
-                }))}
-              />
-              <Input
-                label="Field Key" placeholder="auto-filled"
-                value={newField.fieldKey}
-                onChange={e => setNewField(p => ({ ...p, fieldKey: e.target.value }))}
-              />
-              <Select
-                label="Type" value={newField.fieldType}
-                onChange={e => setNewField(p => ({ ...p, fieldType: e.target.value }))}>
-                {["String", "Number", "Boolean", "Date"].map(t => <option key={t}>{t}</option>)}
+          <div style={{ background: C.panelBg, border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, letterSpacing: "0.08em", textTransform: "uppercase" }}>Add a field</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <Input label="Field Name" placeholder="e.g. Purchase Date" value={newField.fieldName} onChange={e => setNewField(p => ({ ...p, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) }))} />
+              <Input label="Field Key" placeholder="auto-filled" value={newField.fieldKey} onChange={e => setNewField(p => ({ ...p, fieldKey: e.target.value }))} />
+              {/* Boolean removed — only String, Number, Date */}
+              <Select label="Type" value={newField.fieldType} onChange={e => setNewField(p => ({ ...p, fieldType: e.target.value }))}>
+                {FIELD_TYPES.map(t => <option key={t}>{t}</option>)}
               </Select>
-              <Input
-                label="Unit (optional)" placeholder="GB, inch..."
-                value={newField.unit}
-                onChange={e => setNewField(p => ({ ...p, unit: e.target.value }))}
-              />
+              <Input label="Unit (optional)" placeholder="GB, inch..." value={newField.unit} onChange={e => setNewField(p => ({ ...p, unit: e.target.value }))} />
             </div>
-            <Input
-              label="Options (comma separated, optional)"
-              placeholder="8GB, 16GB, 32GB"
-              value={newField.options}
-              onChange={e => setNewField(p => ({ ...p, options: e.target.value }))}
-            />
-            <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
-              <input
-                type="checkbox" checked={newField.isRequired}
-                onChange={e => setNewField(p => ({ ...p, isRequired: e.target.checked }))}
-                className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-              />
+            <Input label="Options (comma separated)" placeholder="8GB, 16GB, 32GB" value={newField.options} onChange={e => setNewField(p => ({ ...p, options: e.target.value }))} />
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: C.textSecondary, cursor: "pointer" }}>
+              <input type="checkbox" checked={newField.isRequired} onChange={e => setNewField(p => ({ ...p, isRequired: e.target.checked }))} style={{ accentColor: C.teal }} />
               Required field
             </label>
-            <Btn variant="ghost" onClick={addFieldToForm}>
-              <PlusIcon /> Add to list
-            </Btn>
-          </div>
-
-          {/* Queued fields */}
-          {configFields.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">
-                Fields to create ({configFields.length})
+            {newField.fieldType === "Date" && (
+              <div style={{ fontSize: 11, color: C.amber, background: C.amberPale, border: `1px solid ${C.amber}44`, borderRadius: 7, padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 }}>
+                <CalendarIcon size={12} color={C.amber} />
+                Date fields show a calendar picker when registering a product
               </div>
+            )}
+            <Btn variant="ghost" onClick={addFieldToForm} style={{ alignSelf: "flex-start" }}><PlusIcon /> Add to list</Btn>
+          </div>
+          {configFields.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>Fields to create ({configFields.length})</div>
               {configFields.map(f => (
-                <div key={f._tempId}
-                  className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3">
+                <div key={f._tempId} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: C.panelBg, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px" }}>
                   <div>
-                    <span className="font-bold text-sm text-gray-900">{f.fieldName}</span>
-                    <span className="text-gray-400 text-xs ml-2">({f.fieldKey})</span>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: C.textPrimary }}>{f.fieldName}</span>
+                    <span style={{ color: C.textMuted, fontSize: 11, marginLeft: 8, fontFamily: "'DM Mono', monospace" }}>({f.fieldKey})</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <FieldTypeBadge type={f.fieldType} />
-                    {f.isRequired && (
-                      <span className="text-emerald-500 text-xs font-bold">REQUIRED</span>
-                    )}
-                    <button
-                      onClick={() => setConfigFields(p => p.filter(x => x._tempId !== f._tempId))}
-                      className="bg-red-50 hover:bg-red-100 border-none rounded-lg p-1 cursor-pointer text-red-400 transition-colors">
-                      <XIcon />
-                    </button>
+                    {f.fieldType === "Date" && <CalendarIcon size={12} color={C.amber} />}
+                    {f.isRequired && <span style={{ color: C.green, fontSize: 10, fontWeight: 700 }}>REQUIRED</span>}
+                    <button onClick={() => setConfigFields(p => p.filter(x => x._tempId !== f._tempId))} style={{ background: "none", border: "none", cursor: "pointer", color: C.red, display: "flex" }}><XIcon /></button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-
-          <div className="flex gap-3 justify-end mt-1">
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <Btn variant="secondary" onClick={() => setShowConfigModal(false)}>Cancel</Btn>
-            <Btn onClick={handleCreateConfig} disabled={configFields.length === 0}>
-              <CheckIcon /> Save Configuration
-            </Btn>
+            <Btn onClick={handleCreateConfig} disabled={configFields.length === 0}><CheckIcon /> Save Configuration</Btn>
           </div>
         </div>
       </Modal>
 
-      {/* ══════════ MODAL: ADD FIELD TO EXISTING CONFIG ══════════ */}
-      <Modal
-        open={showFieldModal}
-        onClose={() => setShowFieldModal(false)}
-        title="Add New Field">
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Field Name" required placeholder="e.g. Screen Size"
-              value={addingField.field.fieldName}
-              onChange={e => setAddingField(p => ({
-                ...p, field: { ...p.field, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) }
-              }))}
-            />
-            <Input
-              label="Field Key" placeholder="auto-filled"
-              value={addingField.field.fieldKey}
-              onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldKey: e.target.value } }))}
-            />
-            <Select
-              label="Type" value={addingField.field.fieldType}
-              onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldType: e.target.value } }))}>
-              {["String", "Number", "Boolean", "Date"].map(t => <option key={t}>{t}</option>)}
+      {/* ══ MODAL: ADD FIELD ══ */}
+      <Modal open={showFieldModal} onClose={() => setShowFieldModal(false)} title="Add New Field">
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <Input label="Field Name" required placeholder="e.g. Warranty End Date" value={addingField.field.fieldName} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) } }))} />
+            <Input label="Field Key" placeholder="auto-filled" value={addingField.field.fieldKey} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldKey: e.target.value } }))} />
+            {/* Boolean removed — only String, Number, Date */}
+            <Select label="Type" value={addingField.field.fieldType} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldType: e.target.value } }))}>
+              {FIELD_TYPES.map(t => <option key={t}>{t}</option>)}
             </Select>
-            <Input
-              label="Unit (optional)" placeholder="GB, inch..."
-              value={addingField.field.unit}
-              onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, unit: e.target.value } }))}
-            />
+            <Input label="Unit (optional)" placeholder="GB, inch..." value={addingField.field.unit} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, unit: e.target.value } }))} />
           </div>
-          <Input
-            label="Options (comma separated)"
-            placeholder="8GB, 16GB, 32GB"
-            value={addingField.field.options}
-            onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, options: e.target.value } }))}
-          />
-          <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
-            <input
-              type="checkbox" checked={addingField.field.isRequired}
-              onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, isRequired: e.target.checked } }))}
-              className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-            />
+          <Input label="Options (comma separated)" placeholder="8GB, 16GB, 32GB" value={addingField.field.options} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, options: e.target.value } }))} />
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: C.textSecondary, cursor: "pointer" }}>
+            <input type="checkbox" checked={addingField.field.isRequired} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, isRequired: e.target.checked } }))} style={{ accentColor: C.teal }} />
             Required field
           </label>
-          <div className="flex gap-3 justify-end mt-1">
+          {addingField.field.fieldType === "Date" && (
+            <div style={{ fontSize: 11, color: C.amber, background: C.amberPale, border: `1px solid ${C.amber}44`, borderRadius: 7, padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 }}>
+              <CalendarIcon size={12} color={C.amber} />
+              Date fields show a calendar picker when registering a product
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <Btn variant="secondary" onClick={() => setShowFieldModal(false)}>Cancel</Btn>
             <Btn onClick={handleAddFieldToExisting}><PlusIcon /> Add Field</Btn>
           </div>
         </div>
       </Modal>
 
-      {/* ══════════ MODAL: REGISTER PRODUCT ══════════ */}
-      <Modal
-        open={showRegisterModal}
-        onClose={() => setShowRegisterModal(false)}
-        title={`Register ${registerCategory?.name}`}
-      >
-        <div className="flex flex-col gap-4">
+      {/* ══ MODAL: REGISTER PRODUCT ══ */}
+      <Modal open={showRegisterModal} onClose={() => setShowRegisterModal(false)} title={`Register — ${registerCategory?.name}`}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <Input label="Product Name" required placeholder="Enter product name"
+            value={registerForm.productName || ""} onChange={e => setRegisterForm(p => ({ ...p, productName: e.target.value }))} />
 
-          <Input
-            label="Product Name"
-            required
-            placeholder="Enter product name"
-            value={registerForm.productName || ""}
-            onChange={e =>
-              setRegisterForm(p => ({ ...p, productName: e.target.value }))
-            }
-          />
+          {/* Date fields get a proper calendar picker; others get text/number */}
+          {configs[registerCategory?._id]?.fields?.map(field => renderRegisterField(field))}
 
-          {/* Dynamic Configuration Fields */}
-          {configs[registerCategory?._id]?.fields?.map(field => (
-            <div key={field.fieldKey}>
-              {field.fieldType === "Boolean" ? (
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={registerForm[field.fieldKey] || false}
-                    onChange={e =>
-                      setRegisterForm(p => ({
-                        ...p,
-                        [field.fieldKey]: e.target.checked
-                      }))
-                    }
-                  />
-                  {field.fieldName}
-                </label>
-              ) : (
-                <Input
-                  label={field.fieldName}
-                  required={field.isRequired}
-                  type={
-                    field.fieldType === "Number"
-                      ? "number"
-                      : field.fieldType === "Date"
-                      ? "date"
-                      : "text"
-                  }
-                  value={registerForm[field.fieldKey] || ""}
-                  onChange={e =>
-                    setRegisterForm(p => ({
-                      ...p,
-                      [field.fieldKey]: e.target.value
-                    }))
-                  }
-                />
-              )}
-            </div>
-          ))}
-
-          <Input
-            label="Quantity"
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={e => setQuantity(Number(e.target.value))}
-          />
-
-          <div className="flex gap-3 justify-end mt-2">
-            <Btn variant="secondary" onClick={() => setShowRegisterModal(false)}>
-              Cancel
+          <Input label="Quantity" type="number" min="1" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+            <Btn variant="secondary" onClick={() => setShowRegisterModal(false)}>Cancel</Btn>
+            <Btn onClick={async () => {
+              try {
+                const { productName, ...configFields } = registerForm;
+                await axiosInstance.post("/category/register", { category: registerCategory._id, productName, configurations: configFields, quantity });
+                addToast("Product registered successfully!");
+                setShowRegisterModal(false);
+              } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
+            }}>
+              <CheckIcon /> Register
             </Btn>
-
-            {/* <Btn
-              onClick={async () => {
-                try {
-                  await axiosInstance.post("/category/register", {
-                    category: registerCategory._id,
-                    productName: registerForm.productName,
-                    configurations: registerForm,
-                    quantity,
-                    batch: registerForm.batch 
-                  });
-
-                  addToast("Product registered successfully!");
-                  setShowRegisterModal(false);
-                } catch (e) {
-                  addToast(e.response?.data?.message || "Failed", "error");
-                }
-              }}
-            >
-              Register
-            </Btn> */}
-           <Btn
-  onClick={async () => {
-    try {
-      const { productName, ...configFields } = registerForm;
-      
-      // 👇 ADD THIS - see exactly what you're sending
-      console.log("📤 Sending to backend:", {
-        category: registerCategory._id,
-        productName,
-        configurations: configFields,
-        quantity
-      });
-
-      await axiosInstance.post("/category/register", {
-        category: registerCategory._id,
-        productName,
-        configurations: configFields,
-        quantity
-      });
-
-      addToast("Product registered successfully!");
-      setShowRegisterModal(false);
-    } catch (e) {
-      console.log("❌ Full error:", e.response?.data); // 👈 ADD THIS
-      addToast(e.response?.data?.message || "Failed", "error");
-    }
-  }}
->
-  Register
-</Btn>
           </div>
         </div>
       </Modal>

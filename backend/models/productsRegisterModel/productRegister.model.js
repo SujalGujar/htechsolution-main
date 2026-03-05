@@ -23,11 +23,7 @@ const productSchema = new mongoose.Schema(
       of: mongoose.Schema.Types.Mixed
     },
 
-    status: {
-      type: String,
-      enum: ["available", "sold", "damaged"],
-      default: "available"
-    }
+    
   },
   { timestamps: true }
 );
