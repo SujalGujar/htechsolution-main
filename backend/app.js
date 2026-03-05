@@ -19,18 +19,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // ✅ MIDDLEWARE FIRST - BEFORE ANY ROUTES!
-// app.use(cors());
-app.use(cors({
-  origin: [
-    "https://htechsolution.in",
-    "https://htechsolution-main-d7ku.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:5173"
-  ],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"], // 👈 critical for JWT
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
+app.use(cors());
+
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
