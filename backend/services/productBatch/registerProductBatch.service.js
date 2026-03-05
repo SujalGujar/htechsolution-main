@@ -59,6 +59,11 @@ export const registerProductsBatch= async (data) => {
     quantity
   } = data;
 
+   console.log("🔍 category:", category);         // 👈 ADD
+  console.log("🔍 productName:", productName);   // 👈 ADD
+  console.log("🔍 configurations:", configurations); // 👈 ADD
+  console.log("🔍 quantity:", quantity)
+
   if (!quantity || quantity <= 0) {
     throw new Error("Quantity must be greater than 0");
   }
