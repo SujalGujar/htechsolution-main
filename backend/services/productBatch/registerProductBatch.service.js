@@ -100,7 +100,7 @@
 
 import Product from "../../models/productsRegisterModel/productRegister.model.js";
 import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
-
+import mongoose from "mongoose";
 export const registerProductsBatch = async (data) => {
   try {
     const { category, productName, configurations, quantity } = data;
