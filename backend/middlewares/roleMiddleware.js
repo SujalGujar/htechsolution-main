@@ -16,7 +16,7 @@
 //   }
   
 // }
-// export default authorizeRoles;
+
 
 const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
@@ -34,5 +34,5 @@ const authorizeRoles = (...allowedRoles) => {
     next();
   };
 };
-
+export default authorizeRoles;
   
