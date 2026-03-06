@@ -3494,10 +3494,64 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
+// ── Minimal shadcn-style Table primitives ─────────────────────────────────────
+const Table = ({ children, ...p }) => (
+  <div style={{ overflowX: "auto", width: "100%" }}>
+    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }} {...p}>
+      {children}
+    </table>
+  </div>
+);
+const TableHeader = ({ children }) => <thead>{children}</thead>;
+const TableBody   = ({ children }) => <tbody>{children}</tbody>;
+const TableRow    = ({ children, onClick, isExpanded, isExpandedDetail }) => (
+  <tr
+    onClick={onClick}
+    style={{
+      borderBottom: "1px solid var(--border)",
+      background: isExpandedDetail ? "#eef6f9" : isExpanded ? "#e4f2f8" : "transparent",
+      transition: "background 0.13s",
+      cursor: onClick ? "pointer" : "default",
+    }}
+    onMouseEnter={e => { if (!isExpanded && !isExpandedDetail) e.currentTarget.style.background = "#f3f9fb"; }}
+    onMouseLeave={e => { if (!isExpanded && !isExpandedDetail) e.currentTarget.style.background = "transparent"; }}
+  >
+    {children}
+  </tr>
+);
+const TableHead = ({ children, style }) => (
+  <th style={{
+    padding: "11px 16px",
+    textAlign: "left",
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.07em",
+    color: "var(--text-secondary)",
+    background: "#f8fbfc",
+    borderBottom: "1.5px solid var(--border)",
+    whiteSpace: "nowrap",
+    ...style,
+  }}>
+    {children}
+  </th>
+);
+const TableCell = ({ children, style }) => (
+  <td style={{
+    padding: "13px 16px",
+    verticalAlign: "middle",
+    color: "var(--text-primary)",
+    ...style,
+  }}>
+    {children}
+  </td>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
 export default function CustomerCareProductHistory() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [products, setProducts]     = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRow, setExpandedRow] = useState(null);
@@ -3507,16 +3561,13 @@ export default function CustomerCareProductHistory() {
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true); setError(null);
       const { data } = await axiosInstance.get("/category/history");
       const list = data.data || data.products || data || [];
       setProducts(Array.isArray(list) ? list : []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const getConfigs = (configurations) => {
@@ -3526,22 +3577,22 @@ export default function CustomerCareProductHistory() {
     return [];
   };
 
+  // Search by ticket, category name, or any config value
   const filtered = products.filter(p => {
-    const name = p.productName?.toLowerCase() || "";
-    const ticket = p.ticketNumber?.toLowerCase() || "";
-    const serial = p.serialNumber?.toLowerCase() || "";
-    const company = p.companyName?.toLowerCase() || "";
-    const search = searchTerm.toLowerCase();
-    return !searchTerm || name.includes(search) || ticket.includes(search) || serial.includes(search) || company.includes(search);
+    const ticket   = p.ticketNumber?.toLowerCase() || "";
+    const catName  = (p.category?.name || p.category || "").toLowerCase();
+    const configs  = getConfigs(p.configurations).map(([, v]) => String(v).toLowerCase()).join(" ");
+    const s = searchTerm.toLowerCase();
+    return !s || ticket.includes(s) || catName.includes(s) || configs.includes(s);
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
 
         .ph-root {
           --primary:        #2B6F84;
@@ -3552,13 +3603,12 @@ export default function CustomerCareProductHistory() {
           --info:           #3A8FB7;
           --success:        #6BA86D;
           --warning:        #D39A3C;
-          --edit-btn:       #5FA8C7;
           --delete-btn:     #E57373;
           --text-primary:   #1E2A32;
           --text-secondary: #6B7C86;
         }
 
-        .ph-root * { box-sizing: border-box; }
+        .ph-root *, .ph-root *::before, .ph-root *::after { box-sizing: border-box; }
         .ph-root {
           font-family: 'DM Sans', sans-serif;
           background: var(--background);
@@ -3566,7 +3616,6 @@ export default function CustomerCareProductHistory() {
           padding: 28px 24px;
         }
 
-        /* ── Card ── */
         .ph-card {
           background: var(--card-bg);
           border-radius: 16px;
@@ -3575,279 +3624,147 @@ export default function CustomerCareProductHistory() {
           box-shadow: 0 4px 24px rgba(43,111,132,0.08);
         }
 
-        /* ── Header ── */
+        /* Header */
         .ph-header {
           background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-          padding: 26px 32px 22px;
+          padding: 24px 28px 20px;
           border-bottom: 1px solid var(--primary-dark);
         }
         .ph-title {
           font-family: 'Syne', sans-serif;
-          font-size: 20px;
-          font-weight: 800;
-          margin: 0 0 4px;
-          letter-spacing: -0.4px;
-          color: #ffffff;
+          font-size: 20px; font-weight: 800;
+          margin: 0 0 3px; letter-spacing: -0.4px; color: #fff;
+          display: flex; align-items: center; gap: 10px;
         }
         .ph-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); margin: 0; }
-
         .ph-count-badge {
-          display: inline-block;
           background: rgba(255,255,255,0.18);
           border: 1px solid rgba(255,255,255,0.25);
-          border-radius: 20px;
-          padding: 2px 10px;
-          font-size: 12px;
-          font-weight: 700;
-          margin-left: 10px;
-          color: #fff;
-          vertical-align: middle;
+          border-radius: 20px; padding: 2px 10px;
+          font-size: 12px; font-weight: 700; color: #fff;
         }
 
-        /* ── Toolbar ── */
+        /* Toolbar */
         .ph-toolbar {
-          padding: 18px 24px;
+          padding: 16px 24px;
           border-bottom: 1px solid var(--border);
           background: #fafcfd;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex-wrap: wrap;
+          display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
         }
-        .ph-search { position: relative; flex: 1; min-width: 220px; max-width: 520px; }
+        .ph-search { position: relative; flex: 1; min-width: 220px; max-width: 480px; }
         .ph-search input {
-          width: 100%;
-          padding: 10px 14px 10px 42px;
-          border: 1.5px solid var(--border);
-          border-radius: 10px;
-          font-size: 13px;
-          outline: none;
-          background: #fff;
-          color: var(--text-primary);
-          font-family: 'DM Sans', sans-serif;
+          width: 100%; padding: 9px 14px 9px 40px;
+          border: 1.5px solid var(--border); border-radius: 9px;
+          font-size: 13px; outline: none; background: #fff;
+          color: var(--text-primary); font-family: 'DM Sans', sans-serif;
           transition: border-color 0.2s, box-shadow 0.2s;
         }
         .ph-search input:focus {
           border-color: var(--primary);
           box-shadow: 0 0 0 3px rgba(43,111,132,0.1);
         }
-        .ph-search input::placeholder { color: #b0bec5; }
+        .ph-search input::placeholder { color: #b0c4ce; }
         .ph-search-icon {
-          position: absolute;
-          left: 13px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: var(--text-secondary);
-          display: flex;
-          align-items: center;
+          position: absolute; left: 12px; top: 50%;
+          transform: translateY(-50%); color: var(--text-secondary);
+          display: flex; align-items: center; pointer-events: none;
         }
-
         .ph-refresh {
-          padding: 9px 18px;
-          background: var(--card-bg);
-          color: var(--primary);
-          border: 1.5px solid var(--border);
-          border-radius: 9px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.18s;
+          padding: 8px 16px; background: var(--card-bg);
+          color: var(--primary); border: 1.5px solid var(--border);
+          border-radius: 9px; font-size: 12px; font-weight: 700;
+          cursor: pointer; transition: all 0.18s;
           font-family: 'DM Sans', sans-serif;
-          white-space: nowrap;
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          display: flex; align-items: center; gap: 6px; white-space: nowrap;
         }
         .ph-refresh:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
         .ph-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ── Table ── */
-        .ph-table-wrap { overflow-x: auto; }
-        table.ph-table { width: 100%; border-collapse: collapse; }
-        .ph-table th {
-          padding: 12px 16px;
-          text-align: left;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.07em;
-          color: var(--text-secondary);
-          background: #f8fbfc;
-          border-bottom: 1.5px solid var(--border);
-          white-space: nowrap;
-        }
-        .ph-table td {
-          padding: 14px 16px;
-          font-size: 13px;
-          border-bottom: 1px solid var(--border);
-          vertical-align: middle;
-          color: var(--text-primary);
-        }
-        .ph-table tr:last-child td { border-bottom: none; }
-        .ph-table tbody tr { transition: background 0.13s; cursor: pointer; }
-        .ph-table tbody tr:hover { background: #eef6f9; }
-        .ph-table tbody tr.expanded { background: #e8f4f9; }
-
-        /* ── Ticket badge ── */
+        /* Ticket badge */
         .ph-ticket {
-          font-family: 'DM Mono', monospace;
-          font-size: 11px;
-          background: #ede9fe;
-          color: #6d28d9;
-          padding: 4px 9px;
-          border-radius: 6px;
-          border: 1px solid #c4b5fd;
-          font-weight: 500;
-          white-space: nowrap;
-        }
-        .ph-serial {
-          font-family: 'DM Mono', monospace;
-          font-size: 11px;
-          color: var(--text-secondary);
-          margin-top: 4px;
-          display: block;
+          font-family: 'DM Mono', monospace; font-size: 11px;
+          background: #ede9fe; color: #6d28d9;
+          padding: 4px 9px; border-radius: 6px;
+          border: 1px solid #c4b5fd; font-weight: 500; white-space: nowrap;
         }
 
-        /* ── Product name ── */
-        .ph-product-name { font-weight: 700; color: var(--text-primary); }
-        .ph-expand-hint { font-size: 11px; color: var(--text-secondary); margin-left: 7px; }
-
-        /* ── Company badge ── */
-        .ph-company {
-          font-size: 12px;
-          color: var(--primary-dark);
-          font-weight: 600;
-          background: #dbedf5;
-          padding: 3px 9px;
-          border-radius: 6px;
-          border: 1px solid #b3d4e2;
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-        }
-
-        /* ── Category badge ── */
+        /* Category badge */
         .ph-category {
-          font-size: 12px;
-          color: var(--info);
-          font-weight: 600;
-          background: #e0f2fe;
-          padding: 3px 9px;
-          border-radius: 6px;
-          border: 1px solid #bae6fd;
-          display: inline-block;
+          font-size: 12px; color: var(--info); font-weight: 600;
+          background: #e0f2fe; padding: 3px 9px;
+          border-radius: 6px; border: 1px solid #bae6fd; display: inline-block;
         }
 
-        /* ── Config chips ── */
-        .ph-config-chip {
-          display: inline-flex;
-          gap: 4px;
-          align-items: center;
-          background: #f0f7fa;
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          padding: 3px 9px;
-          font-size: 12px;
+        /* Config chips */
+        .ph-chip {
+          display: inline-flex; gap: 4px; align-items: center;
+          background: #f0f7fa; border: 1px solid var(--border);
+          border-radius: 6px; padding: 3px 9px; font-size: 12px;
         }
-        .ph-config-key { color: var(--text-secondary); font-weight: 500; }
-        .ph-config-val { color: var(--primary); font-weight: 700; }
+        .ph-chip-key { color: var(--text-secondary); font-weight: 500; }
+        .ph-chip-val { color: var(--primary); font-weight: 700; }
 
-        /* ── Expanded panel ── */
-        .ph-expand-panel {
-          background: #eef6f9;
-          border-bottom: 1px solid var(--border);
-        }
-        .ph-expand-inner {
-          padding: 14px 20px 20px;
-        }
+        /* Expand panel */
         .ph-expand-label {
-          font-size: 10px;
-          font-weight: 800;
-          color: var(--primary);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
+          font-size: 10px; font-weight: 800; color: var(--primary);
+          text-transform: uppercase; letter-spacing: 0.08em;
           margin-bottom: 10px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          display: flex; align-items: center; gap: 6px;
         }
-        .ph-configs {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 14px 16px;
-          background: #fff;
-          border-radius: 10px;
-          border: 1px solid var(--border);
+        .ph-expand-chips {
+          display: flex; flex-wrap: wrap; gap: 8px;
+          padding: 14px 16px; background: #fff;
+          border-radius: 10px; border: 1px solid var(--border);
         }
-        .ph-no-config { font-size: 12px; color: var(--text-secondary); font-style: italic; }
+        .ph-expand-meta {
+          display: flex; gap: 24px; flex-wrap: wrap;
+        }
+        .ph-meta-label {
+          font-size: 10px; font-weight: 700; color: var(--text-secondary);
+          text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;
+        }
 
-        /* ── Date ── */
-        .ph-date { color: var(--text-secondary); font-size: 12px; }
-
-        /* ── Empty ── */
+        /* Empty */
         .ph-empty { text-align: center; padding: 56px 24px; }
-        .ph-empty-icon { font-size: 40px; margin-bottom: 12px; }
 
-        /* ── Error ── */
+        /* Error */
         .ph-error {
-          margin: 20px 24px;
-          padding: 14px 18px;
-          background: #fff5f5;
-          border: 1px solid #fca5a5;
+          margin: 20px 24px; padding: 14px 18px;
+          background: #fff5f5; border: 1px solid #fca5a5;
           border-left: 3px solid var(--delete-btn);
-          border-radius: 10px;
-          color: #b91c1c;
-          font-size: 13px;
+          border-radius: 10px; color: #b91c1c; font-size: 13px;
         }
 
-        /* ── Loading skeleton ── */
+        /* Skeleton */
         .ph-loading { padding: 24px; display: flex; flex-direction: column; gap: 10px; }
         .ph-skeleton {
-          height: 48px;
-          border-radius: 8px;
+          height: 48px; border-radius: 8px;
           background: linear-gradient(90deg, #e8f0f4 25%, #d4e4ec 50%, #e8f0f4 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.4s infinite;
+          background-size: 200% 100%; animation: ph-shimmer 1.4s infinite;
         }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes ph-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        /* ── Pagination ── */
+        /* Pagination */
         .ph-pagination {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 14px 24px;
-          border-top: 1px solid var(--border);
-          background: #fafcfd;
-          flex-wrap: wrap;
-          gap: 10px;
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 14px 24px; border-top: 1px solid var(--border);
+          background: #fafcfd; flex-wrap: wrap; gap: 10px;
         }
         .ph-page-info { font-size: 12px; color: var(--text-secondary); }
         .ph-page-btns { display: flex; gap: 5px; align-items: center; }
         .ph-page-btn {
-          padding: 6px 12px;
-          border: 1.5px solid var(--border);
-          border-radius: 7px;
-          font-size: 12px;
-          font-weight: 600;
-          background: #fff;
-          cursor: pointer;
-          color: var(--text-secondary);
-          transition: all 0.15s;
-          font-family: 'DM Sans', sans-serif;
+          padding: 6px 12px; border: 1.5px solid var(--border);
+          border-radius: 7px; font-size: 12px; font-weight: 600;
+          background: #fff; cursor: pointer; color: var(--text-secondary);
+          transition: all 0.15s; font-family: 'DM Sans', sans-serif;
         }
-        .ph-page-btn:hover:not(:disabled) {
-          border-color: var(--primary);
-          color: var(--primary);
-          background: #eef6f9;
-        }
-        .ph-page-btn.active {
-          background: var(--primary);
-          color: #fff;
-          border-color: var(--primary);
-        }
+        .ph-page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: #eef6f9; }
+        .ph-page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         .ph-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* chevron rotate */
+        .ph-chevron { transition: transform 0.2s; display: inline-flex; }
+        .ph-chevron.open { transform: rotate(180deg); }
       `}</style>
 
       <div className="ph-root">
@@ -3855,11 +3772,14 @@ export default function CustomerCareProductHistory() {
 
           {/* ── Header ── */}
           <div className="ph-header">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
                 <h2 className="ph-title">
-                  <svg style={{ verticalAlign: "middle", marginRight: 8, marginTop: -2 }} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
                   Product History
                   <span className="ph-count-badge">{filtered.length}</span>
@@ -3867,8 +3787,9 @@ export default function CustomerCareProductHistory() {
                 <p className="ph-subtitle">All registered products with their configurations</p>
               </div>
               <button className="ph-refresh" onClick={fetchProducts} disabled={loading}>
-                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10"/>
+                  <polyline points="1 20 1 14 7 14"/>
                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
                 </svg>
                 {loading ? "Loading…" : "Refresh"}
@@ -3876,16 +3797,16 @@ export default function CustomerCareProductHistory() {
             </div>
           </div>
 
-          {/* ── Toolbar / Search ── */}
+          {/* ── Toolbar ── */}
           <div className="ph-toolbar">
             <div className="ph-search">
               <span className="ph-search-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
               </span>
               <input
-                placeholder="Search by product name, ticket, serial or company…"
+                placeholder="Search by ticket, category or config value…"
                 value={searchTerm}
                 onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
               />
@@ -3896,172 +3817,169 @@ export default function CustomerCareProductHistory() {
           {error && (
             <div className="ph-error">
               ⚠️ {error}&nbsp;&nbsp;
-              <button onClick={fetchProducts} style={{ color: "#2B6F84", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
+              <button onClick={fetchProducts} style={{ color: "var(--primary)", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
                 Retry
               </button>
             </div>
           )}
 
-          {/* ── Loading ── */}
+          {/* ── Skeleton ── */}
           {loading && (
             <div className="ph-loading">
               {[...Array(5)].map((_, i) => <div key={i} className="ph-skeleton" />)}
             </div>
           )}
 
-          {/* ── Table ── */}
+          {/* ── shadcn-style Table ── */}
           {!loading && !error && (
-            <div className="ph-table-wrap">
-              <table className="ph-table">
-                <thead>
-                  <tr>
-                    <th>Ticket # / Serial</th>
-                    <th>Product Name</th>
-                    <th>Company</th>
-                    <th>Category</th>
-                    <th>Registered</th>
-                    <th>Configurations</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.length === 0 ? (
-                    <tr>
-                      <td colSpan={6}>
-                        <div className="ph-empty">
-                          <div className="ph-empty-icon">🔍</div>
-                          <div style={{ fontWeight: 700, color: "#6B7C86", fontSize: 14 }}>No products found</div>
-                          <div style={{ fontSize: 12, marginTop: 4, color: "#9fb3be" }}>Try adjusting your search</div>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    paginated.map((product) => {
-                      const configs = getConfigs(product.configurations);
-                      const isExpanded = expandedRow === product._id;
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ticket #</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Registered</TableHead>
+                  <TableHead>Configurations</TableHead>
+                  <TableHead style={{ width: 36 }}></TableHead>
+                </TableRow>
+              </TableHeader>
 
-                      return (
-                        <React.Fragment key={product._id}>
-                          <tr
-                            className={isExpanded ? "expanded" : ""}
-                            onClick={() => setExpandedRow(isExpanded ? null : product._id)}
-                          >
-                            {/* Ticket & Serial */}
-                            <td>
-                              <span className="ph-ticket">{product.ticketNumber || "—"}</span>
-                              {product.serialNumber && (
-                                <span className="ph-serial">SN: {product.serialNumber}</span>
-                              )}
-                            </td>
+              <TableBody>
+                {paginated.length === 0 ? (
+                  <TableRow>
+                    <TableCell style={{ padding: 0 }}>
+                      {/* colSpan workaround — just span via a wrapper */}
+                    </TableCell>
+                    <TableCell colSpan={5}>
+                      <div className="ph-empty">
+                        <div style={{ fontSize: 38, marginBottom: 12 }}>🔍</div>
+                        <div style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: 14 }}>No products found</div>
+                        <div style={{ fontSize: 12, marginTop: 4, color: "#9fb3be" }}>Try adjusting your search</div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginated.map((product) => {
+                    const configs    = getConfigs(product.configurations);
+                    const isExpanded = expandedRow === product._id;
 
-                            {/* Product Name */}
-                            <td>
-                              <span className="ph-product-name">{product.productName || "—"}</span>
-                              <span className="ph-expand-hint">{isExpanded ? "▲" : "▼"}</span>
-                            </td>
+                    return (
+                      <React.Fragment key={product._id}>
 
-                            {/* Company */}
-                            <td>
-                              {product.companyName ? (
-                                <span className="ph-company">
-                                  <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M3 21h18M3 7l9-4 9 4M4 7v14M20 7v14M9 21V11h6v10"/>
-                                  </svg>
-                                  {product.companyName}
-                                </span>
-                              ) : (
-                                <span style={{ color: "#b0bec5", fontSize: 12 }}>—</span>
-                              )}
-                            </td>
+                        {/* ── Main row ── */}
+                        <TableRow
+                          isExpanded={isExpanded}
+                          onClick={() => setExpandedRow(isExpanded ? null : product._id)}
+                        >
+                          {/* Ticket */}
+                          <TableCell>
+                            <span className="ph-ticket">{product.ticketNumber || "—"}</span>
+                          </TableCell>
 
-                            {/* Category */}
-                            <td>
-                              <span className="ph-category">
-                                {product.category?.name || product.category || "—"}
-                              </span>
-                            </td>
+                          {/* Category */}
+                          <TableCell>
+                            <span className="ph-category">
+                              {product.category?.name || product.category || "—"}
+                            </span>
+                          </TableCell>
 
-                            {/* Date */}
-                            <td className="ph-date">
-                              {product.createdAt
-                                ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-                                : "—"}
-                            </td>
+                          {/* Date */}
+                          <TableCell style={{ color: "var(--text-secondary)", fontSize: 12, whiteSpace: "nowrap" }}>
+                            {product.createdAt
+                              ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+                              : "—"}
+                          </TableCell>
 
-                            {/* Configs preview */}
-                            <td>
-                              {configs.length === 0 ? (
-                                <span className="ph-no-config">No configurations</span>
-                              ) : (
-                                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                                  {configs.slice(0, 3).map(([k, v]) => (
-                                    <span key={k} className="ph-config-chip">
-                                      <span className="ph-config-key">{k}:</span>
-                                      <span className="ph-config-val">{String(v)}</span>
-                                    </span>
-                                  ))}
-                                  {configs.length > 3 && (
-                                    <span style={{ fontSize: 11, color: "#6B7C86", alignSelf: "center", fontWeight: 600 }}>
-                                      +{configs.length - 3} more
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </td>
-                          </tr>
+                          {/* Config chips preview */}
+                          <TableCell>
+                            {configs.length === 0 ? (
+                              <span style={{ fontSize: 12, color: "var(--text-secondary)", fontStyle: "italic" }}>No configurations</span>
+                            ) : (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                                {configs.slice(0, 3).map(([k, v]) => (
+                                  <span key={k} className="ph-chip">
+                                    <span className="ph-chip-key">{k}:</span>
+                                    <span className="ph-chip-val">{String(v)}</span>
+                                  </span>
+                                ))}
+                                {configs.length > 3 && (
+                                  <span style={{ fontSize: 11, color: "var(--text-secondary)", alignSelf: "center", fontWeight: 600 }}>
+                                    +{configs.length - 3} more
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </TableCell>
 
-                          {/* Expanded row — full configs */}
-                          {isExpanded && (
-                            <tr>
-                              <td colSpan={6} style={{ padding: 0 }} className="ph-expand-panel">
-                                <div className="ph-expand-inner">
-                                  {configs.length > 0 && (
-                                    <>
-                                      <div className="ph-expand-label">
-                                        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                                          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-                                        </svg>
-                                        Full Configuration
-                                      </div>
-                                      <div className="ph-configs">
-                                        {configs.map(([k, v]) => (
-                                          <span key={k} className="ph-config-chip">
-                                            <span className="ph-config-key">{k}:</span>
-                                            <span className="ph-config-val">{String(v)}</span>
-                                          </span>
-                                        ))}
-                                      </div>
-                                    </>
-                                  )}
+                          {/* Expand chevron */}
+                          <TableCell style={{ textAlign: "center", color: "var(--text-secondary)" }}>
+                            <span className={`ph-chevron${isExpanded ? " open" : ""}`}>
+                              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M6 9l6 6 6-6"/>
+                              </svg>
+                            </span>
+                          </TableCell>
+                        </TableRow>
 
-                                  {/* Extra product details row */}
-                                  <div style={{ display: "flex", gap: 24, marginTop: configs.length > 0 ? 14 : 0, flexWrap: "wrap" }}>
-                                    
-                                    {product.createdAt && (
-                                      <div>
-                                        <div style={{ fontSize: 10, fontWeight: 700, color: "#6B7C86", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Registered On</div>
-                                        <span style={{ fontSize: 13, color: "#1E2A32", fontWeight: 600 }}>
-                                          {new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
-                                        </span>
-                                      </div>
-                                    )}
-                                    {product.ticketNumber && (
-                                      <div>
-                                        <div style={{ fontSize: 10, fontWeight: 700, color: "#6B7C86", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Ticket</div>
-                                        <span className="ph-ticket">{product.ticketNumber}</span>
-                                      </div>
-                                    )}
+                        {/* ── Expanded detail row ── */}
+                        {isExpanded && (
+                          <TableRow isExpandedDetail>
+                            <TableCell
+                              colSpan={5}
+                              style={{ padding: "16px 20px 20px", background: "#eef6f9", borderBottom: "1px solid var(--border)" }}
+                            >
+                              {configs.length > 0 && (
+                                <>
+                                  <div className="ph-expand-label">
+                                    <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                                      <circle cx="12" cy="12" r="3"/>
+                                      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                                    </svg>
+                                    Full Configuration
                                   </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+                                  <div className="ph-expand-chips" style={{ marginBottom: 14 }}>
+                                    {configs.map(([k, v]) => (
+                                      <span key={k} className="ph-chip">
+                                        <span className="ph-chip-key">{k}:</span>
+                                        <span className="ph-chip-val">{String(v)}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+
+                              {/* Meta strip */}
+                              <div className="ph-expand-meta">
+                                {product.ticketNumber && (
+                                  <div>
+                                    <div className="ph-meta-label">Ticket</div>
+                                    <span className="ph-ticket">{product.ticketNumber}</span>
+                                  </div>
+                                )}
+                                {product.category && (
+                                  <div>
+                                    <div className="ph-meta-label">Category</div>
+                                    <span className="ph-category">{product.category?.name || product.category}</span>
+                                  </div>
+                                )}
+                                {product.createdAt && (
+                                  <div>
+                                    <div className="ph-meta-label">Registered On</div>
+                                    <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
+                                      {new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+
+                      </React.Fragment>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
           )}
 
           {/* ── Pagination ── */}
@@ -4074,10 +3992,10 @@ export default function CustomerCareProductHistory() {
                 <button className="ph-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>←</button>
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
                   let p;
-                  if (totalPages <= 5) p = i + 1;
-                  else if (currentPage <= 3) p = i + 1;
+                  if (totalPages <= 5)           p = i + 1;
+                  else if (currentPage <= 3)     p = i + 1;
                   else if (currentPage >= totalPages - 2) p = totalPages - 4 + i;
-                  else p = currentPage - 2 + i;
+                  else                           p = currentPage - 2 + i;
                   return (
                     <button key={i} className={`ph-page-btn${currentPage === p ? " active" : ""}`} onClick={() => setCurrentPage(p)}>
                       {p}

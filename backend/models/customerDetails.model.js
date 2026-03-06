@@ -44,7 +44,7 @@
 // export default Customer;
 
 
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const customerDetailsSchema = new mongoose.Schema({
     customerName: {
@@ -60,28 +60,33 @@ const customerDetailsSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    proName: {
-        type: String,
-        required: true
-    },
-    proCatogory: {
-        type: String,
-        required: true
-    },
-    proSrNo: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    proModNum: {
-        type: String,
-        required: true
-    },
-    ticketNumber: {  
-        type: String,
-        required: true,
-        unique: true
-    },
+    configurations: {
+          type: Map,
+          of: mongoose.Schema.Types.Mixed,
+          default: {},
+        },
+    // proName: {
+    //     type: String,
+    //     required: true
+    // },
+    // proCatogory: {
+    //     type: String,
+    //     required: true
+    // },
+    // proSrNo: {
+    //     type: String,
+    //     required: true,
+    //     unique: true
+    // },
+    // proModNum: {
+    //     type: String,
+    //     required: true
+    // },
+    // ticketNumber: {  
+    //     type: String,
+    //     required: true,
+    //     unique: true
+    // },
     warrStartDate: {
         type: Date,
         required: true
@@ -90,13 +95,13 @@ const customerDetailsSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    password: {
-        type: String,
-        required: true
-    },
-    plainPassword: { type: String ,
+    // password: {
+    //     type: String,
+    //     required: true
+    // },
+    // plainPassword: { type: String ,
         
-    },
+    // },
 
 }, {
     timestamps: true
