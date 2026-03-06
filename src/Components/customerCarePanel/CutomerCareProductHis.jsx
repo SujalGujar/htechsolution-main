@@ -3491,7 +3491,6 @@
 
 // export default CustomerCareProductHistory;
 
-
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
@@ -3520,7 +3519,6 @@ export default function CustomerCareProductHistory() {
     }
   };
 
-  // Get configurations as array of [key, value] pairs
   const getConfigs = (configurations) => {
     if (!configurations) return [];
     if (configurations instanceof Map) return [...configurations.entries()];
@@ -3528,13 +3526,13 @@ export default function CustomerCareProductHistory() {
     return [];
   };
 
-  // Search by product name, ticket number, or serial number
   const filtered = products.filter(p => {
     const name = p.productName?.toLowerCase() || "";
     const ticket = p.ticketNumber?.toLowerCase() || "";
     const serial = p.serialNumber?.toLowerCase() || "";
+    const company = p.companyName?.toLowerCase() || "";
     const search = searchTerm.toLowerCase();
-    return !searchTerm || name.includes(search) || ticket.includes(search) || serial.includes(search);
+    return !searchTerm || name.includes(search) || ticket.includes(search) || serial.includes(search) || company.includes(search);
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -3544,272 +3542,382 @@ export default function CustomerCareProductHistory() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
-        .ph-root * { box-sizing: border-box; }
-        .ph-root { font-family: 'DM Sans', sans-serif; background: #020818; min-height: 100vh; padding: 24px; }
-        .ph-card { background: #0f172a; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .ph-header { background: linear-gradient(135deg, #0f172a 0%, #1a2639 100%); padding: 28px 32px 24px; border-bottom: 1px solid #1e293b; }
-        .ph-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.5px; color: #f1f5f9; }
-        .ph-subtitle { font-size: 13px; color: #64748b; margin: 0; }
-        .ph-toolbar { padding: 20px 24px; border-bottom: 1px solid #1e293b; }
-        .ph-search { position: relative; max-width: 500px; }
-        .ph-search input { 
-          width: 100%; 
-          padding: 12px 16px 12px 44px; 
-          border: 1px solid #1e293b; 
-          border-radius: 10px; 
-          font-size: 14px; 
-          outline: none; 
-          background: #0a1628; 
-          color: #e2e8f0;
-          font-family: 'DM Sans', sans-serif;
-          transition: border-color 0.2s;
+
+        .ph-root {
+          --primary:        #2B6F84;
+          --primary-dark:   #1F5668;
+          --background:     #F4F7F9;
+          --card-bg:        #FFFFFF;
+          --border:         #D9E6ED;
+          --info:           #3A8FB7;
+          --success:        #6BA86D;
+          --warning:        #D39A3C;
+          --edit-btn:       #5FA8C7;
+          --delete-btn:     #E57373;
+          --text-primary:   #1E2A32;
+          --text-secondary: #6B7C86;
         }
-        .ph-search input:focus { border-color: #38bdf8; }
-        .ph-search input::placeholder { color: #475569; }
-        .ph-search-icon { 
-          position: absolute; 
-          left: 14px; 
-          top: 50%; 
-          transform: translateY(-50%); 
-          color: #64748b;
+
+        .ph-root * { box-sizing: border-box; }
+        .ph-root {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--background);
+          min-height: 100vh;
+          padding: 28px 24px;
+        }
+
+        /* ── Card ── */
+        .ph-card {
+          background: var(--card-bg);
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid var(--border);
+          box-shadow: 0 4px 24px rgba(43,111,132,0.08);
+        }
+
+        /* ── Header ── */
+        .ph-header {
+          background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+          padding: 26px 32px 22px;
+          border-bottom: 1px solid var(--primary-dark);
+        }
+        .ph-title {
+          font-family: 'Syne', sans-serif;
+          font-size: 20px;
+          font-weight: 800;
+          margin: 0 0 4px;
+          letter-spacing: -0.4px;
+          color: #ffffff;
+        }
+        .ph-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); margin: 0; }
+
+        .ph-count-badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.18);
+          border: 1px solid rgba(255,255,255,0.25);
+          border-radius: 20px;
+          padding: 2px 10px;
+          font-size: 12px;
+          font-weight: 700;
+          margin-left: 10px;
+          color: #fff;
+          vertical-align: middle;
+        }
+
+        /* ── Toolbar ── */
+        .ph-toolbar {
+          padding: 18px 24px;
+          border-bottom: 1px solid var(--border);
+          background: #fafcfd;
           display: flex;
           align-items: center;
-          justify-content: center;
+          gap: 12px;
+          flex-wrap: wrap;
         }
-        .ph-refresh { 
-          padding: 8px 16px; 
-          background: #1e293b; 
-          color: #94a3b8; 
-          border: 1px solid #334155; 
-          border-radius: 8px; 
-          font-size: 13px; 
-          font-weight: 600; 
-          cursor: pointer; 
-          transition: all 0.2s; 
-          font-family: 'DM Sans', sans-serif; 
+        .ph-search { position: relative; flex: 1; min-width: 220px; max-width: 520px; }
+        .ph-search input {
+          width: 100%;
+          padding: 10px 14px 10px 42px;
+          border: 1.5px solid var(--border);
+          border-radius: 10px;
+          font-size: 13px;
+          outline: none;
+          background: #fff;
+          color: var(--text-primary);
+          font-family: 'DM Sans', sans-serif;
+          transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .ph-refresh:hover { background: #263347; color: #f1f5f9; border-color: #475569; }
+        .ph-search input:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(43,111,132,0.1);
+        }
+        .ph-search input::placeholder { color: #b0bec5; }
+        .ph-search-icon {
+          position: absolute;
+          left: 13px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--text-secondary);
+          display: flex;
+          align-items: center;
+        }
+
+        .ph-refresh {
+          padding: 9px 18px;
+          background: var(--card-bg);
+          color: var(--primary);
+          border: 1.5px solid var(--border);
+          border-radius: 9px;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.18s;
+          font-family: 'DM Sans', sans-serif;
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .ph-refresh:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .ph-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Table ── */
         .ph-table-wrap { overflow-x: auto; }
         table.ph-table { width: 100%; border-collapse: collapse; }
-        .ph-table th { 
-          padding: 14px 16px; 
-          text-align: left; 
-          font-size: 11px; 
-          font-weight: 700; 
-          text-transform: uppercase; 
-          letter-spacing: 0.06em; 
-          color: #64748b; 
-          background: #0f172a; 
-          border-bottom: 1px solid #1e293b; 
-          white-space: nowrap; 
+        .ph-table th {
+          padding: 12px 16px;
+          text-align: left;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
+          color: var(--text-secondary);
+          background: #f8fbfc;
+          border-bottom: 1.5px solid var(--border);
+          white-space: nowrap;
         }
-        .ph-table td { 
-          padding: 16px; 
-          font-size: 13px; 
-          border-bottom: 1px solid #1e293b; 
-          vertical-align: top;
-          color: #e2e8f0;
+        .ph-table td {
+          padding: 14px 16px;
+          font-size: 13px;
+          border-bottom: 1px solid var(--border);
+          vertical-align: middle;
+          color: var(--text-primary);
         }
         .ph-table tr:last-child td { border-bottom: none; }
-        .ph-table tbody tr { transition: background 0.15s; cursor: pointer; }
-        .ph-table tbody tr:hover { background: #1a2639; }
-        .ph-table tbody tr.expanded { background: #1e2a3a; }
-        .ph-ticket { 
-          font-family: 'DM Mono', monospace; 
-          font-size: 11px; 
-          background: #1e293b; 
-          color: #c4b5fd; 
-          padding: 4px 8px; 
-          border-radius: 6px; 
-          border: 1px solid #334155; 
-          font-weight: 500; 
-          white-space: nowrap; 
+        .ph-table tbody tr { transition: background 0.13s; cursor: pointer; }
+        .ph-table tbody tr:hover { background: #eef6f9; }
+        .ph-table tbody tr.expanded { background: #e8f4f9; }
+
+        /* ── Ticket badge ── */
+        .ph-ticket {
+          font-family: 'DM Mono', monospace;
+          font-size: 11px;
+          background: #ede9fe;
+          color: #6d28d9;
+          padding: 4px 9px;
+          border-radius: 6px;
+          border: 1px solid #c4b5fd;
+          font-weight: 500;
+          white-space: nowrap;
         }
-        .ph-serial { 
-          font-family: 'DM Mono', monospace; 
-          font-size: 11px; 
-          color: #94a3b8; 
+        .ph-serial {
+          font-family: 'DM Mono', monospace;
+          font-size: 11px;
+          color: var(--text-secondary);
           margin-top: 4px;
           display: block;
         }
-        .ph-configs { 
-          display: flex; 
-          flex-wrap: wrap; 
-          gap: 6px; 
-          margin-top: 10px; 
-          padding: 12px 16px; 
-          background: #0f172a; 
-          border-radius: 10px; 
-          border: 1px solid #1e293b; 
-        }
-        .ph-config-chip { 
-          display: flex; 
-          gap: 4px; 
-          align-items: center; 
-          background: #1e293b; 
-          border: 1px solid #334155; 
-          border-radius: 6px; 
-          padding: 4px 10px; 
-          font-size: 12px; 
-        }
-        .ph-config-key { color: #94a3b8; font-weight: 500; }
-        .ph-config-val { color: #38bdf8; font-weight: 600; }
-        .ph-empty { 
-          text-align: center; 
-          padding: 56px 24px; 
-          color: #64748b; 
-        }
-        .ph-empty-icon { font-size: 40px; margin-bottom: 12px; }
-        .ph-pagination { 
-          display: flex; 
-          align-items: center; 
-          justify-content: space-between; 
-          padding: 16px 24px; 
-          border-top: 1px solid #1e293b; 
-          background: #0f172a; 
-          flex-wrap: wrap; 
-          gap: 10px; 
-        }
-        .ph-page-info { font-size: 12px; color: #64748b; }
-        .ph-page-btns { display: flex; gap: 6px; align-items: center; }
-        .ph-page-btn { 
-          padding: 6px 12px; 
-          border: 1px solid #1e293b; 
-          border-radius: 6px; 
-          font-size: 12px; 
-          font-weight: 600; 
-          background: #0f172a; 
-          cursor: pointer; 
-          color: #94a3b8; 
-          transition: all 0.15s; 
-          font-family: 'DM Sans', sans-serif; 
-        }
-        .ph-page-btn:hover:not(:disabled) { 
-          border-color: #38bdf8; 
-          color: #38bdf8; 
-          background: #1e293b; 
-        }
-        .ph-page-btn.active { 
-          background: #38bdf8; 
-          color: #0f172a; 
-          border-color: #38bdf8; 
-        }
-        .ph-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .ph-error { 
-          margin: 24px; 
-          padding: 16px 20px; 
-          background: #2a0f0f; 
-          border: 1px solid #ef4444; 
-          border-radius: 10px; 
-          color: #ef4444; 
-          font-size: 13px; 
-        }
-        .ph-loading { padding: 40px 24px; display: flex; flex-direction: column; gap: 10px; }
-        .ph-skeleton { 
-          height: 44px; 
-          border-radius: 8px; 
-          background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%); 
-          background-size: 200% 100%; 
-          animation: shimmer 1.4s infinite; 
-        }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .ph-expand-hint { 
-          font-size: 11px; 
-          color: #64748b; 
-          margin-left: 8px;
-          font-weight: 400;
-        }
-        .ph-no-config { font-size: 12px; color: #64748b; font-style: italic; }
-        .ph-count-badge { 
-          display: inline-block; 
-          background: #1e293b; 
-          border-radius: 20px; 
-          padding: 2px 10px; 
-          font-size: 12px; 
-          font-weight: 600; 
-          margin-left: 10px;
-          color: #94a3b8;
-        }
-        .ph-product-name {
+
+        /* ── Product name ── */
+        .ph-product-name { font-weight: 700; color: var(--text-primary); }
+        .ph-expand-hint { font-size: 11px; color: var(--text-secondary); margin-left: 7px; }
+
+        /* ── Company badge ── */
+        .ph-company {
+          font-size: 12px;
+          color: var(--primary-dark);
           font-weight: 600;
-          color: #f1f5f9;
+          background: #dbedf5;
+          padding: 3px 9px;
+          border-radius: 6px;
+          border: 1px solid #b3d4e2;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
         }
+
+        /* ── Category badge ── */
         .ph-category {
           font-size: 12px;
-          color: #38bdf8;
+          color: var(--info);
           font-weight: 600;
-          background: #1e293b;
-          padding: 4px 8px;
+          background: #e0f2fe;
+          padding: 3px 9px;
           border-radius: 6px;
+          border: 1px solid #bae6fd;
           display: inline-block;
         }
-        .ph-date {
-          color: #64748b;
+
+        /* ── Config chips ── */
+        .ph-config-chip {
+          display: inline-flex;
+          gap: 4px;
+          align-items: center;
+          background: #f0f7fa;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 3px 9px;
           font-size: 12px;
         }
+        .ph-config-key { color: var(--text-secondary); font-weight: 500; }
+        .ph-config-val { color: var(--primary); font-weight: 700; }
+
+        /* ── Expanded panel ── */
+        .ph-expand-panel {
+          background: #eef6f9;
+          border-bottom: 1px solid var(--border);
+        }
+        .ph-expand-inner {
+          padding: 14px 20px 20px;
+        }
+        .ph-expand-label {
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--primary);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .ph-configs {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 14px 16px;
+          background: #fff;
+          border-radius: 10px;
+          border: 1px solid var(--border);
+        }
+        .ph-no-config { font-size: 12px; color: var(--text-secondary); font-style: italic; }
+
+        /* ── Date ── */
+        .ph-date { color: var(--text-secondary); font-size: 12px; }
+
+        /* ── Empty ── */
+        .ph-empty { text-align: center; padding: 56px 24px; }
+        .ph-empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+        /* ── Error ── */
+        .ph-error {
+          margin: 20px 24px;
+          padding: 14px 18px;
+          background: #fff5f5;
+          border: 1px solid #fca5a5;
+          border-left: 3px solid var(--delete-btn);
+          border-radius: 10px;
+          color: #b91c1c;
+          font-size: 13px;
+        }
+
+        /* ── Loading skeleton ── */
+        .ph-loading { padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+        .ph-skeleton {
+          height: 48px;
+          border-radius: 8px;
+          background: linear-gradient(90deg, #e8f0f4 25%, #d4e4ec 50%, #e8f0f4 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── Pagination ── */
+        .ph-pagination {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 24px;
+          border-top: 1px solid var(--border);
+          background: #fafcfd;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .ph-page-info { font-size: 12px; color: var(--text-secondary); }
+        .ph-page-btns { display: flex; gap: 5px; align-items: center; }
+        .ph-page-btn {
+          padding: 6px 12px;
+          border: 1.5px solid var(--border);
+          border-radius: 7px;
+          font-size: 12px;
+          font-weight: 600;
+          background: #fff;
+          cursor: pointer;
+          color: var(--text-secondary);
+          transition: all 0.15s;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .ph-page-btn:hover:not(:disabled) {
+          border-color: var(--primary);
+          color: var(--primary);
+          background: #eef6f9;
+        }
+        .ph-page-btn.active {
+          background: var(--primary);
+          color: #fff;
+          border-color: var(--primary);
+        }
+        .ph-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
       `}</style>
 
       <div className="ph-root">
         <div className="ph-card">
 
-          {/* Header */}
+          {/* ── Header ── */}
           <div className="ph-header">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
               <div>
                 <h2 className="ph-title">
-                  📋 Product History
+                  <svg style={{ verticalAlign: "middle", marginRight: 8, marginTop: -2 }} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                  </svg>
+                  Product History
                   <span className="ph-count-badge">{filtered.length}</span>
                 </h2>
                 <p className="ph-subtitle">All registered products with their configurations</p>
               </div>
               <button className="ph-refresh" onClick={fetchProducts} disabled={loading}>
-                {loading ? "⏳" : "↻"} Refresh
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                </svg>
+                {loading ? "Loading…" : "Refresh"}
               </button>
             </div>
           </div>
 
-          {/* Search Bar */}
+          {/* ── Toolbar / Search ── */}
           <div className="ph-toolbar">
             <div className="ph-search">
               <span className="ph-search-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.35-4.35"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
               </span>
               <input
-                placeholder="Search by product name, ticket number, or serial number..."
+                placeholder="Search by product name, ticket, serial or company…"
                 value={searchTerm}
                 onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
               />
             </div>
           </div>
 
-          {/* Error */}
+          {/* ── Error ── */}
           {error && (
             <div className="ph-error">
-              ⚠️ {error} &nbsp;
-              <button onClick={fetchProducts} style={{ color: "#38bdf8", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>
+              ⚠️ {error}&nbsp;&nbsp;
+              <button onClick={fetchProducts} style={{ color: "#2B6F84", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
                 Retry
               </button>
             </div>
           )}
 
-          {/* Loading */}
+          {/* ── Loading ── */}
           {loading && (
             <div className="ph-loading">
               {[...Array(5)].map((_, i) => <div key={i} className="ph-skeleton" />)}
             </div>
           )}
 
-          {/* Table */}
+          {/* ── Table ── */}
           {!loading && !error && (
             <div className="ph-table-wrap">
               <table className="ph-table">
                 <thead>
                   <tr>
-                    <th>Ticket # / Serial #</th>
+                    <th>Ticket # / Serial</th>
                     <th>Product Name</th>
+                    <th>Company</th>
                     <th>Category</th>
                     <th>Registered</th>
                     <th>Configurations</th>
@@ -3818,11 +3926,11 @@ export default function CustomerCareProductHistory() {
                 <tbody>
                   {paginated.length === 0 ? (
                     <tr>
-                      <td colSpan={5}>
+                      <td colSpan={6}>
                         <div className="ph-empty">
                           <div className="ph-empty-icon">🔍</div>
-                          <div style={{ fontWeight: 600, color: "#94a3b8" }}>No products found</div>
-                          <div style={{ fontSize: 12, marginTop: 4, color: "#64748b" }}>Try adjusting your search term</div>
+                          <div style={{ fontWeight: 700, color: "#6B7C86", fontSize: 14 }}>No products found</div>
+                          <div style={{ fontSize: 12, marginTop: 4, color: "#9fb3be" }}>Try adjusting your search</div>
                         </div>
                       </td>
                     </tr>
@@ -3839,24 +3947,30 @@ export default function CustomerCareProductHistory() {
                           >
                             {/* Ticket & Serial */}
                             <td>
-                              <span className="ph-ticket">
-                                {product.ticketNumber || "—"}
-                              </span>
+                              <span className="ph-ticket">{product.ticketNumber || "—"}</span>
                               {product.serialNumber && (
-                                <span className="ph-serial">
-                                  SN: {product.serialNumber}
-                                </span>
+                                <span className="ph-serial">SN: {product.serialNumber}</span>
                               )}
                             </td>
 
                             {/* Product Name */}
                             <td>
-                              <span className="ph-product-name">
-                                {product.productName || "—"}
-                              </span>
-                              <span className="ph-expand-hint">
-                                {isExpanded ? "▲" : "▼"}
-                              </span>
+                              <span className="ph-product-name">{product.productName || "—"}</span>
+                              <span className="ph-expand-hint">{isExpanded ? "▲" : "▼"}</span>
+                            </td>
+
+                            {/* Company */}
+                            <td>
+                              {product.companyName ? (
+                                <span className="ph-company">
+                                  <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M3 21h18M3 7l9-4 9 4M4 7v14M20 7v14M9 21V11h6v10"/>
+                                  </svg>
+                                  {product.companyName}
+                                </span>
+                              ) : (
+                                <span style={{ color: "#b0bec5", fontSize: 12 }}>—</span>
+                              )}
                             </td>
 
                             {/* Category */}
@@ -3869,11 +3983,7 @@ export default function CustomerCareProductHistory() {
                             {/* Date */}
                             <td className="ph-date">
                               {product.createdAt
-                                ? new Date(product.createdAt).toLocaleDateString("en-IN", { 
-                                    day: "2-digit", 
-                                    month: "short", 
-                                    year: "numeric" 
-                                  })
+                                ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
                                 : "—"}
                             </td>
 
@@ -3882,7 +3992,7 @@ export default function CustomerCareProductHistory() {
                               {configs.length === 0 ? (
                                 <span className="ph-no-config">No configurations</span>
                               ) : (
-                                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                                   {configs.slice(0, 3).map(([k, v]) => (
                                     <span key={k} className="ph-config-chip">
                                       <span className="ph-config-key">{k}:</span>
@@ -3890,8 +4000,8 @@ export default function CustomerCareProductHistory() {
                                     </span>
                                   ))}
                                   {configs.length > 3 && (
-                                    <span style={{ fontSize: 11, color: "#64748b", alignSelf: "center" }}>
-                                      +{configs.length - 3}
+                                    <span style={{ fontSize: 11, color: "#6B7C86", alignSelf: "center", fontWeight: 600 }}>
+                                      +{configs.length - 3} more
                                     </span>
                                   )}
                                 </div>
@@ -3899,28 +4009,48 @@ export default function CustomerCareProductHistory() {
                             </td>
                           </tr>
 
-                          {/* Expanded row — all configs */}
-                          {isExpanded && configs.length > 0 && (
+                          {/* Expanded row — full configs */}
+                          {isExpanded && (
                             <tr>
-                              <td colSpan={5} style={{ padding: "0 16px 20px", background: "#1a2639" }}>
-                                <div style={{ 
-                                  fontSize: 11, 
-                                  fontWeight: 700, 
-                                  color: "#38bdf8", 
-                                  textTransform: "uppercase", 
-                                  letterSpacing: "0.05em", 
-                                  marginBottom: 10,
-                                  paddingTop: 8
-                                }}>
-                                  ⚙️ Full Configuration
-                                </div>
-                                <div className="ph-configs">
-                                  {configs.map(([k, v]) => (
-                                    <span key={k} className="ph-config-chip">
-                                      <span className="ph-config-key">{k}:</span>
-                                      <span className="ph-config-val">{String(v)}</span>
-                                    </span>
-                                  ))}
+                              <td colSpan={6} style={{ padding: 0 }} className="ph-expand-panel">
+                                <div className="ph-expand-inner">
+                                  {configs.length > 0 && (
+                                    <>
+                                      <div className="ph-expand-label">
+                                        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                                          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                                        </svg>
+                                        Full Configuration
+                                      </div>
+                                      <div className="ph-configs">
+                                        {configs.map(([k, v]) => (
+                                          <span key={k} className="ph-config-chip">
+                                            <span className="ph-config-key">{k}:</span>
+                                            <span className="ph-config-val">{String(v)}</span>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </>
+                                  )}
+
+                                  {/* Extra product details row */}
+                                  <div style={{ display: "flex", gap: 24, marginTop: configs.length > 0 ? 14 : 0, flexWrap: "wrap" }}>
+                                    
+                                    {product.createdAt && (
+                                      <div>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: "#6B7C86", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Registered On</div>
+                                        <span style={{ fontSize: 13, color: "#1E2A32", fontWeight: 600 }}>
+                                          {new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {product.ticketNumber && (
+                                      <div>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: "#6B7C86", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Ticket</div>
+                                        <span className="ph-ticket">{product.ticketNumber}</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </td>
                             </tr>
@@ -3934,48 +4064,27 @@ export default function CustomerCareProductHistory() {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* ── Pagination ── */}
           {!loading && filtered.length > ITEMS_PER_PAGE && (
             <div className="ph-pagination">
               <span className="ph-page-info">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length}
+                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products
               </span>
               <div className="ph-page-btns">
-                <button 
-                  className="ph-page-btn" 
-                  disabled={currentPage === 1} 
-                  onClick={() => setCurrentPage(p => p - 1)}
-                >
-                  ←
-                </button>
+                <button className="ph-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>←</button>
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
                   let p;
-                  if (totalPages <= 5) {
-                    p = i + 1;
-                  } else if (currentPage <= 3) {
-                    p = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    p = totalPages - 4 + i;
-                  } else {
-                    p = currentPage - 2 + i;
-                  }
+                  if (totalPages <= 5) p = i + 1;
+                  else if (currentPage <= 3) p = i + 1;
+                  else if (currentPage >= totalPages - 2) p = totalPages - 4 + i;
+                  else p = currentPage - 2 + i;
                   return (
-                    <button 
-                      key={i} 
-                      className={`ph-page-btn${currentPage === p ? " active" : ""}`} 
-                      onClick={() => setCurrentPage(p)}
-                    >
+                    <button key={i} className={`ph-page-btn${currentPage === p ? " active" : ""}`} onClick={() => setCurrentPage(p)}>
                       {p}
                     </button>
                   );
                 })}
-                <button 
-                  className="ph-page-btn" 
-                  disabled={currentPage === totalPages} 
-                  onClick={() => setCurrentPage(p => p + 1)}
-                >
-                  →
-                </button>
+                <button className="ph-page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>→</button>
               </div>
             </div>
           )}

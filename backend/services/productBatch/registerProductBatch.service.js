@@ -103,7 +103,7 @@ import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js
 import mongoose from "mongoose";
 export const registerProductsBatch = async (data) => {
   try {
-    const { category, productName,companyName, configurations, quantity } = data;
+    const { category, configurations, quantity } = data;
 
     console.log("✅ STEP 1 - data received:", JSON.stringify(data));
 
@@ -134,8 +134,8 @@ export const registerProductsBatch = async (data) => {
       
       const product = await Product.create({
         category,
-        productName,
-        companyName,
+        // productName,
+        // companyName,
         configurations: configMap
       });
 

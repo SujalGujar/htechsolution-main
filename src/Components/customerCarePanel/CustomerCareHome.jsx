@@ -2258,7 +2258,6 @@ const C = {
   redPale:       "#fce8e8",
 };
 
-// ─── FIELD TYPES — Boolean removed ───────────────────────────────────────────
 const FIELD_TYPES = ["String", "Number", "Date"];
 
 const TYPE_META = {
@@ -2317,7 +2316,6 @@ const Modal = ({ open, onClose, title, children }) => {
       position: "fixed", inset: 0,
       background: "rgba(10,28,40,0.55)", backdropFilter: "blur(4px)",
       zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-      // FIX: ensure modal scrolls internally on small screens
       overflowY: "auto",
     }}>
       <div onClick={e => e.stopPropagation()} style={{
@@ -2325,7 +2323,6 @@ const Modal = ({ open, onClose, title, children }) => {
         boxShadow: "0 24px 64px rgba(31,110,140,0.2)",
         animation: "modalIn 0.2s ease", overflow: "hidden",
         border: `1px solid ${C.border}`,
-        // FIX: allow modal body to scroll if content is tall
         maxHeight: "90vh", display: "flex", flexDirection: "column",
       }}>
         <div style={{
@@ -2344,7 +2341,6 @@ const Modal = ({ open, onClose, title, children }) => {
             <XIcon />
           </button>
         </div>
-        {/* FIX: scrollable modal body */}
         <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>{children}</div>
       </div>
     </div>
@@ -2374,7 +2370,6 @@ const Input = ({ label, required, ...props }) => (
   </div>
 );
 
-// ─── DATE INPUT — styled calendar picker ──────────────────────────────────────
 const DateInput = ({ label, required, ...props }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
     {label && (
@@ -2385,34 +2380,24 @@ const DateInput = ({ label, required, ...props }) => (
         {label}{required && <span style={{ color: C.red }}> *</span>}
       </label>
     )}
-    <div style={{ position: "relative" }}>
-      <input
-        type="date"
-        {...props}
-        style={{
-          background: C.inputBg,
-          border: `1.5px solid ${C.border}`,
-          borderRadius: 8,
-          padding: "9px 13px",
-          fontSize: 13,
-          color: props.value ? C.textPrimary : C.textMuted,
-          outline: "none",
-          fontFamily: "'DM Sans', sans-serif",
-          transition: "border-color 0.15s",
-          width: "100%",
-          cursor: "pointer",
-          // Make the calendar icon teal-tinted on webkit
-          colorScheme: "light",
-          ...(props.style || {})
-        }}
-        onFocus={e => e.target.style.borderColor = C.teal}
-        onBlur={e => e.target.style.borderColor = C.border}
-      />
-    </div>
+    <input
+      type="date"
+      {...props}
+      style={{
+        background: C.inputBg, border: `1.5px solid ${C.border}`,
+        borderRadius: 8, padding: "9px 13px", fontSize: 13,
+        color: props.value ? C.textPrimary : C.textMuted,
+        outline: "none", fontFamily: "'DM Sans', sans-serif",
+        transition: "border-color 0.15s", width: "100%",
+        cursor: "pointer", colorScheme: "light",
+        ...(props.style || {})
+      }}
+      onFocus={e => e.target.style.borderColor = C.teal}
+      onBlur={e => e.target.style.borderColor = C.border}
+    />
   </div>
 );
 
-// ─── SELECT ──────────────────────────────────────────────────────────────────
 const Select = ({ label, required, children, ...props }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
     {label && (
@@ -2430,7 +2415,6 @@ const Select = ({ label, required, children, ...props }) => (
   </div>
 );
 
-// ─── BUTTON ──────────────────────────────────────────────────────────────────
 const BVARS = {
   primary:   { bg: C.teal,       color: "#fff",          border: C.teal,       hover: "#174f68" },
   secondary: { bg: C.tealPale,   color: C.textSecondary, border: C.border,     hover: "#cde6f0" },
@@ -2457,7 +2441,6 @@ const Btn = ({ variant = "primary", children, loading, style = {}, ...props }) =
   );
 };
 
-// ─── AVATAR ──────────────────────────────────────────────────────────────────
 const CategoryAvatar = ({ name }) => {
   const hue = (name.charCodeAt(0) * 53 + name.charCodeAt(name.length - 1) * 17) % 360;
   return (
@@ -2583,42 +2566,29 @@ export default function CustomerCareHome() {
   const activeCount = categories.filter(c => c.isActive !== false).length;
   const configCount = Object.values(configs).filter(Boolean).length;
 
-  // ── Helper: render correct input for a field type in Register modal ──
   const renderRegisterField = (field) => {
     if (field.fieldType === "Date") {
       return (
-        <DateInput
-          key={field.fieldKey}
-          label={field.fieldName}
-          required={field.isRequired}
+        <DateInput key={field.fieldKey} label={field.fieldName} required={field.isRequired}
           value={registerForm[field.fieldKey] || ""}
-          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
-        />
+          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))} />
       );
     }
     if (field.options?.length > 0) {
       return (
-        <Select
-          key={field.fieldKey}
-          label={field.fieldName}
-          required={field.isRequired}
+        <Select key={field.fieldKey} label={field.fieldName} required={field.isRequired}
           value={registerForm[field.fieldKey] || ""}
-          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
-        >
+          onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}>
           <option value="">— Select —</option>
           {field.options.map(o => <option key={o} value={o}>{o}</option>)}
         </Select>
       );
     }
     return (
-      <Input
-        key={field.fieldKey}
-        label={field.fieldName}
-        required={field.isRequired}
+      <Input key={field.fieldKey} label={field.fieldName} required={field.isRequired}
         type={field.fieldType === "Number" ? "number" : "text"}
         value={registerForm[field.fieldKey] || ""}
-        onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))}
-      />
+        onChange={e => setRegisterForm(p => ({ ...p, [field.fieldKey]: e.target.value }))} />
     );
   };
 
@@ -2626,26 +2596,56 @@ export default function CustomerCareHome() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── FIX: page scroll — html/body must fill viewport and scroll naturally ── */
-        html, body { height: 100%; }
-        body { background: #eef2f5 !important; overflow-y: auto !important; }
+        /* ── KEY FIX: reset box model, let the page scroll naturally ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /*
+         * DO NOT set height/overflow on html or body here.
+         * Your app shell (index.html / root layout) controls that.
+         * We only ensure our own wrapper never clamps the scroll.
+         */
+        .ccm-root {
+          background: #eef2f5;
+          font-family: 'DM Sans', sans-serif;
+          /* No height, no overflow — lets the browser scroll normally */
+        }
+
+        /* Sticky header sits at the top of the viewport while the page scrolls */
+        .ccm-header {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          height: 64px;
+          background: linear-gradient(135deg, #1a3a4f 0%, #1F6E8C 100%);
+          padding: 0 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          box-shadow: 0 2px 16px rgba(26,58,79,0.25);
+        }
+
+        /* Main content area — no overflow clipping, just padding */
+        .ccm-main {
+          max-width: 860px;
+          margin: 0 auto;
+          padding: 32px 20px 48px;
+        }
 
         @keyframes toastIn { from { transform: translateX(20px); opacity:0 } to { transform:none; opacity:1 } }
         @keyframes modalIn { from { transform: scale(0.97) translateY(-6px); opacity:0 } to { transform:none; opacity:1 } }
         @keyframes fadeUp  { from { transform: translateY(10px); opacity:0 } to { transform:none; opacity:1 } }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        .cat-card { animation: fadeUp 0.28s ease both; }
+
+        .cat-card { animation: fadeUp 0.28s ease both; transition: box-shadow 0.2s, transform 0.2s; }
         .cat-card:hover { box-shadow: 0 6px 24px rgba(31,110,140,0.12) !important; transform: translateY(-1px); }
         .cat-row:hover  { background: #f0f9fc !important; }
         .field-row:hover { background: #f0f9fc !important; }
+
         input::placeholder { color: #a8c8d8; }
-        /* Date input calendar icon color */
         input[type="date"]::-webkit-calendar-picker-indicator {
           filter: invert(35%) sepia(60%) saturate(400%) hue-rotate(165deg);
-          cursor: pointer;
-          opacity: 0.8;
+          cursor: pointer; opacity: 0.8;
         }
         input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
         ::-webkit-scrollbar { width: 4px; }
@@ -2654,17 +2654,11 @@ export default function CustomerCareHome() {
 
       <Toast toasts={toasts} removeToast={removeToast} />
 
-      {/* ── FIX: wrapper uses minHeight instead of height so it grows with content ── */}
-      <div style={{ minHeight: "100vh", background: C.pageBg, fontFamily: "'DM Sans', sans-serif" }}>
+      {/* ── ROOT: no height / overflow constraints ── */}
+      <div className="ccm-root">
 
-        {/* ── HEADER — sticky, 64px tall ── */}
-        <header style={{
-          background: C.headerBg,
-          padding: "0 40px", height: 64,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          position: "sticky", top: 0, zIndex: 100,
-          boxShadow: "0 2px 16px rgba(26,58,79,0.25)",
-        }}>
+        {/* ── STICKY HEADER ── */}
+        <header className="ccm-header">
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{
               width: 34, height: 34, borderRadius: 9,
@@ -2688,15 +2682,15 @@ export default function CustomerCareHome() {
           </Btn>
         </header>
 
-        {/* ── MAIN — padding-top ensures content starts below sticky header ── */}
-        <main style={{ maxWidth: 860, margin: "0 auto", padding: "32px 20px" }}>
+        {/* ── MAIN CONTENT — scrolls with the page ── */}
+        <main className="ccm-main">
 
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 30 }}>
             {[
-              { label: "Total Categories", value: categories.length, color: C.teal,  accent: "#1a5e7a" },
-              { label: "With Config",       value: configCount,       color: C.green, accent: "#4e8a4b" },
-              { label: "Active",            value: activeCount,       color: C.amber, accent: "#b8862e" },
+              { label: "Total Categories", value: categories.length, color: C.teal  },
+              { label: "With Config",       value: configCount,       color: C.green },
+              { label: "Active",            value: activeCount,       color: C.amber },
             ].map(s => (
               <div key={s.label} style={{
                 background: "#fff", border: `1px solid ${C.border}`,
@@ -2806,7 +2800,7 @@ export default function CustomerCareHome() {
                       </div>
                     </div>
 
-                    {/* ── Config Panel ── */}
+                    {/* Config Panel */}
                     {isOpen && (
                       <div style={{ background: C.panelBg, padding: "16px 18px 20px", borderTop: `1px solid ${C.tealPale}` }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
@@ -2859,10 +2853,7 @@ export default function CustomerCareHome() {
                                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ fontWeight: 600, fontSize: 13, color: C.textPrimary }}>{field.fieldName}</span>
                                     {field.fieldType === "Date" && (
-                                      <span title="Date field — calendar picker in register form"
-                                        style={{ color: C.amber, display: "flex" }}>
-                                        <CalendarIcon size={12} color={C.amber} />
-                                      </span>
+                                      <span title="Date field"><CalendarIcon size={12} color={C.amber} /></span>
                                     )}
                                   </div>
                                   <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'DM Mono', monospace", marginTop: 2 }}>{field.fieldKey}</div>
@@ -2926,7 +2917,6 @@ export default function CustomerCareHome() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <Input label="Field Name" placeholder="e.g. Purchase Date" value={newField.fieldName} onChange={e => setNewField(p => ({ ...p, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) }))} />
               <Input label="Field Key" placeholder="auto-filled" value={newField.fieldKey} onChange={e => setNewField(p => ({ ...p, fieldKey: e.target.value }))} />
-              {/* Boolean removed — only String, Number, Date */}
               <Select label="Type" value={newField.fieldType} onChange={e => setNewField(p => ({ ...p, fieldType: e.target.value }))}>
                 {FIELD_TYPES.map(t => <option key={t}>{t}</option>)}
               </Select>
@@ -2977,7 +2967,6 @@ export default function CustomerCareHome() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <Input label="Field Name" required placeholder="e.g. Warranty End Date" value={addingField.field.fieldName} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldName: e.target.value, fieldKey: toFieldKey(e.target.value) } }))} />
             <Input label="Field Key" placeholder="auto-filled" value={addingField.field.fieldKey} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldKey: e.target.value } }))} />
-            {/* Boolean removed — only String, Number, Date */}
             <Select label="Type" value={addingField.field.fieldType} onChange={e => setAddingField(p => ({ ...p, field: { ...p.field, fieldType: e.target.value } }))}>
               {FIELD_TYPES.map(t => <option key={t}>{t}</option>)}
             </Select>
@@ -3004,21 +2993,49 @@ export default function CustomerCareHome() {
       {/* ══ MODAL: REGISTER PRODUCT ══ */}
       <Modal open={showRegisterModal} onClose={() => setShowRegisterModal(false)} title={`Register — ${registerCategory?.name}`}>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <Input label="Product Name" required placeholder="Enter product name"
-            value={registerForm.productName || ""} onChange={e => setRegisterForm(p => ({ ...p, productName: e.target.value }))} />
 
-          {/* Date fields get a proper calendar picker; others get text/number */}
+          {/* Category info banner — auto-filled, read-only */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: C.tealPale, border: `1px solid ${C.borderMid}`,
+            borderRadius: 9, padding: "10px 14px",
+          }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 7, flexShrink: 0,
+              background: C.teal, display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <BoxIcon size={14} color="#fff" />
+            </div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>Category</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.teal, fontFamily: "'Syne', sans-serif" }}>
+                {registerCategory?.name}
+              </div>
+            </div>
+            <span style={{
+              marginLeft: "auto", fontSize: 10, fontWeight: 600, color: C.teal,
+              background: "#fff", border: `1px solid ${C.borderMid}`,
+              borderRadius: 5, padding: "2px 8px",
+            }}>Auto</span>
+          </div>
+
+          {/* Dynamic config fields only */}
           {configs[registerCategory?._id]?.fields?.map(field => renderRegisterField(field))}
 
           <Input label="Quantity" type="number" min="1" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
+
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
             <Btn variant="secondary" onClick={() => setShowRegisterModal(false)}>Cancel</Btn>
             <Btn onClick={async () => {
               try {
-                const { productName, ...configFields } = registerForm;
-                await axiosInstance.post("/category/register", { category: registerCategory._id, productName, configurations: configFields, quantity });
+                await axiosInstance.post("/category/register", {
+                  category: registerCategory._id,
+                  configurations: registerForm,
+                  quantity,
+                });
                 addToast("Product registered successfully!");
                 setShowRegisterModal(false);
+                setRegisterForm({});
               } catch (e) { addToast(e.response?.data?.message || "Failed", "error"); }
             }}>
               <CheckIcon /> Register
