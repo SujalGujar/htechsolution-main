@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import Customer from "../models/customerDetails.model.js";
+import Customer from "../models/customerRegisterModel/customerDetails.model.js";
 import Product from "../models/productDetails.model.js";
 import complainData from "../models/complainsData.model.js";
 

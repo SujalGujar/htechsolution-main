@@ -108,8 +108,76 @@
 // export default customerSearchProducts;
 
 // Fallback default export so routes that import the module succeed
-const customerSearchProducts = async (req, res) => {
-	res.status(501).json({ success: false, message: "Customer search not implemented" });
+// const customerSearchProducts = async (req, res) => {
+// 	res.status(501).json({ success: false, message: "Customer search not implemented" });
+// };
+
+// export default customerSearchProducts;
+
+import {
+  getAllRegistrationsService,
+  getRegistrationByIdService,
+} from "../../services/customerRegister/customerHistory.service.js";
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FILE: controllers/customerHistoryController.js
+//
+//  PURPOSE:
+//  Handles ONLY the read/query endpoints for existing registrations.
+//  Get all registrations (with filters) and get one by ID.
+//
+//  ROUTES:
+//    GET /api/customer/registrations
+//    GET /api/customer/registrations/:id
+//  SERVICE: customerHistoryService.js
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── GET all registrations ─────────────────────────────────────────────────────
+//  Optional query params:
+//  ?purchaseType=bulk
+//  ?email=rahul@example.com
+//  ?ticketNumber=PRD-20250101-12345
+//  ?status=active
+export const getAllRegistrations = async (req, res) => {
+  try {
+    const { purchaseType, email, ticketNumber, status } = req.query;
+
+    const registrations = await getAllRegistrationsService({
+      purchaseType,
+      email,
+      ticketNumber,
+      status,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: registrations.length,
+      data: registrations,
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
 
-export default customerSearchProducts;
+// ── GET one registration by ID ────────────────────────────────────────────────
+export const getRegistrationById = async (req, res) => {
+  try {
+    const registration = await getRegistrationByIdService(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      data: registration,
+    });
+
+  } catch (err) {
+    const is404 = err.message.toLowerCase().includes("not found");
+    return res.status(is404 ? 404 : 500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

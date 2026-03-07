@@ -200,122 +200,122 @@
 //   }
 // };
 
-import bcrypt from "bcrypt";
-import Customer from "../../models/customerDetails.model.js";
-import Admin from "../../models/admin.model.js";
+// import bcrypt from "bcrypt";
+// import Customer from "../../models/customerRegisterModel/customerDetails.model.js";
+// import Admin from "../../models/admin.model.js";
 
-// Function to generate secure password
-const generateSecurePassword = () => {
-    const length = 5;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        password += charset[randomIndex];
-    }
-    return password;
-};
+// // Function to generate secure password
+// const generateSecurePassword = () => {
+//     const length = 5;
+//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+//     let password = "";
+//     for (let i = 0; i < length; i++) {
+//         const randomIndex = Math.floor(Math.random() * charset.length);
+//         password += charset[randomIndex];
+//     }
+//     return password;
+// };
 
-export const registerCustomer = async(req, res) => {
-  try {
-    const body = req.body;
+// export const registerCustomer = async(req, res) => {
+//   try {
+//     const body = req.body;
     
-    if (!body) {
-      return res.status(400).json({  
-        message: "Request body missing"
-      });
-    }
+//     if (!body) {
+//       return res.status(400).json({  
+//         message: "Request body missing"
+//       });
+//     }
 
-    const {
-      customerName,
-      email,
-      mobileNum,
-      proName,
-      proCatogory,
-      proSrNo,
-      proModNum,
-      warrStartDate,
-      warrEndDate,
-      ticketNumber 
-    } = body;
+//     const {
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate,
+//       warrEndDate,
+//       ticketNumber 
+//     } = body;
 
-    // Validate all required fields including ticketNumber
-    if (!customerName || !email || !mobileNum || !ticketNumber) {
-      return res.status(400).json({
-        message: "All fields are required"
-      });
-    }
+//     // Validate all required fields including ticketNumber
+//     if (!customerName || !email || !mobileNum || !ticketNumber) {
+//       return res.status(400).json({
+//         message: "All fields are required"
+//       });
+//     }
 
-    // Check if customer already exists by email
-    const existingCus = await Customer.findOne({ email });
-    if (existingCus) {
-      return res.status(400).json({
-        message: "Customer with this email already exists"
-      });
-    }
+//     // Check if customer already exists by email
+//     const existingCus = await Customer.findOne({ email });
+//     if (existingCus) {
+//       return res.status(400).json({
+//         message: "Customer with this email already exists"
+//       });
+//     }
 
    
-    const existingAdmin = await Admin.findOne({ username: customerName });
-    if (existingAdmin) {
-      return res.status(400).json({
-        message: "Username already exists in the system"
-      });
-    }
+//     const existingAdmin = await Admin.findOne({ username: customerName });
+//     if (existingAdmin) {
+//       return res.status(400).json({
+//         message: "Username already exists in the system"
+//       });
+//     }
 
-    // Generate password
-    const plainPassword = generateSecurePassword();
-    const hashedPassword = await bcrypt.hash(plainPassword, 10); 
-    // const encryptPass = encrypt(hashedPassword)// Increased salt rounds for better security
+//     // Generate password
+//     const plainPassword = generateSecurePassword();
+//     const hashedPassword = await bcrypt.hash(plainPassword, 10); 
+//     // const encryptPass = encrypt(hashedPassword)// Increased salt rounds for better security
     
-    // Create customer record - NOW INCLUDING TICKET NUMBER
-    const customer = new Customer({
-      customerName,
-      email,
-      mobileNum,
-      proName,
-      proCatogory,
-      proSrNo,
-      proModNum,
-      warrStartDate: new Date(warrStartDate), // Convert to Date object
-      warrEndDate: new Date(warrEndDate),     // Convert to Date object
-      password: plainPassword,  // Store plain password for panel use (consider security implications)
-      ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
-    });
+//     // Create customer record - NOW INCLUDING TICKET NUMBER
+//     const customer = new Customer({
+//       customerName,
+//       email,
+//       mobileNum,
+//       proName,
+//       proCatogory,
+//       proSrNo,
+//       proModNum,
+//       warrStartDate: new Date(warrStartDate), // Convert to Date object
+//       warrEndDate: new Date(warrEndDate),     // Convert to Date object
+//       password: plainPassword,  // Store plain password for panel use (consider security implications)
+//       ticketNumber: ticketNumber  // ✅ FIXED: Using ticketNumber from request
+//     });
 
-    await customer.save();
+//     await customer.save();
 
-    // Create admin user record with customerName as username
-    const newAdminUser = new Admin({
-      username: customerName,  // ✅ Using customerName as username
-      password: plainPassword,  // Store plain password for panel use (consider security implications)
-      role: "user"  
-    });
+//     // Create admin user record with customerName as username
+//     const newAdminUser = new Admin({
+//       username: customerName,  // ✅ Using customerName as username
+//       password: plainPassword,  // Store plain password for panel use (consider security implications)
+//       role: "user"  
+//     });
 
-    await newAdminUser.save();
+//     await newAdminUser.save();
 
-    return res.status(201).json({  
-      success: true,
-      message: "Customer registered successfully",
-      password: plainPassword,  // Send plain password only once
-      username: customerName    // ✅ Return customerName as username
-    });
+//     return res.status(201).json({  
+//       success: true,
+//       message: "Customer registered successfully",
+//       password: plainPassword,  // Send plain password only once
+//       username: customerName    // ✅ Return customerName as username
+//     });
 
-  } catch (error) {
-    console.error("Registration error:", error);
+//   } catch (error) {
+//     console.error("Registration error:", error);
     
-    // Handle specific MongoDB errors
-    // if (error.code === 11000) {
-    //   const field = Object.keys(error.keyPattern)[0];
-    //   return res.status(400).json({ 
-    //     message: `${field} already exists. Please use a different ${field}.`
-    //   });
-    // }
+//     // Handle specific MongoDB errors
+//     // if (error.code === 11000) {
+//     //   const field = Object.keys(error.keyPattern)[0];
+//     //   return res.status(400).json({ 
+//     //     message: `${field} already exists. Please use a different ${field}.`
+//     //   });
+//     // }
     
-    return res.status(500).json({ 
-      message: error.message || "Internal server error"
-    });
-  }
-};
+//     return res.status(500).json({ 
+//       message: error.message || "Internal server error"
+//     });
+//   }
+// };
 
 // const generateSecurePassword = () => {
 //   const length  = 8;
@@ -465,3 +465,100 @@ export const registerCustomer = async(req, res) => {
 //     });
 //   }
 // };
+
+import { registerCustomerService } from "../../services/customerRegistrationService.js";
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FILE: controllers/customerRegistrationController.js
+//
+//  PURPOSE:
+//  Handles ONLY the POST /register endpoint.
+//  Validates request body → calls service → returns saved registration.
+//
+//  ROUTE:   POST /api/customer/register
+//  SERVICE: customerRegistrationService.js
+//
+//  Request body shape:
+//
+//  SINGLE purchase:
+//  {
+//    "customerName":  "Rahul Shah",
+//    "email":         "rahul@example.com",
+//    "mobileNum":     "9876543210",
+//    "purchaseType":  "single",
+//    "products": [
+//      {
+//        "ticketNumber":  "PRD-20250101-12345",
+//        "warrStartDate": "2025-01-01",
+//        "warrEndDate":   "2027-01-01"
+//      }
+//    ]
+//  }
+//
+//  BULK purchase: (same shape, more items in products array)
+//  {
+//    "customerName":  "Rahul Shah",
+//    "email":         "rahul@example.com",
+//    "mobileNum":     "9876543210",
+//    "purchaseType":  "bulk",
+//    "products": [
+//      { "ticketNumber": "PRD-20250101-11111", "warrStartDate": "...", "warrEndDate": "..." },
+//      { "ticketNumber": "PRD-20250101-22222", "warrStartDate": "...", "warrEndDate": "..." },
+//      { "ticketNumber": "PRD-20250101-33333", "warrStartDate": "...", "warrEndDate": "..." }
+//    ]
+//  }
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Validate required fields in request body ──────────────────────────────────
+const validateBody = ({ customerName, email, mobileNum, purchaseType, products }) => {
+  const missing = [];
+
+  if (!customerName?.trim())                              missing.push("customerName");
+  if (!email?.trim())                                     missing.push("email");
+  if (!mobileNum)                                         missing.push("mobileNum");
+  if (!purchaseType)                                      missing.push("purchaseType");
+  if (!Array.isArray(products) || products.length === 0) missing.push("products");
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required fields: ${missing.join(", ")}`);
+  }
+
+  if (!["single", "bulk"].includes(purchaseType)) {
+    throw new Error("purchaseType must be either 'single' or 'bulk'");
+  }
+};
+
+// ── Controller ────────────────────────────────────────────────────────────────
+export const registerCustomer = async (req, res) => {
+  try {
+    // Validate body first (throws if invalid)
+    validateBody(req.body);
+
+    const { customerName, email, mobileNum, purchaseType, products } = req.body;
+
+    const registration = await registerCustomerService({
+      customerName,
+      email,
+      mobileNum,
+      purchaseType,
+      products,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: `Customer registered successfully — ${purchaseType} purchase with ${products.length} product(s)`,
+      data: registration,
+    });
+
+  } catch (err) {
+    const is400 = [
+      "missing", "must have", "must be", "duplicate",
+      "at least", "exactly", "required",
+    ].some(keyword => err.message.toLowerCase().includes(keyword));
+
+    return res.status(is400 ? 400 : 500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

@@ -3491,524 +3491,1942 @@
 
 // export default CustomerCareProductHistory;
 
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, useCallback } from "react";
+// // import axiosInstance from "../../Utils/axiosIntance";
+
+// // ─── MOCK DATA (remove when connecting real API) ───────────────────────────────
+// const MOCK_PRODUCTS = [
+//   { _id: "1",  ticketNumber: "TK-1001", category: { name: "Laptop" },      createdAt: "2025-01-10", configurations: { RAM: "16GB", Storage: "512GB", Display: "15.6 inch", Processor: "i7-12700H" } },
+//   { _id: "2",  ticketNumber: "TK-1002", category: { name: "Laptop" },      createdAt: "2025-01-11", configurations: { RAM: "16GB", Storage: "512GB", Display: "15.6 inch", Processor: "i7-12700H" } },
+//   { _id: "3",  ticketNumber: "TK-1003", category: { name: "Laptop" },      createdAt: "2025-01-12", configurations: { RAM: "32GB", Storage: "1TB",   Display: "15.6 inch", Processor: "i9-13900H" } },
+//   { _id: "4",  ticketNumber: "TK-2001", category: { name: "Headphones" },  createdAt: "2025-02-01", configurations: { Type: "Over-Ear", Battery: "30H", Bluetooth: "5.2", NC: "Active" } },
+//   { _id: "5",  ticketNumber: "TK-2002", category: { name: "Headphones" },  createdAt: "2025-02-02", configurations: { Type: "Over-Ear", Battery: "30H", Bluetooth: "5.2", NC: "Active" } },
+//   { _id: "6",  ticketNumber: "TK-2003", category: { name: "Headphones" },  createdAt: "2025-02-03", configurations: { Type: "In-Ear",  Battery: "8H",  Bluetooth: "5.3", NC: "Passive" } },
+//   { _id: "7",  ticketNumber: "TK-3001", category: { name: "Smartphone" },  createdAt: "2025-03-01", configurations: { Display: "6.8 inch", RAM: "12GB", Storage: "256GB", Camera: "200MP" } },
+//   { _id: "8",  ticketNumber: "TK-3002", category: { name: "Smartphone" },  createdAt: "2025-03-02", configurations: { Display: "6.8 inch", RAM: "12GB", Storage: "256GB", Camera: "200MP" } },
+//   { _id: "9",  ticketNumber: "TK-4001", category: { name: "Monitor" },     createdAt: "2025-04-01", configurations: { Size: "27 inch", Resolution: "4K", Panel: "IPS", RefreshRate: "144Hz" } },
+//   { _id: "10", ticketNumber: "TK-4002", category: { name: "Monitor" },     createdAt: "2025-04-02", configurations: { Size: "27 inch", Resolution: "4K", Panel: "IPS", RefreshRate: "144Hz" } },
+//   { _id: "11", ticketNumber: "TK-4003", category: { name: "Monitor" },     createdAt: "2025-04-03", configurations: { Size: "32 inch", Resolution: "QHD", Panel: "VA", RefreshRate: "165Hz" } },
+// ];
+
+// // ─── Helpers ──────────────────────────────────────────────────────────────────
+// const getCategoryName = (p) => p.category?.name || p.category || "Uncategorized";
+// const getConfigs = (c) => {
+//   if (!c) return [];
+//   if (c instanceof Map) return [...c.entries()];
+//   if (typeof c === "object") return Object.entries(c);
+//   return [];
+// };
+
+// // Group products by category → { "Laptop": [...], "Headphones": [...] }
+// const groupByCategory = (products) => {
+//   return products.reduce((acc, p) => {
+//     const cat = getCategoryName(p);
+//     if (!acc[cat]) acc[cat] = [];
+//     acc[cat].push(p);
+//     return acc;
+//   }, {});
+// };
+
+// // ─── Category colour palette ──────────────────────────────────────────────────
+// const CAT_COLORS = [
+//   { bg: "#ede9fe", border: "#c4b5fd", text: "#6d28d9", accent: "#7c3aed" },
+//   { bg: "#dbeafe", border: "#93c5fd", text: "#1d4ed8", accent: "#2563eb" },
+//   { bg: "#dcfce7", border: "#86efac", text: "#15803d", accent: "#16a34a" },
+//   { bg: "#fef3c7", border: "#fcd34d", text: "#b45309", accent: "#d97706" },
+//   { bg: "#fce7f3", border: "#f9a8d4", text: "#be185d", accent: "#db2777" },
+//   { bg: "#e0f2fe", border: "#7dd3fc", text: "#0369a1", accent: "#0284c7" },
+// ];
+// const getCatColor = (index) => CAT_COLORS[index % CAT_COLORS.length];
+
+// // ─── Main Component ───────────────────────────────────────────────────────────
+// export default function CustomerCareProductHistory({ onSelectTickets }) {
+//   const [products,     setProducts]     = useState([]);
+//   const [loading,      setLoading]      = useState(true);
+//   const [error,        setError]        = useState(null);
+//   const [searchTerm,   setSearchTerm]   = useState("");
+//   const [expandedCats, setExpandedCats] = useState({});       // { "Laptop": true }
+//   const [expandedRows, setExpandedRows] = useState({});       // { "TK-1001": true }
+//   const [copiedId,     setCopiedId]     = useState(null);
+//   const [selectedTickets, setSelectedTickets] = useState([]); // for bulk form
+//   const [toast,        setToast]        = useState(null);
+
+//   useEffect(() => { fetchProducts(); }, []);
+
+//   const fetchProducts = async () => {
+//     try {
+//       setLoading(true); setError(null);
+//       // Real API:
+//       // const { data } = await axiosInstance.get("/category/history");
+//       // const list = data.data || data.products || data || [];
+//       await new Promise(r => setTimeout(r, 800)); // simulate
+//       const list = MOCK_PRODUCTS;
+//       setProducts(Array.isArray(list) ? list : []);
+//       // Auto-expand first category
+//       const cats = [...new Set(list.map(getCategoryName))];
+//       if (cats.length) setExpandedCats({ [cats[0]]: true });
+//     } catch (err) {
+//       setError(err?.response?.data?.message || "Failed to fetch products");
+//     } finally { setLoading(false); }
+//   };
+
+//   // ── Filter ──────────────────────────────────────────────────────────────────
+//   const filtered = products.filter(p => {
+//     if (!searchTerm) return true;
+//     const s = searchTerm.toLowerCase();
+//     const ticket  = (p.ticketNumber || "").toLowerCase();
+//     const cat     = getCategoryName(p).toLowerCase();
+//     const configs = getConfigs(p.configurations).map(([, v]) => String(v).toLowerCase()).join(" ");
+//     return ticket.includes(s) || cat.includes(s) || configs.includes(s);
+//   });
+
+//   const grouped   = groupByCategory(filtered);
+//   const catNames  = Object.keys(grouped).sort();
+
+//   // ── Toggle category expand ──────────────────────────────────────────────────
+//   const toggleCat = (cat) => setExpandedCats(prev => ({ ...prev, [cat]: !prev[cat] }));
+//   const toggleRow = (id)  => setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }));
+
+//   // ── Copy single ticket number ───────────────────────────────────────────────
+//   const copyTicket = (ticket, e) => {
+//     e.stopPropagation();
+//     navigator.clipboard.writeText(ticket).catch(() => {});
+//     setCopiedId(ticket);
+//     showToast(`Copied ${ticket}`);
+//     setTimeout(() => setCopiedId(null), 2000);
+//   };
+
+//   // ── Select / deselect ticket for bulk registration ──────────────────────────
+//   const toggleTicket = (ticket, e) => {
+//     e.stopPropagation();
+//     setSelectedTickets(prev =>
+//       prev.includes(ticket) ? prev.filter(t => t !== ticket) : [...prev, ticket]
+//     );
+//   };
+
+//   // ── Select ALL tickets in a category ───────────────────────────────────────
+//   const selectAllInCategory = (cat, e) => {
+//     e.stopPropagation();
+//     const catTickets = grouped[cat].map(p => p.ticketNumber).filter(Boolean);
+//     const allSelected = catTickets.every(t => selectedTickets.includes(t));
+//     if (allSelected) {
+//       setSelectedTickets(prev => prev.filter(t => !catTickets.includes(t)));
+//     } else {
+//       setSelectedTickets(prev => [...new Set([...prev, ...catTickets])]);
+//     }
+//   };
+
+//   // ── Copy all selected tickets ───────────────────────────────────────────────
+//   const copyAllSelected = () => {
+//     navigator.clipboard.writeText(selectedTickets.join("\n")).catch(() => {});
+//     showToast(`Copied ${selectedTickets.length} ticket numbers`);
+//   };
+
+//   // ── Use in form (sends to parent or copies) ─────────────────────────────────
+//   const useInForm = () => {
+//     if (onSelectTickets) {
+//       onSelectTickets(selectedTickets);
+//       showToast(`${selectedTickets.length} tickets sent to registration form`);
+//     } else {
+//       copyAllSelected();
+//     }
+//   };
+
+//   const showToast = (msg) => {
+//     setToast(msg);
+//     setTimeout(() => setToast(null), 2500);
+//   };
+
+//   const clearSelection = () => setSelectedTickets([]);
+
+//   // ─────────────────────────────────────────────────────────────────────────────
+//   return (
+//     <>
+//       <style>{CSS}</style>
+
+//       {/* Toast */}
+//       {toast && <div className="ph-toast">{toast}</div>}
+
+//       <div className="ph-root">
+//         <div className="ph-card">
+
+//           {/* ── Header ── */}
+//           <div className="ph-header">
+//             <div className="ph-header-row">
+//               <div>
+//                 <h2 className="ph-title">
+//                   <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+//                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+//                     <polyline points="14 2 14 8 20 8"/>
+//                     <line x1="16" y1="13" x2="8" y2="13"/>
+//                     <line x1="16" y1="17" x2="8" y2="17"/>
+//                   </svg>
+//                   Product History
+//                   <span className="ph-count-badge">{filtered.length} products · {catNames.length} categories</span>
+//                 </h2>
+//                 <p className="ph-subtitle">Grouped by category — select tickets for bulk registration</p>
+//               </div>
+//               <button className="ph-refresh" onClick={fetchProducts} disabled={loading}>
+//                 <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                   <polyline points="23 4 23 10 17 10"/>
+//                   <polyline points="1 20 1 14 7 14"/>
+//                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+//                 </svg>
+//                 {loading ? "Loading…" : "Refresh"}
+//               </button>
+//             </div>
+//           </div>
+
+//           {/* ── Selected Tickets Bar ── */}
+//           {selectedTickets.length > 0 && (
+//             <div className="ph-selected-bar">
+//               <div className="ph-selected-info">
+//                 <div className="ph-selected-dot" />
+//                 <strong>{selectedTickets.length}</strong> ticket{selectedTickets.length > 1 ? "s" : ""} selected for bulk registration
+//                 <div className="ph-selected-chips">
+//                   {selectedTickets.map(t => (
+//                     <span key={t} className="ph-sel-chip">
+//                       {t}
+//                       <button onClick={() => setSelectedTickets(prev => prev.filter(x => x !== t))} className="ph-sel-chip-x">✕</button>
+//                     </span>
+//                   ))}
+//                 </div>
+//               </div>
+//               <div className="ph-selected-actions">
+//                 <button className="ph-btn-outline" onClick={copyAllSelected}>
+//                   <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+//                   </svg>
+//                   Copy All
+//                 </button>
+//                 <button className="ph-btn-primary" onClick={useInForm}>
+//                   <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                     <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+//                     <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/>
+//                   </svg>
+//                   Use in Bulk Form →
+//                 </button>
+//                 <button className="ph-btn-ghost" onClick={clearSelection}>Clear</button>
+//               </div>
+//             </div>
+//           )}
+
+//           {/* ── Toolbar ── */}
+//           <div className="ph-toolbar">
+//             <div className="ph-search">
+//               <span className="ph-search-icon">
+//                 <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+//                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+//                 </svg>
+//               </span>
+//               <input
+//                 placeholder="Search ticket number, category, config…"
+//                 value={searchTerm}
+//                 onChange={e => setSearchTerm(e.target.value)}
+//               />
+//               {searchTerm && (
+//                 <button className="ph-clear-search" onClick={() => setSearchTerm("")}>✕</button>
+//               )}
+//             </div>
+//             <div style={{ fontSize: 12, color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
+//               {catNames.length} categories
+//             </div>
+//           </div>
+
+//           {/* ── Error ── */}
+//           {error && (
+//             <div className="ph-error">
+//               ⚠️ {error}&nbsp;
+//               <button onClick={fetchProducts} style={{ color: "var(--primary)", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>Retry</button>
+//             </div>
+//           )}
+
+//           {/* ── Skeleton ── */}
+//           {loading && (
+//             <div className="ph-loading">
+//               {[...Array(4)].map((_, i) => <div key={i} className="ph-skeleton" style={{ height: i === 0 ? 56 : 44 }} />)}
+//             </div>
+//           )}
+
+//           {/* ── Category Groups ── */}
+//           {!loading && !error && (
+//             <div className="ph-groups">
+//               {catNames.length === 0 ? (
+//                 <div className="ph-empty">
+//                   <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
+//                   <div style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: 14 }}>No products found</div>
+//                   <div style={{ fontSize: 12, marginTop: 4, color: "#9fb3be" }}>Try adjusting your search</div>
+//                 </div>
+//               ) : (
+//                 catNames.map((cat, catIdx) => {
+//                   const items      = grouped[cat];
+//                   const color      = getCatColor(catIdx);
+//                   const isOpen     = !!expandedCats[cat];
+//                   const catTickets = items.map(p => p.ticketNumber).filter(Boolean);
+//                   const selCount   = catTickets.filter(t => selectedTickets.includes(t)).length;
+//                   const allSel     = selCount === catTickets.length && catTickets.length > 0;
+
+//                   return (
+//                     <div key={cat} className="ph-cat-group">
+
+//                       {/* ── Category Header Row ── */}
+//                       <div
+//                         className="ph-cat-header"
+//                         style={{ borderLeftColor: color.accent }}
+//                         onClick={() => toggleCat(cat)}
+//                       >
+//                         <div className="ph-cat-left">
+//                           {/* Chevron */}
+//                           <span className={`ph-chevron${isOpen ? " open" : ""}`}>
+//                             <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke={color.accent} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                               <path d="M6 9l6 6 6-6"/>
+//                             </svg>
+//                           </span>
+
+//                           {/* Category name */}
+//                           <span className="ph-cat-name" style={{ color: color.text, background: color.bg, border: `1px solid ${color.border}` }}>
+//                             {cat}
+//                           </span>
+
+//                           {/* Count */}
+//                           <span className="ph-cat-count" style={{ color: color.accent }}>
+//                             {items.length} product{items.length > 1 ? "s" : ""}
+//                           </span>
+
+//                           {/* Selected indicator */}
+//                           {selCount > 0 && (
+//                             <span className="ph-cat-sel-badge">
+//                               {selCount}/{catTickets.length} selected
+//                             </span>
+//                           )}
+//                         </div>
+
+//                         {/* Category-level actions */}
+//                         <div className="ph-cat-actions" onClick={e => e.stopPropagation()}>
+//                           <button
+//                             className={`ph-cat-selall${allSel ? " active" : ""}`}
+//                             onClick={(e) => selectAllInCategory(cat, e)}
+//                             title={allSel ? "Deselect all in category" : "Select all in category"}
+//                           >
+//                             {allSel ? "✓ All Selected" : "☐ Select All"}
+//                           </button>
+//                         </div>
+//                       </div>
+
+//                       {/* ── Ticket Rows ── */}
+//                       {isOpen && (
+//                         <div className="ph-ticket-rows">
+//                           {/* Column headers */}
+//                           <div className="ph-ticket-thead">
+//                             <span style={{ width: 28 }}></span>
+//                             <span>Ticket Number</span>
+//                             <span>Registered</span>
+//                             <span>Configuration Preview</span>
+//                             <span style={{ width: 120, textAlign: "right" }}>Actions</span>
+//                           </div>
+
+//                           {items.map((product) => {
+//                             const configs    = getConfigs(product.configurations);
+//                             const ticket     = product.ticketNumber;
+//                             const isRowOpen  = !!expandedRows[product._id];
+//                             const isSel      = selectedTickets.includes(ticket);
+//                             const isCopied   = copiedId === ticket;
+
+//                             return (
+//                               <React.Fragment key={product._id}>
+//                                 <div
+//                                   className={`ph-ticket-row${isSel ? " selected" : ""}${isRowOpen ? " row-open" : ""}`}
+//                                   onClick={() => toggleRow(product._id)}
+//                                 >
+//                                   {/* Checkbox */}
+//                                   <div
+//                                     className={`ph-checkbox${isSel ? " checked" : ""}`}
+//                                     style={isSel ? { background: color.accent, borderColor: color.accent } : {}}
+//                                     onClick={(e) => toggleTicket(ticket, e)}
+//                                   >
+//                                     {isSel && <span>✓</span>}
+//                                   </div>
+
+//                                   {/* Ticket Number — the MAIN field */}
+//                                   <div className="ph-ticket-num">
+//                                     <span className="ph-ticket-badge" style={{ background: color.bg, border: `1px solid ${color.border}`, color: color.text }}>
+//                                       {ticket || "—"}
+//                                     </span>
+//                                   </div>
+
+//                                   {/* Date */}
+//                                   <div className="ph-ticket-date">
+//                                     {product.createdAt
+//                                       ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+//                                       : "—"}
+//                                   </div>
+
+//                                   {/* Config preview chips */}
+//                                   <div className="ph-ticket-configs">
+//                                     {configs.slice(0, 3).map(([k, v]) => (
+//                                       <span key={k} className="ph-chip">
+//                                         <span className="ph-chip-key">{k}:</span>
+//                                         <span className="ph-chip-val">{String(v)}</span>
+//                                       </span>
+//                                     ))}
+//                                     {configs.length > 3 && (
+//                                       <span className="ph-chip-more">+{configs.length - 3}</span>
+//                                     )}
+//                                   </div>
+
+//                                   {/* Action buttons */}
+//                                   <div className="ph-ticket-actions" onClick={e => e.stopPropagation()}>
+//                                     {/* Copy */}
+//                                     <button
+//                                       className={`ph-act-btn copy${isCopied ? " copied" : ""}`}
+//                                       onClick={(e) => copyTicket(ticket, e)}
+//                                       title="Copy ticket number"
+//                                     >
+//                                       {isCopied ? (
+//                                         <>✓ Copied</>
+//                                       ) : (
+//                                         <>
+//                                           <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                                             <rect x="9" y="9" width="13" height="13" rx="2"/>
+//                                             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+//                                           </svg>
+//                                           Copy
+//                                         </>
+//                                       )}
+//                                     </button>
+//                                     {/* Add to selection */}
+//                                     <button
+//                                       className={`ph-act-btn select${isSel ? " selected" : ""}`}
+//                                       onClick={(e) => toggleTicket(ticket, e)}
+//                                       title={isSel ? "Remove from selection" : "Add to bulk form"}
+//                                     >
+//                                       {isSel ? "− Remove" : "+ Add"}
+//                                     </button>
+//                                     {/* Expand */}
+//                                     <span className={`ph-chevron${isRowOpen ? " open" : ""}`} style={{ marginLeft: 4 }}>
+//                                       <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#9fb3be" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+//                                         <path d="M6 9l6 6 6-6"/>
+//                                       </svg>
+//                                     </span>
+//                                   </div>
+//                                 </div>
+
+//                                 {/* ── Expanded config detail ── */}
+//                                 {isRowOpen && (
+//                                   <div className="ph-row-detail" style={{ borderLeftColor: color.accent }}>
+//                                     <div className="ph-detail-label" style={{ color: color.accent }}>
+//                                       Full Configuration — {ticket}
+//                                     </div>
+//                                     <div className="ph-detail-chips">
+//                                       {configs.map(([k, v]) => (
+//                                         <span key={k} className="ph-chip large">
+//                                           <span className="ph-chip-key">{k}:</span>
+//                                           <span className="ph-chip-val">{String(v)}</span>
+//                                         </span>
+//                                       ))}
+//                                     </div>
+//                                     {/* One-click copy for this ticket right from detail */}
+//                                     <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+//                                       <button className="ph-act-btn copy" style={{ fontSize: 12, padding: "6px 14px" }}
+//                                         onClick={(e) => copyTicket(ticket, e)}>
+//                                         Copy Ticket Number
+//                                       </button>
+//                                       <button className={`ph-act-btn select${isSel ? " selected" : ""}`} style={{ fontSize: 12, padding: "6px 14px" }}
+//                                         onClick={(e) => toggleTicket(ticket, e)}>
+//                                         {isSel ? "− Remove from bulk" : "+ Add to bulk form"}
+//                                       </button>
+//                                     </div>
+//                                   </div>
+//                                 )}
+//                               </React.Fragment>
+//                             );
+//                           })}
+//                         </div>
+//                       )}
+//                     </div>
+//                   );
+//                 })
+//               )}
+//             </div>
+//           )}
+
+//           {/* ── Bottom summary ── */}
+//           {!loading && selectedTickets.length > 0 && (
+//             <div className="ph-bottom-bar">
+//               <span>{selectedTickets.length} ticket{selectedTickets.length > 1 ? "s" : ""} ready for bulk registration</span>
+//               <button className="ph-btn-primary" onClick={useInForm}>
+//                 Use in Bulk Form ({selectedTickets.length}) →
+//               </button>
+//             </div>
+//           )}
+
+//         </div>
+//       </div>
+//     </>
+//   );
+// }
+
+// // ─── Styles ───────────────────────────────────────────────────────────────────
+// const CSS = `
+//   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+//   .ph-root {
+//     --primary:        #2B6F84;
+//     --primary-dark:   #1F5668;
+//     --background:     #F2F6F9;
+//     --card-bg:        #FFFFFF;
+//     --border:         #D9E6ED;
+//     --text-primary:   #1E2A32;
+//     --text-secondary: #6B7C86;
+//   }
+//   .ph-root *, .ph-root *::before, .ph-root *::after { box-sizing: border-box; }
+//   .ph-root {
+//     font-family: 'DM Sans', sans-serif;
+//     background: var(--background);
+//     min-height: 100vh;
+//     padding: 24px 20px 60px;
+//   }
+
+//   .ph-card {
+//     background: var(--card-bg);
+//     border-radius: 16px;
+//     border: 1px solid var(--border);
+//     box-shadow: 0 4px 24px rgba(43,111,132,0.08);
+//     overflow: hidden;
+//   }
+
+//   /* Header */
+//   .ph-header {
+//     background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+//     padding: 22px 26px 18px;
+//   }
+//   .ph-header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+//   .ph-title {
+//     font-family: 'Syne', sans-serif;
+//     font-size: 19px; font-weight: 800; color: #fff;
+//     margin: 0 0 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+//   }
+//   .ph-subtitle { font-size: 12px; color: rgba(255,255,255,0.55); margin: 0; }
+//   .ph-count-badge {
+//     font-family: 'DM Sans', sans-serif;
+//     font-size: 11px; font-weight: 600;
+//     background: rgba(255,255,255,0.18);
+//     border: 1px solid rgba(255,255,255,0.22);
+//     border-radius: 20px; padding: 3px 10px; color: #fff;
+//   }
+//   .ph-refresh {
+//     display: flex; align-items: center; gap: 6px;
+//     padding: 8px 14px; background: rgba(255,255,255,0.15);
+//     border: 1px solid rgba(255,255,255,0.3);
+//     border-radius: 8px; font-size: 12px; font-weight: 700;
+//     color: #fff; cursor: pointer; transition: all .18s; white-space: nowrap;
+//     font-family: 'DM Sans', sans-serif;
+//   }
+//   .ph-refresh:hover:not(:disabled) { background: rgba(255,255,255,0.28); }
+//   .ph-refresh:disabled { opacity: .5; cursor: not-allowed; }
+
+//   /* Selected bar */
+//   .ph-selected-bar {
+//     background: linear-gradient(135deg, #1a3a45, #1d4a5a);
+//     border-bottom: 1px solid #2a5a6e;
+//     padding: 12px 24px;
+//     display: flex; align-items: flex-start; justify-content: space-between;
+//     gap: 12px; flex-wrap: wrap;
+//   }
+//   .ph-selected-info {
+//     display: flex; align-items: flex-start; gap: 10px;
+//     font-size: 13px; color: #90cfe0; font-weight: 600; flex-wrap: wrap; flex: 1;
+//   }
+//   .ph-selected-dot {
+//     width: 8px; height: 8px; border-radius: 50%;
+//     background: #4ade80; margin-top: 3px; flex-shrink: 0;
+//     box-shadow: 0 0 6px #4ade80;
+//   }
+//   .ph-selected-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; width: 100%; }
+//   .ph-sel-chip {
+//     display: inline-flex; align-items: center; gap: 5px;
+//     background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+//     border-radius: 6px; padding: 3px 8px;
+//     font-size: 11px; color: #e0f2fe; font-family: 'DM Mono', monospace;
+//   }
+//   .ph-sel-chip-x {
+//     background: none; border: none; color: #90cfe0;
+//     cursor: pointer; font-size: 10px; padding: 0 2px; line-height: 1;
+//   }
+//   .ph-selected-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+//   /* Toolbar */
+//   .ph-toolbar {
+//     padding: 14px 22px; border-bottom: 1px solid var(--border);
+//     background: #fafcfd; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+//   }
+//   .ph-search { position: relative; flex: 1; min-width: 220px; max-width: 460px; }
+//   .ph-search input {
+//     width: 100%; padding: 9px 36px 9px 38px;
+//     border: 1.5px solid var(--border); border-radius: 9px;
+//     font-size: 13px; outline: none; background: #fff;
+//     color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+//     transition: border-color .2s, box-shadow .2s;
+//   }
+//   .ph-search input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,111,132,.1); }
+//   .ph-search input::placeholder { color: #c0d4dc; }
+//   .ph-search-icon {
+//     position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+//     color: var(--text-secondary); display: flex; align-items: center; pointer-events: none;
+//   }
+//   .ph-clear-search {
+//     position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+//     background: none; border: none; color: var(--text-secondary);
+//     cursor: pointer; font-size: 13px; padding: 2px;
+//   }
+
+//   /* Groups */
+//   .ph-groups { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+//   /* Category group card */
+//   .ph-cat-group {
+//     border: 1.5px solid var(--border);
+//     border-radius: 12px; overflow: hidden;
+//   }
+
+//   /* Category header */
+//   .ph-cat-header {
+//     display: flex; align-items: center; justify-content: space-between;
+//     padding: 13px 18px; background: #f8fbfc;
+//     border-left: 4px solid; cursor: pointer;
+//     transition: background .15s; gap: 12px; flex-wrap: wrap;
+//   }
+//   .ph-cat-header:hover { background: #eef5f8; }
+//   .ph-cat-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+//   .ph-cat-name {
+//     font-size: 13px; font-weight: 700;
+//     padding: 4px 12px; border-radius: 7px;
+//     letter-spacing: .2px;
+//   }
+//   .ph-cat-count { font-size: 12px; font-weight: 600; }
+//   .ph-cat-sel-badge {
+//     background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;
+//     border-radius: 10px; font-size: 11px; font-weight: 700;
+//     padding: 2px 8px;
+//   }
+//   .ph-cat-actions { display: flex; align-items: center; gap: 8px; }
+//   .ph-cat-selall {
+//     font-size: 11px; font-weight: 700; padding: 5px 12px;
+//     border: 1.5px solid var(--border); border-radius: 7px;
+//     background: #fff; color: var(--text-secondary);
+//     cursor: pointer; transition: all .15s;
+//     font-family: 'DM Sans', sans-serif; white-space: nowrap;
+//   }
+//   .ph-cat-selall:hover { border-color: var(--primary); color: var(--primary); }
+//   .ph-cat-selall.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+//   /* Ticket rows container */
+//   .ph-ticket-rows { border-top: 1px solid var(--border); }
+//   .ph-ticket-thead {
+//     display: grid; grid-template-columns: 28px 150px 110px 1fr 140px;
+//     padding: 8px 18px; background: #f4f8fa;
+//     border-bottom: 1px solid var(--border);
+//     font-size: 10px; font-weight: 700; text-transform: uppercase;
+//     letter-spacing: .07em; color: var(--text-secondary); gap: 12px; align-items: center;
+//   }
+
+//   /* Individual ticket row */
+//   .ph-ticket-row {
+//     display: grid; grid-template-columns: 28px 150px 110px 1fr 140px;
+//     padding: 11px 18px; gap: 12px; align-items: center;
+//     border-bottom: 1px solid #f0f5f7;
+//     cursor: pointer; transition: background .13s;
+//   }
+//   .ph-ticket-row:hover { background: #f4fbfd; }
+//   .ph-ticket-row.selected { background: #e8f8f0; }
+//   .ph-ticket-row.row-open { background: #eef5f8; }
+//   .ph-ticket-row:last-child { border-bottom: none; }
+
+//   /* Checkbox */
+//   .ph-checkbox {
+//     width: 18px; height: 18px; border-radius: 5px;
+//     border: 2px solid var(--border); background: #fff;
+//     display: flex; align-items: center; justify-content: center;
+//     cursor: pointer; transition: all .15s; flex-shrink: 0;
+//     font-size: 11px; color: #fff; font-weight: 700;
+//   }
+//   .ph-checkbox:hover { border-color: var(--primary); }
+
+//   /* Ticket badge */
+//   .ph-ticket-badge {
+//     font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+//     padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+//     display: inline-block;
+//   }
+//   .ph-ticket-date { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+//   .ph-ticket-configs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+//   .ph-ticket-actions { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+
+//   /* Config chips */
+//   .ph-chip {
+//     display: inline-flex; gap: 3px; align-items: center;
+//     background: #f0f7fa; border: 1px solid var(--border);
+//     border-radius: 5px; padding: 2px 7px; font-size: 11px; white-space: nowrap;
+//   }
+//   .ph-chip.large { padding: 4px 10px; font-size: 12px; }
+//   .ph-chip-key { color: var(--text-secondary); }
+//   .ph-chip-val { color: var(--primary); font-weight: 700; }
+//   .ph-chip-more {
+//     font-size: 11px; color: var(--text-secondary);
+//     background: #eef5f8; border: 1px solid var(--border);
+//     border-radius: 5px; padding: 2px 7px; font-weight: 600;
+//   }
+
+//   /* Action buttons */
+//   .ph-act-btn {
+//     display: inline-flex; align-items: center; gap: 4px;
+//     padding: 5px 10px; border-radius: 6px;
+//     font-size: 11px; font-weight: 700; cursor: pointer;
+//     transition: all .15s; border: 1.5px solid; white-space: nowrap;
+//     font-family: 'DM Sans', sans-serif;
+//   }
+//   .ph-act-btn.copy { background: #fff; border-color: var(--border); color: var(--text-secondary); }
+//   .ph-act-btn.copy:hover { border-color: var(--primary); color: var(--primary); background: #eef6f9; }
+//   .ph-act-btn.copy.copied { background: #dcfce7; border-color: #6ee7b7; color: #15803d; }
+//   .ph-act-btn.select { background: #fff; border-color: var(--border); color: var(--text-secondary); }
+//   .ph-act-btn.select:hover { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+//   .ph-act-btn.select.selected { background: #dcfce7; border-color: #6ee7b7; color: #15803d; }
+
+//   /* Expanded row detail */
+//   .ph-row-detail {
+//     padding: 14px 18px 16px 52px;
+//     background: #f0f8fb;
+//     border-top: 1px solid var(--border);
+//     border-left: 4px solid;
+//   }
+//   .ph-detail-label {
+//     font-size: 10px; font-weight: 800; text-transform: uppercase;
+//     letter-spacing: .08em; margin-bottom: 10px;
+//     display: flex; align-items: center; gap: 6px;
+//   }
+//   .ph-detail-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+//   /* Buttons */
+//   .ph-btn-primary {
+//     display: inline-flex; align-items: center; gap: 6px;
+//     padding: 8px 16px; background: #2ecc71; color: #fff;
+//     border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
+//     cursor: pointer; transition: background .15s; white-space: nowrap;
+//     font-family: 'DM Sans', sans-serif;
+//   }
+//   .ph-btn-primary:hover { background: #27ae60; }
+//   .ph-btn-outline {
+//     display: inline-flex; align-items: center; gap: 6px;
+//     padding: 7px 13px; background: rgba(255,255,255,.12);
+//     border: 1px solid rgba(255,255,255,.3); border-radius: 8px;
+//     font-size: 12px; font-weight: 700; color: #fff; cursor: pointer;
+//     transition: all .15s; font-family: 'DM Sans', sans-serif;
+//   }
+//   .ph-btn-outline:hover { background: rgba(255,255,255,.22); }
+//   .ph-btn-ghost {
+//     padding: 7px 12px; background: none;
+//     border: 1px solid rgba(255,255,255,.2); border-radius: 8px;
+//     font-size: 12px; color: rgba(255,255,255,.6); cursor: pointer;
+//     font-family: 'DM Sans', sans-serif;
+//   }
+//   .ph-btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,.5); }
+
+//   /* Bottom bar */
+//   .ph-bottom-bar {
+//     display: flex; align-items: center; justify-content: space-between;
+//     padding: 14px 24px; border-top: 1px solid var(--border);
+//     background: #f0fdf4; gap: 12px; flex-wrap: wrap;
+//     font-size: 13px; font-weight: 600; color: #15803d;
+//   }
+
+//   /* Toast */
+//   .ph-toast {
+//     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+//     background: #1a3a45; color: #e0f2fe;
+//     padding: 10px 20px; border-radius: 10px;
+//     font-size: 13px; font-weight: 600;
+//     box-shadow: 0 8px 32px rgba(0,0,0,.25);
+//     z-index: 9999; white-space: nowrap;
+//     animation: toastIn .25s ease;
+//     font-family: 'DM Sans', sans-serif;
+//   }
+//   @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(10px) } to { opacity:1; transform: translateX(-50%) translateY(0) } }
+
+//   /* Skeleton */
+//   .ph-loading { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+//   .ph-skeleton {
+//     border-radius: 8px;
+//     background: linear-gradient(90deg,#e8f0f4 25%,#d4e4ec 50%,#e8f0f4 75%);
+//     background-size: 200% 100%; animation: shimmer 1.4s infinite;
+//   }
+//   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+//   .ph-error {
+//     margin: 16px 22px; padding: 12px 16px;
+//     background: #fff5f5; border: 1px solid #fca5a5;
+//     border-left: 3px solid #e57373;
+//     border-radius: 10px; color: #b91c1c; font-size: 13px;
+//   }
+//   .ph-empty { text-align: center; padding: 48px 24px; }
+
+//   /* Chevron */
+//   .ph-chevron { display: inline-flex; transition: transform .2s; }
+//   .ph-chevron.open { transform: rotate(180deg); }
+// `;
+
+
+import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
-// ── Minimal shadcn-style Table primitives ─────────────────────────────────────
-const Table = ({ children, ...p }) => (
-  <div style={{ overflowX: "auto", width: "100%" }}>
-    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }} {...p}>
-      {children}
-    </table>
-  </div>
-);
-const TableHeader = ({ children }) => <thead>{children}</thead>;
-const TableBody   = ({ children }) => <tbody>{children}</tbody>;
-const TableRow    = ({ children, onClick, isExpanded, isExpandedDetail }) => (
-  <tr
-    onClick={onClick}
-    style={{
-      borderBottom: "1px solid var(--border)",
-      background: isExpandedDetail ? "#eef6f9" : isExpanded ? "#e4f2f8" : "transparent",
-      transition: "background 0.13s",
-      cursor: onClick ? "pointer" : "default",
-    }}
-    onMouseEnter={e => { if (!isExpanded && !isExpandedDetail) e.currentTarget.style.background = "#f3f9fb"; }}
-    onMouseLeave={e => { if (!isExpanded && !isExpandedDetail) e.currentTarget.style.background = "transparent"; }}
-  >
-    {children}
-  </tr>
-);
-const TableHead = ({ children, style }) => (
-  <th style={{
-    padding: "11px 16px",
-    textAlign: "left",
-    fontSize: 11,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    letterSpacing: "0.07em",
-    color: "var(--text-secondary)",
-    background: "#f8fbfc",
-    borderBottom: "1.5px solid var(--border)",
-    whiteSpace: "nowrap",
-    ...style,
-  }}>
-    {children}
-  </th>
-);
-const TableCell = ({ children, style }) => (
-  <td style={{
-    padding: "13px 16px",
-    verticalAlign: "middle",
-    color: "var(--text-primary)",
-    ...style,
-  }}>
-    {children}
-  </td>
+// ─────────────────────────────────────────────────────────────────────────────
+//  HOW API CALLS WORK IN THIS FILE
+//
+//  Your axiosInstance already has baseURL = "http://localhost:5000/api"
+//  Your app.js has:  app.use("/api/customerDetails", customerRoutes)
+//
+//  So all calls here use paths like:
+//    axiosInstance.get("/customerDetails/product/lookup?identifier=TK-1001")
+//    → becomes → GET http://localhost:5000/api/customerDetails/product/lookup?identifier=TK-1001
+//
+//  axiosInstance.post("/customerDetails/register", { ...body })
+//    → becomes → POST http://localhost:5000/api/customerDetails/register
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const getCategoryName = (p) => p.category?.name || p.category || "Uncategorized";
+
+const getConfigs = (c) => {
+  if (!c) return [];
+  if (c instanceof Map) return [...c.entries()];
+  if (typeof c === "object") return Object.entries(c);
+  return [];
+};
+
+const groupByCategory = (products) =>
+  products.reduce((acc, p) => {
+    const cat = getCategoryName(p);
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(p);
+    return acc;
+  }, {});
+
+const CAT_COLORS = [
+  { bg: "#ede9fe", border: "#c4b5fd", text: "#6d28d9", accent: "#7c3aed" },
+  { bg: "#dbeafe", border: "#93c5fd", text: "#1d4ed8", accent: "#2563eb" },
+  { bg: "#dcfce7", border: "#86efac", text: "#15803d", accent: "#16a34a" },
+  { bg: "#fef3c7", border: "#fcd34d", text: "#b45309", accent: "#d97706" },
+  { bg: "#fce7f3", border: "#f9a8d4", text: "#be185d", accent: "#db2777" },
+  { bg: "#e0f2fe", border: "#7dd3fc", text: "#0369a1", accent: "#0284c7" },
+];
+const getCatColor = (i) => CAT_COLORS[i % CAT_COLORS.length];
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+const Spin = ({ size = 14 }) => (
+  <span style={{
+    display: "inline-block", width: size, height: size, flexShrink: 0,
+    border: "2px solid #d9e6ed", borderTop: "2px solid #2B6F84",
+    borderRadius: "50%", animation: "cc-spin .7s linear infinite",
+  }} />
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-export default function CustomerCareProductHistory() {
-  const [products, setProducts]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [expandedRow, setExpandedRow] = useState(null);
-  const ITEMS_PER_PAGE = 10;
+//  MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
+export default function CustomerCareRegistration() {
+  // ── View state: "history" shows product list, "form" shows registration form
+  const [view, setView] = useState("history"); // "history" | "form"
 
+  // ── Product History state ─────────────────────────────────────────────────
+  const [products,        setProducts]        = useState([]);
+  const [histLoading,     setHistLoading]      = useState(true);
+  const [histError,       setHistError]        = useState(null);
+  const [searchTerm,      setSearchTerm]       = useState("");
+  const [expandedCats,    setExpandedCats]     = useState({});
+  const [expandedRows,    setExpandedRows]     = useState({});
+  const [copiedId,        setCopiedId]         = useState(null);
+  const [selectedTickets, setSelectedTickets]  = useState([]);
+  const [toast,           setToast]            = useState(null);
+
+  // ── Registration Form state ───────────────────────────────────────────────
+  const [purchaseType,  setPurchaseType]  = useState("single"); // "single" | "bulk"
+  const [customer,      setCustomer]      = useState({ customerName: "", email: "", mobileNum: "" });
+  const [warrDates,     setWarrDates]     = useState({ warrStartDate: "", warrEndDate: "" });
+
+  // Single mode: one ticket input
+  const [singleTicket,  setSingleTicket]  = useState("");
+  const [singleProduct, setSingleProduct] = useState(null);  // fetched from API
+  const [singleState,   setSingleState]   = useState("idle"); // idle|loading|ok|err
+  const [singleErr,     setSingleErr]     = useState("");
+
+  // Bulk mode: list of { ticketNumber, product (fetched), warrStartDate, warrEndDate }
+  const [bulkList,      setBulkList]      = useState([]);
+  const [bulkInput,     setBulkInput]     = useState("");
+  const [bulkInputState,setBulkInputState]= useState("idle"); // idle|loading|ok|err|duplicate
+  const [bulkInputErr,  setBulkInputErr]  = useState("");
+  const [bulkFetched,   setBulkFetched]   = useState(null);  // product fetched for current bulkInput
+
+  // Submission
+  const [submitState,   setSubmitState]   = useState("idle"); // idle|loading|done|err
+  const [submitError,   setSubmitError]   = useState("");
+  const [submitted,     setSubmitted]     = useState(false);
+  const [savedReg,      setSavedReg]      = useState(null);
+
+  const singleDebounce = useRef(null);
+  const bulkDebounce   = useRef(null);
+
+  // ── On mount: fetch product history ──────────────────────────────────────
   useEffect(() => { fetchProducts(); }, []);
 
+  // ── When tickets are sent from history → switch to form ──────────────────
+  useEffect(() => {
+    if (selectedTickets.length > 0 && view === "form") {
+      // Pre-populate bulk list with selected tickets (fetch each)
+      prefillBulkFromHistory(selectedTickets);
+    }
+  }, [view]);
+
+  // ── Single mode: auto-fetch product when ticket typed ────────────────────
+  useEffect(() => {
+    if (purchaseType !== "single") return;
+    if (!singleTicket || singleTicket.length < 4) {
+      setSingleProduct(null); setSingleState("idle"); return;
+    }
+    clearTimeout(singleDebounce.current);
+    singleDebounce.current = setTimeout(() => fetchSingleProduct(singleTicket), 600);
+  }, [singleTicket, purchaseType]);
+
+  // ── Bulk input: auto-validate when ticket typed ───────────────────────────
+  useEffect(() => {
+    if (purchaseType !== "bulk") return;
+    if (!bulkInput || bulkInput.length < 4) {
+      setBulkInputState("idle"); setBulkInputErr(""); setBulkFetched(null); return;
+    }
+    if (bulkList.some(i => i.ticketNumber.toUpperCase() === bulkInput.toUpperCase().trim())) {
+      setBulkInputState("duplicate"); setBulkInputErr("Already added"); return;
+    }
+    clearTimeout(bulkDebounce.current);
+    bulkDebounce.current = setTimeout(() => fetchBulkInputProduct(bulkInput), 600);
+  }, [bulkInput, purchaseType]);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  API CALL 1: Fetch product history list
+  //  GET /customerDetails/product/history
+  //  → Returns all products grouped (your existing category/history endpoint)
+  // ─────────────────────────────────────────────────────────────────────────
   const fetchProducts = async () => {
     try {
-      setLoading(true); setError(null);
+      setHistLoading(true); setHistError(null);
       const { data } = await axiosInstance.get("/category/history");
       const list = data.data || data.products || data || [];
       setProducts(Array.isArray(list) ? list : []);
+      const cats = [...new Set((Array.isArray(list) ? list : []).map(getCategoryName))];
+      if (cats.length) setExpandedCats({ [cats[0]]: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products");
-    } finally { setLoading(false); }
+      setHistError(err?.response?.data?.message || "Failed to fetch products");
+    } finally {
+      setHistLoading(false);
+    }
   };
 
-  const getConfigs = (configurations) => {
-    if (!configurations) return [];
-    if (configurations instanceof Map) return [...configurations.entries()];
-    if (typeof configurations === "object") return Object.entries(configurations);
-    return [];
+  
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  API CALL 2: Lookup a single product by ticket number
+  //  GET /customerDetails/product/lookup?identifier=TK-1001
+  //
+  //  WHAT HAPPENS:
+  //  1. Customer care types/pastes a ticket number in the form
+  //  2. After 600ms debounce, this function runs
+  //  3. Calls backend → backend searches Product DB by ticketNumber
+  //  4. Returns: { ticketNumber, categoryName, configurations: {...} }
+  //  5. Auto-fills the configuration display on the form
+  // ─────────────────────────────────────────────────────────────────────────
+  const fetchSingleProduct = async (ticket) => {
+    try {
+      setSingleState("loading"); setSingleProduct(null); setSingleErr("");
+      const { data } = await axiosInstance.get(
+        `/customerDetails/product/lookup?identifier=${encodeURIComponent(ticket.trim())}`
+      );
+      setSingleProduct(data.product);
+      setSingleState("ok");
+    } catch (err) {
+      setSingleErr(err?.response?.data?.message || "Product not found");
+      setSingleState("err");
+    }
   };
 
-  // Search by ticket, category name, or any config value
-  const filtered = products.filter(p => {
-    const ticket   = p.ticketNumber?.toLowerCase() || "";
-    const catName  = (p.category?.name || p.category || "").toLowerCase();
-    const configs  = getConfigs(p.configurations).map(([, v]) => String(v).toLowerCase()).join(" ");
+  // ─────────────────────────────────────────────────────────────────────────
+  //  API CALL 3: Validate bulk input ticket (same lookup endpoint)
+  //  GET /customerDetails/product/lookup?identifier=TK-1002
+  //
+  //  WHAT HAPPENS:
+  //  Same as above but for bulk — just validates the ticket exists
+  //  before showing the + Add button as active
+  // ─────────────────────────────────────────────────────────────────────────
+  const fetchBulkInputProduct = async (ticket) => {
+    try {
+      setBulkInputState("loading"); setBulkInputErr(""); setBulkFetched(null);
+      const { data } = await axiosInstance.get(
+        `/customerDetails/product/lookup?identifier=${encodeURIComponent(ticket.trim())}`
+      );
+      setBulkFetched(data.product);
+      setBulkInputState("ok");
+    } catch (err) {
+      setBulkInputErr(err?.response?.data?.message || "Product not found");
+      setBulkInputState("err");
+    }
+  };
+
+  // ── Add validated ticket to bulk list ─────────────────────────────────────
+  const addToBulkList = () => {
+    if (bulkInputState !== "ok" || !bulkFetched) return;
+    const id = bulkInput.toUpperCase().trim();
+    if (bulkList.some(i => i.ticketNumber === id)) return;
+    setBulkList(prev => [...prev, {
+      ticketNumber:  bulkFetched.ticketNumber,
+      product:       bulkFetched,
+      warrStartDate: warrDates.warrStartDate,
+      warrEndDate:   warrDates.warrEndDate,
+    }]);
+    setBulkInput(""); setBulkInputState("idle"); setBulkFetched(null);
+  };
+
+  // ── Pre-fill bulk list from ProductHistory selection ──────────────────────
+  const prefillBulkFromHistory = async (tickets) => {
+    if (!tickets.length) return;
+    setPurchaseType(tickets.length === 1 ? "single" : "bulk");
+    if (tickets.length === 1) {
+      setSingleTicket(tickets[0]);
+      return;
+    }
+    // Fetch each ticket in parallel
+    const results = await Promise.allSettled(
+      tickets.map(t =>
+        axiosInstance.get(`/customerDetails/product/lookup?identifier=${encodeURIComponent(t)}`)
+          .then(r => ({ ticketNumber: t, product: r.data.product, warrStartDate: "", warrEndDate: "" }))
+      )
+    );
+    const resolved = results
+      .filter(r => r.status === "fulfilled")
+      .map(r => r.value);
+    setBulkList(resolved);
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  API CALL 4: Submit registration
+  //  POST /customerDetails/register
+  //
+  //  WHAT HAPPENS:
+  //  1. Customer care fills: customerName, email, mobileNum + warranty dates
+  //  2. Products are already fetched and shown on screen
+  //  3. On submit, sends this body to backend:
+  //     {
+  //       customerName, email, mobileNum, purchaseType,
+  //       products: [{ ticketNumber, warrStartDate, warrEndDate }, ...]
+  //     }
+  //  4. Backend service: for each ticketNumber → re-fetches from Product DB
+  //     → saves configSnapshot permanently → saves Customer document
+  //  5. Returns saved registration with _id
+  // ─────────────────────────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    try {
+      setSubmitState("loading"); setSubmitError("");
+
+      // Build products array for request body
+      const products = purchaseType === "single"
+        ? [{
+            ticketNumber:  singleTicket.trim(),
+            warrStartDate: warrDates.warrStartDate,
+            warrEndDate:   warrDates.warrEndDate,
+          }]
+        : bulkList.map(item => ({
+            ticketNumber:  item.ticketNumber,
+            warrStartDate: item.warrStartDate || warrDates.warrStartDate,
+            warrEndDate:   item.warrEndDate   || warrDates.warrEndDate,
+          }));
+
+      const body = {
+        customerName:  customer.customerName.trim(),
+        email:         customer.email.trim(),
+        mobileNum:     customer.mobileNum.trim(),
+        purchaseType,
+        products,
+      };
+
+      const { data } = await axiosInstance.post("/customerDetails/register", body);
+
+      setSavedReg(data.data);
+      setSubmitState("done");
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err?.response?.data?.message || "Registration failed. Please try again.");
+      setSubmitState("err");
+    }
+  };
+
+  // ── Send tickets from history to form ─────────────────────────────────────
+  const handleUseInForm = () => {
+    setView("form");
+    showToast(`${selectedTickets.length} ticket(s) sent to registration form`);
+  };
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
+  };
+
+  const resetForm = () => {
+    setCustomer({ customerName: "", email: "", mobileNum: "" });
+    setWarrDates({ warrStartDate: "", warrEndDate: "" });
+    setSingleTicket(""); setSingleProduct(null); setSingleState("idle");
+    setBulkList([]); setBulkInput(""); setBulkInputState("idle");
+    setSubmitState("idle"); setSubmitError(""); setSubmitted(false); setSavedReg(null);
+    setPurchaseType("single"); setSelectedTickets([]);
+  };
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+  const custOk = customer.customerName && customer.email && customer.mobileNum;
+  const datesOk = warrDates.warrStartDate && warrDates.warrEndDate;
+  const singleValid = purchaseType === "single" && singleState === "ok" && custOk && datesOk;
+  const bulkValid   = purchaseType === "bulk"   && bulkList.length >= 2 && custOk;
+  const canSubmit   = (singleValid || bulkValid) && submitState !== "loading";
+
+  // ── Filtered + grouped products ───────────────────────────────────────────
+  const filtered  = products.filter(p => {
+    if (!searchTerm) return true;
     const s = searchTerm.toLowerCase();
-    return !s || ticket.includes(s) || catName.includes(s) || configs.includes(s);
+    return (p.ticketNumber || "").toLowerCase().includes(s)
+      || getCategoryName(p).toLowerCase().includes(s)
+      || getConfigs(p.configurations).map(([, v]) => String(v).toLowerCase()).join(" ").includes(s);
   });
+  const grouped  = groupByCategory(filtered);
+  const catNames = Object.keys(grouped).sort();
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  // ─── History helpers ───────────────────────────────────────────────────────
+  const toggleCat   = (cat) => setExpandedCats(p => ({ ...p, [cat]: !p[cat] }));
+  const toggleRow   = (id)  => setExpandedRows(p => ({ ...p, [id]:  !p[id] }));
+  const toggleTicket = (ticket, e) => {
+    e.stopPropagation();
+    setSelectedTickets(p => p.includes(ticket) ? p.filter(t => t !== ticket) : [...p, ticket]);
+  };
+  const selectAllInCat = (cat, e) => {
+    e.stopPropagation();
+    const ts = grouped[cat].map(p => p.ticketNumber).filter(Boolean);
+    const allSel = ts.every(t => selectedTickets.includes(t));
+    setSelectedTickets(p => allSel ? p.filter(t => !ts.includes(t)) : [...new Set([...p, ...ts])]);
+  };
+  const copyTicket = (ticket, e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(ticket).catch(() => {});
+    setCopiedId(ticket);
+    showToast(`Copied ${ticket}`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
+  // ─────────────────────────────────────────────────────────────────────────
+  //  SUCCESS SCREEN
+  // ─────────────────────────────────────────────────────────────────────────
+  if (submitted && savedReg) {
+    return (
+      <div className="cc-root">
+        <style>{CSS}</style>
+        <div className="cc-success-wrap">
+          <div className="cc-success-icon">✓</div>
+          <h2 className="cc-success-title">Registration Complete</h2>
+          <p className="cc-success-sub">
+            Ref: <strong style={{ color: "#2B6F84", fontFamily: "DM Mono, monospace" }}>
+              {savedReg._id?.slice(-8).toUpperCase() || "—"}
+            </strong>
+          </p>
+          <div className="cc-detail-box">
+            <DetailRow label="Customer"  value={savedReg.customerName} />
+            <DetailRow label="Email"     value={savedReg.email} />
+            <DetailRow label="Mobile"    value={savedReg.mobileNum} />
+            <DetailRow label="Type"      value={savedReg.purchaseType === "bulk" ? "Bulk Purchase" : "Single Purchase"}
+              accent={savedReg.purchaseType === "bulk" ? "#d97706" : "#15803d"} />
+            <DetailRow label="Products"  value={`${savedReg.products?.length} unit(s) registered`} />
+          </div>
+          {savedReg.products?.length > 0 && (
+            <div className="cc-saved-tickets">
+              {savedReg.products.map(p => (
+                <div key={p._id || p.ticketNumber} className="cc-saved-ticket-row">
+                  <span className="cc-mono">{p.ticketNumber}</span>
+                  <span style={{ color: "#6B7C86", fontSize: 12 }}>
+                    {p.categoryRef?.name || "—"}
+                  </span>
+                  <span style={{ color: "#6B7C86", fontSize: 11 }}>
+                    Warranty: {p.warrStartDate?.slice(0,10)} → {p.warrEndDate?.slice(0,10)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+            <button className="cc-btn-primary" onClick={() => { resetForm(); setView("history"); }}>
+              ← Back to Products
+            </button>
+            <button className="cc-btn-outline-dark" onClick={resetForm}>
+              + New Registration
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  MAIN RENDER
+  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+    <div className="cc-root">
+      <style>{CSS}</style>
+      {toast && <div className="cc-toast">{toast}</div>}
 
-        .ph-root {
-          --primary:        #2B6F84;
-          --primary-dark:   #1F5668;
-          --background:     #F4F7F9;
-          --card-bg:        #FFFFFF;
-          --border:         #D9E6ED;
-          --info:           #3A8FB7;
-          --success:        #6BA86D;
-          --warning:        #D39A3C;
-          --delete-btn:     #E57373;
-          --text-primary:   #1E2A32;
-          --text-secondary: #6B7C86;
-        }
+      {/* ── Top Tab Navigation ── */}
+      <div className="cc-tabs">
+        <button
+          className={`cc-tab${view === "history" ? " active" : ""}`}
+          onClick={() => setView("history")}
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Product History
+          {selectedTickets.length > 0 && (
+            <span className="cc-tab-badge">{selectedTickets.length}</span>
+          )}
+        </button>
+        <button
+          className={`cc-tab${view === "form" ? " active" : ""}`}
+          onClick={() => setView("form")}
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Registration Form
+          {(singleState === "ok" || bulkList.length > 0) && (
+            <span className="cc-tab-badge" style={{ background: "#15803d" }}>●</span>
+          )}
+        </button>
+      </div>
 
-        .ph-root *, .ph-root *::before, .ph-root *::after { box-sizing: border-box; }
-        .ph-root {
-          font-family: 'DM Sans', sans-serif;
-          background: var(--background);
-          min-height: 100vh;
-          padding: 28px 24px;
-        }
-
-        .ph-card {
-          background: var(--card-bg);
-          border-radius: 16px;
-          overflow: hidden;
-          border: 1px solid var(--border);
-          box-shadow: 0 4px 24px rgba(43,111,132,0.08);
-        }
-
-        /* Header */
-        .ph-header {
-          background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-          padding: 24px 28px 20px;
-          border-bottom: 1px solid var(--primary-dark);
-        }
-        .ph-title {
-          font-family: 'Syne', sans-serif;
-          font-size: 20px; font-weight: 800;
-          margin: 0 0 3px; letter-spacing: -0.4px; color: #fff;
-          display: flex; align-items: center; gap: 10px;
-        }
-        .ph-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); margin: 0; }
-        .ph-count-badge {
-          background: rgba(255,255,255,0.18);
-          border: 1px solid rgba(255,255,255,0.25);
-          border-radius: 20px; padding: 2px 10px;
-          font-size: 12px; font-weight: 700; color: #fff;
-        }
-
-        /* Toolbar */
-        .ph-toolbar {
-          padding: 16px 24px;
-          border-bottom: 1px solid var(--border);
-          background: #fafcfd;
-          display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-        }
-        .ph-search { position: relative; flex: 1; min-width: 220px; max-width: 480px; }
-        .ph-search input {
-          width: 100%; padding: 9px 14px 9px 40px;
-          border: 1.5px solid var(--border); border-radius: 9px;
-          font-size: 13px; outline: none; background: #fff;
-          color: var(--text-primary); font-family: 'DM Sans', sans-serif;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .ph-search input:focus {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(43,111,132,0.1);
-        }
-        .ph-search input::placeholder { color: #b0c4ce; }
-        .ph-search-icon {
-          position: absolute; left: 12px; top: 50%;
-          transform: translateY(-50%); color: var(--text-secondary);
-          display: flex; align-items: center; pointer-events: none;
-        }
-        .ph-refresh {
-          padding: 8px 16px; background: var(--card-bg);
-          color: var(--primary); border: 1.5px solid var(--border);
-          border-radius: 9px; font-size: 12px; font-weight: 700;
-          cursor: pointer; transition: all 0.18s;
-          font-family: 'DM Sans', sans-serif;
-          display: flex; align-items: center; gap: 6px; white-space: nowrap;
-        }
-        .ph-refresh:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .ph-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Ticket badge */
-        .ph-ticket {
-          font-family: 'DM Mono', monospace; font-size: 11px;
-          background: #ede9fe; color: #6d28d9;
-          padding: 4px 9px; border-radius: 6px;
-          border: 1px solid #c4b5fd; font-weight: 500; white-space: nowrap;
-        }
-
-        /* Category badge */
-        .ph-category {
-          font-size: 12px; color: var(--info); font-weight: 600;
-          background: #e0f2fe; padding: 3px 9px;
-          border-radius: 6px; border: 1px solid #bae6fd; display: inline-block;
-        }
-
-        /* Config chips */
-        .ph-chip {
-          display: inline-flex; gap: 4px; align-items: center;
-          background: #f0f7fa; border: 1px solid var(--border);
-          border-radius: 6px; padding: 3px 9px; font-size: 12px;
-        }
-        .ph-chip-key { color: var(--text-secondary); font-weight: 500; }
-        .ph-chip-val { color: var(--primary); font-weight: 700; }
-
-        /* Expand panel */
-        .ph-expand-label {
-          font-size: 10px; font-weight: 800; color: var(--primary);
-          text-transform: uppercase; letter-spacing: 0.08em;
-          margin-bottom: 10px;
-          display: flex; align-items: center; gap: 6px;
-        }
-        .ph-expand-chips {
-          display: flex; flex-wrap: wrap; gap: 8px;
-          padding: 14px 16px; background: #fff;
-          border-radius: 10px; border: 1px solid var(--border);
-        }
-        .ph-expand-meta {
-          display: flex; gap: 24px; flex-wrap: wrap;
-        }
-        .ph-meta-label {
-          font-size: 10px; font-weight: 700; color: var(--text-secondary);
-          text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;
-        }
-
-        /* Empty */
-        .ph-empty { text-align: center; padding: 56px 24px; }
-
-        /* Error */
-        .ph-error {
-          margin: 20px 24px; padding: 14px 18px;
-          background: #fff5f5; border: 1px solid #fca5a5;
-          border-left: 3px solid var(--delete-btn);
-          border-radius: 10px; color: #b91c1c; font-size: 13px;
-        }
-
-        /* Skeleton */
-        .ph-loading { padding: 24px; display: flex; flex-direction: column; gap: 10px; }
-        .ph-skeleton {
-          height: 48px; border-radius: 8px;
-          background: linear-gradient(90deg, #e8f0f4 25%, #d4e4ec 50%, #e8f0f4 75%);
-          background-size: 200% 100%; animation: ph-shimmer 1.4s infinite;
-        }
-        @keyframes ph-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-        /* Pagination */
-        .ph-pagination {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 14px 24px; border-top: 1px solid var(--border);
-          background: #fafcfd; flex-wrap: wrap; gap: 10px;
-        }
-        .ph-page-info { font-size: 12px; color: var(--text-secondary); }
-        .ph-page-btns { display: flex; gap: 5px; align-items: center; }
-        .ph-page-btn {
-          padding: 6px 12px; border: 1.5px solid var(--border);
-          border-radius: 7px; font-size: 12px; font-weight: 600;
-          background: #fff; cursor: pointer; color: var(--text-secondary);
-          transition: all 0.15s; font-family: 'DM Sans', sans-serif;
-        }
-        .ph-page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: #eef6f9; }
-        .ph-page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .ph-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* chevron rotate */
-        .ph-chevron { transition: transform 0.2s; display: inline-flex; }
-        .ph-chevron.open { transform: rotate(180deg); }
-      `}</style>
-
-      <div className="ph-root">
-        <div className="ph-card">
-
-          {/* ── Header ── */}
-          <div className="ph-header">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      {/* ═══════════════════════════════════════════════════════════════════
+          VIEW 1: PRODUCT HISTORY
+      ═══════════════════════════════════════════════════════════════════ */}
+      {view === "history" && (
+        <div className="cc-card">
+          {/* Header */}
+          <div className="cc-header">
+            <div className="cc-header-row">
               <div>
-                <h2 className="ph-title">
-                  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                  </svg>
+                <h2 className="cc-title">
                   Product History
-                  <span className="ph-count-badge">{filtered.length}</span>
+                  <span className="cc-count-badge">{filtered.length} products · {catNames.length} categories</span>
                 </h2>
-                <p className="ph-subtitle">All registered products with their configurations</p>
+                <p className="cc-subtitle">Select tickets below → click "Use in Form" to register</p>
               </div>
-              <button className="ph-refresh" onClick={fetchProducts} disabled={loading}>
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="23 4 23 10 17 10"/>
-                  <polyline points="1 20 1 14 7 14"/>
-                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-                </svg>
-                {loading ? "Loading…" : "Refresh"}
+              <button className="cc-refresh" onClick={fetchProducts} disabled={histLoading}>
+                {histLoading ? <Spin size={12} /> : "↺"} {histLoading ? "Loading…" : "Refresh"}
               </button>
             </div>
           </div>
 
-          {/* ── Toolbar ── */}
-          <div className="ph-toolbar">
-            <div className="ph-search">
-              <span className="ph-search-icon">
-                <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-              </span>
-              <input
-                placeholder="Search by ticket, category or config value…"
-                value={searchTerm}
-                onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              />
+          {/* Selected bar */}
+          {selectedTickets.length > 0 && (
+            <div className="cc-sel-bar">
+              <div className="cc-sel-info">
+                <span className="cc-sel-dot" />
+                <strong>{selectedTickets.length}</strong> ticket{selectedTickets.length > 1 ? "s" : ""} selected
+                <div className="cc-sel-chips">
+                  {selectedTickets.map(t => (
+                    <span key={t} className="cc-sel-chip">
+                      {t}
+                      <button onClick={() => setSelectedTickets(p => p.filter(x => x !== t))} className="cc-sel-x">✕</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="cc-sel-actions">
+                <button className="cc-btn-ghost-light" onClick={() => { navigator.clipboard.writeText(selectedTickets.join("\n")); showToast("Copied all"); }}>
+                  Copy All
+                </button>
+                <button className="cc-btn-green" onClick={handleUseInForm}>
+                  Use in Form ({selectedTickets.length}) →
+                </button>
+                <button className="cc-btn-ghost-light" onClick={() => setSelectedTickets([])}>Clear</button>
+              </div>
+            </div>
+          )}
+
+          {/* Search */}
+          <div className="cc-toolbar">
+            <div className="cc-search">
+              <span className="cc-search-icon">⌕</span>
+              <input placeholder="Search ticket, category, config…" value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)} />
+              {searchTerm && <button className="cc-clear-srch" onClick={() => setSearchTerm("")}>✕</button>}
             </div>
           </div>
 
-          {/* ── Error ── */}
-          {error && (
-            <div className="ph-error">
-              ⚠️ {error}&nbsp;&nbsp;
-              <button onClick={fetchProducts} style={{ color: "var(--primary)", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
-                Retry
-              </button>
+          {/* Error */}
+          {histError && (
+            <div className="cc-error-bar">
+              ⚠ {histError} <button onClick={fetchProducts} className="cc-retry-btn">Retry</button>
             </div>
           )}
 
-          {/* ── Skeleton ── */}
-          {loading && (
-            <div className="ph-loading">
-              {[...Array(5)].map((_, i) => <div key={i} className="ph-skeleton" />)}
+          {/* Skeleton */}
+          {histLoading && (
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+              {[56, 44, 44, 44].map((h, i) => (
+                <div key={i} className="cc-skeleton" style={{ height: h }} />
+              ))}
             </div>
           )}
 
-          {/* ── shadcn-style Table ── */}
-          {!loading && !error && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Ticket #</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Registered</TableHead>
-                  <TableHead>Configurations</TableHead>
-                  <TableHead style={{ width: 36 }}></TableHead>
-                </TableRow>
-              </TableHeader>
+          {/* Category groups */}
+          {!histLoading && !histError && (
+            <div className="cc-groups">
+              {catNames.length === 0 ? (
+                <div className="cc-empty">🔍 No products found</div>
+              ) : catNames.map((cat, catIdx) => {
+                const items     = grouped[cat];
+                const color     = getCatColor(catIdx);
+                const isOpen    = !!expandedCats[cat];
+                const catTix    = items.map(p => p.ticketNumber).filter(Boolean);
+                const selCount  = catTix.filter(t => selectedTickets.includes(t)).length;
+                const allSel    = selCount === catTix.length && catTix.length > 0;
 
-              <TableBody>
-                {paginated.length === 0 ? (
-                  <TableRow>
-                    <TableCell style={{ padding: 0 }}>
-                      {/* colSpan workaround — just span via a wrapper */}
-                    </TableCell>
-                    <TableCell colSpan={5}>
-                      <div className="ph-empty">
-                        <div style={{ fontSize: 38, marginBottom: 12 }}>🔍</div>
-                        <div style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: 14 }}>No products found</div>
-                        <div style={{ fontSize: 12, marginTop: 4, color: "#9fb3be" }}>Try adjusting your search</div>
+                return (
+                  <div key={cat} className="cc-cat-group">
+                    {/* Category header */}
+                    <div className="cc-cat-hdr" style={{ borderLeftColor: color.accent }} onClick={() => toggleCat(cat)}>
+                      <div className="cc-cat-left">
+                        <span className={`cc-chevron${isOpen ? " open" : ""}`}>▸</span>
+                        <span className="cc-cat-name" style={{ color: color.text, background: color.bg, border: `1px solid ${color.border}` }}>
+                          {cat}
+                        </span>
+                        <span className="cc-cat-count" style={{ color: color.accent }}>
+                          {items.length} product{items.length > 1 ? "s" : ""}
+                        </span>
+                        {selCount > 0 && (
+                          <span className="cc-cat-sel-badge">{selCount}/{catTix.length} selected</span>
+                        )}
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginated.map((product) => {
-                    const configs    = getConfigs(product.configurations);
-                    const isExpanded = expandedRow === product._id;
+                      <div onClick={e => e.stopPropagation()}>
+                        <button className={`cc-selall-btn${allSel ? " active" : ""}`}
+                          onClick={(e) => selectAllInCat(cat, e)}>
+                          {allSel ? "✓ All Selected" : "☐ Select All"}
+                        </button>
+                      </div>
+                    </div>
 
-                    return (
-                      <React.Fragment key={product._id}>
+                    {/* Ticket rows */}
+                    {isOpen && (
+                      <div className="cc-ticket-rows">
+                        <div className="cc-ticket-thead">
+                          <span></span><span>Ticket #</span><span>Date</span>
+                          <span>Config Preview</span><span style={{ textAlign: "right" }}>Actions</span>
+                        </div>
+                        {items.map(product => {
+                          const configs   = getConfigs(product.configurations);
+                          const ticket    = product.ticketNumber;
+                          const isRowOpen = !!expandedRows[product._id];
+                          const isSel     = selectedTickets.includes(ticket);
+                          const isCopied  = copiedId === ticket;
 
-                        {/* ── Main row ── */}
-                        <TableRow
-                          isExpanded={isExpanded}
-                          onClick={() => setExpandedRow(isExpanded ? null : product._id)}
-                        >
-                          {/* Ticket */}
-                          <TableCell>
-                            <span className="ph-ticket">{product.ticketNumber || "—"}</span>
-                          </TableCell>
-
-                          {/* Category */}
-                          <TableCell>
-                            <span className="ph-category">
-                              {product.category?.name || product.category || "—"}
-                            </span>
-                          </TableCell>
-
-                          {/* Date */}
-                          <TableCell style={{ color: "var(--text-secondary)", fontSize: 12, whiteSpace: "nowrap" }}>
-                            {product.createdAt
-                              ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-                              : "—"}
-                          </TableCell>
-
-                          {/* Config chips preview */}
-                          <TableCell>
-                            {configs.length === 0 ? (
-                              <span style={{ fontSize: 12, color: "var(--text-secondary)", fontStyle: "italic" }}>No configurations</span>
-                            ) : (
-                              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                                {configs.slice(0, 3).map(([k, v]) => (
-                                  <span key={k} className="ph-chip">
-                                    <span className="ph-chip-key">{k}:</span>
-                                    <span className="ph-chip-val">{String(v)}</span>
-                                  </span>
-                                ))}
-                                {configs.length > 3 && (
-                                  <span style={{ fontSize: 11, color: "var(--text-secondary)", alignSelf: "center", fontWeight: 600 }}>
-                                    +{configs.length - 3} more
-                                  </span>
-                                )}
+                          return (
+                            <React.Fragment key={product._id}>
+                              <div className={`cc-ticket-row${isSel ? " selected" : ""}${isRowOpen ? " row-open" : ""}`}
+                                onClick={() => toggleRow(product._id)}>
+                                {/* Checkbox */}
+                                <div className={`cc-checkbox${isSel ? " checked" : ""}`}
+                                  style={isSel ? { background: color.accent, borderColor: color.accent } : {}}
+                                  onClick={e => toggleTicket(ticket, e)}>
+                                  {isSel && "✓"}
+                                </div>
+                                {/* Ticket badge */}
+                                <span className="cc-ticket-badge" style={{ background: color.bg, border: `1px solid ${color.border}`, color: color.text }}>
+                                  {ticket || "—"}
+                                </span>
+                                {/* Date */}
+                                <span className="cc-ticket-date">
+                                  {product.createdAt ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                                </span>
+                                {/* Config chips */}
+                                <div className="cc-ticket-configs">
+                                  {configs.slice(0, 3).map(([k, v]) => (
+                                    <span key={k} className="cc-chip">
+                                      <span className="cc-chip-k">{k}:</span>
+                                      <span className="cc-chip-v">{String(v)}</span>
+                                    </span>
+                                  ))}
+                                  {configs.length > 3 && <span className="cc-chip-more">+{configs.length - 3}</span>}
+                                </div>
+                                {/* Actions */}
+                                <div className="cc-ticket-actions" onClick={e => e.stopPropagation()}>
+                                  <button className={`cc-act-btn copy${isCopied ? " copied" : ""}`} onClick={e => copyTicket(ticket, e)}>
+                                    {isCopied ? "✓ Copied" : "Copy"}
+                                  </button>
+                                  <button className={`cc-act-btn select${isSel ? " selected" : ""}`} onClick={e => toggleTicket(ticket, e)}>
+                                    {isSel ? "− Remove" : "+ Add"}
+                                  </button>
+                                  <span className={`cc-chevron${isRowOpen ? " open" : ""}`} style={{ marginLeft: 4, color: "#9fb3be" }}>▸</span>
+                                </div>
                               </div>
-                            )}
-                          </TableCell>
-
-                          {/* Expand chevron */}
-                          <TableCell style={{ textAlign: "center", color: "var(--text-secondary)" }}>
-                            <span className={`ph-chevron${isExpanded ? " open" : ""}`}>
-                              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M6 9l6 6 6-6"/>
-                              </svg>
-                            </span>
-                          </TableCell>
-                        </TableRow>
-
-                        {/* ── Expanded detail row ── */}
-                        {isExpanded && (
-                          <TableRow isExpandedDetail>
-                            <TableCell
-                              colSpan={5}
-                              style={{ padding: "16px 20px 20px", background: "#eef6f9", borderBottom: "1px solid var(--border)" }}
-                            >
-                              {configs.length > 0 && (
-                                <>
-                                  <div className="ph-expand-label">
-                                    <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                                      <circle cx="12" cy="12" r="3"/>
-                                      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-                                    </svg>
-                                    Full Configuration
+                              {/* Expanded detail */}
+                              {isRowOpen && (
+                                <div className="cc-row-detail" style={{ borderLeftColor: color.accent }}>
+                                  <div className="cc-detail-label" style={{ color: color.accent }}>
+                                    Full Configuration — {ticket}
                                   </div>
-                                  <div className="ph-expand-chips" style={{ marginBottom: 14 }}>
+                                  <div className="cc-detail-chips">
                                     {configs.map(([k, v]) => (
-                                      <span key={k} className="ph-chip">
-                                        <span className="ph-chip-key">{k}:</span>
-                                        <span className="ph-chip-val">{String(v)}</span>
+                                      <span key={k} className="cc-chip large">
+                                        <span className="cc-chip-k">{k}:</span>
+                                        <span className="cc-chip-v">{String(v)}</span>
                                       </span>
                                     ))}
                                   </div>
-                                </>
+                                  <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                                    <button className="cc-act-btn copy" onClick={e => copyTicket(ticket, e)}>Copy Ticket</button>
+                                    <button className={`cc-act-btn select${isSel ? " selected" : ""}`} onClick={e => toggleTicket(ticket, e)}>
+                                      {isSel ? "− Remove from bulk" : "+ Add to form"}
+                                    </button>
+                                  </div>
+                                </div>
                               )}
-
-                              {/* Meta strip */}
-                              <div className="ph-expand-meta">
-                                {product.ticketNumber && (
-                                  <div>
-                                    <div className="ph-meta-label">Ticket</div>
-                                    <span className="ph-ticket">{product.ticketNumber}</span>
-                                  </div>
-                                )}
-                                {product.category && (
-                                  <div>
-                                    <div className="ph-meta-label">Category</div>
-                                    <span className="ph-category">{product.category?.name || product.category}</span>
-                                  </div>
-                                )}
-                                {product.createdAt && (
-                                  <div>
-                                    <div className="ph-meta-label">Registered On</div>
-                                    <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
-                                      {new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-
-                      </React.Fragment>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          )}
-
-          {/* ── Pagination ── */}
-          {!loading && filtered.length > ITEMS_PER_PAGE && (
-            <div className="ph-pagination">
-              <span className="ph-page-info">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products
-              </span>
-              <div className="ph-page-btns">
-                <button className="ph-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>←</button>
-                {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  let p;
-                  if (totalPages <= 5)           p = i + 1;
-                  else if (currentPage <= 3)     p = i + 1;
-                  else if (currentPage >= totalPages - 2) p = totalPages - 4 + i;
-                  else                           p = currentPage - 2 + i;
-                  return (
-                    <button key={i} className={`ph-page-btn${currentPage === p ? " active" : ""}`} onClick={() => setCurrentPage(p)}>
-                      {p}
-                    </button>
-                  );
-                })}
-                <button className="ph-page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>→</button>
-              </div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
+          {/* Bottom bar */}
+          {!histLoading && selectedTickets.length > 0 && (
+            <div className="cc-bottom-bar">
+              <span>{selectedTickets.length} ticket{selectedTickets.length > 1 ? "s" : ""} ready</span>
+              <button className="cc-btn-green" onClick={handleUseInForm}>
+                Use in Registration Form ({selectedTickets.length}) →
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-    </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          VIEW 2: REGISTRATION FORM
+      ═══════════════════════════════════════════════════════════════════ */}
+      {view === "form" && (
+        <div className="cc-card">
+          <div className="cc-header">
+            <div className="cc-header-row">
+              <div>
+                <h2 className="cc-title">Customer Registration</h2>
+                <p className="cc-subtitle">
+                  {selectedTickets.length > 0
+                    ? `${selectedTickets.length} ticket(s) pre-filled from Product History`
+                    : "Fill customer details and enter ticket numbers"}
+                </p>
+              </div>
+              <button className="cc-refresh" onClick={() => setView("history")}>
+                ← Back to History
+              </button>
+            </div>
+          </div>
+
+          <div className="cc-form-body">
+
+            {/* ── STEP 1: Purchase Type ── */}
+            <FormSection step="01" title="Purchase Type">
+              <div className="cc-type-row">
+                <TypeCard active={purchaseType === "single"} color="#2B6F84"
+                  title="Single Product" desc="One unit — one ticket number"
+                  onClick={() => { setPurchaseType("single"); setBulkList([]); }} />
+                <TypeCard active={purchaseType === "bulk"} color="#d97706"
+                  title="Bulk Purchase" desc="Multiple units — add each ticket separately"
+                  onClick={() => { setPurchaseType("bulk"); setSingleProduct(null); setSingleTicket(""); }} />
+              </div>
+            </FormSection>
+
+            {/* ── STEP 2: Customer Info ── */}
+            <FormSection step="02" title="Customer Information">
+              <div className="cc-grid3">
+                <FormField label="Full Name">
+                  <input className="cc-input" value={customer.customerName}
+                    onChange={e => setCustomer(p => ({ ...p, customerName: e.target.value }))}
+                    placeholder="Customer full name" />
+                </FormField>
+                <FormField label="Email Address">
+                  <input className="cc-input" type="email" value={customer.email}
+                    onChange={e => setCustomer(p => ({ ...p, email: e.target.value }))}
+                    placeholder="customer@email.com" />
+                </FormField>
+                <FormField label="Mobile Number">
+                  <input className="cc-input" value={customer.mobileNum}
+                    onChange={e => setCustomer(p => ({ ...p, mobileNum: e.target.value }))}
+                    placeholder="+91 XXXXX XXXXX" />
+                </FormField>
+              </div>
+            </FormSection>
+
+            {/* ── STEP 3: Warranty Dates ── */}
+            <FormSection step="03" title="Warranty Period">
+              <div className="cc-grid2">
+                <FormField label="Warranty Start Date">
+                  <input className="cc-input" type="date" value={warrDates.warrStartDate}
+                    onChange={e => setWarrDates(p => ({ ...p, warrStartDate: e.target.value }))} />
+                </FormField>
+                <FormField label="Warranty End Date">
+                  <input className="cc-input" type="date" value={warrDates.warrEndDate}
+                    onChange={e => setWarrDates(p => ({ ...p, warrEndDate: e.target.value }))} />
+                </FormField>
+              </div>
+            </FormSection>
+
+            {/* ── STEP 4: Product Ticket(s) ── */}
+            <FormSection step="04" title={
+              purchaseType === "bulk"
+                ? `Product Ticket Numbers — ${bulkList.length} added`
+                : "Product Ticket Number"
+            }>
+
+              {/* SINGLE MODE */}
+              {purchaseType === "single" && (
+                <>
+                  <TicketInput
+                    value={singleTicket}
+                    onChange={setSingleTicket}
+                    state={singleState}
+                    error={singleErr}
+                    placeholder="Paste or type ticket number (e.g. PRD-20250101-12345)"
+                  />
+                  {singleState === "ok" && singleProduct && (
+                    <ProductFetchedCard product={singleProduct} />
+                  )}
+                </>
+              )}
+
+              {/* BULK MODE */}
+              {purchaseType === "bulk" && (
+                <>
+                  <div className="cc-bulk-hint">
+                    Each unit has its own ticket number. Add them one by one or use
+                    <strong> Product History</strong> to select and send multiple tickets at once.
+                  </div>
+
+                  {/* Input + Add button */}
+                  <div className="cc-bulk-input-row">
+                    <div style={{ flex: 1 }}>
+                      <TicketInput
+                        value={bulkInput}
+                        onChange={setBulkInput}
+                        onKeyDown={e => e.key === "Enter" && addToBulkList()}
+                        state={bulkInputState === "duplicate" ? "err" : bulkInputState}
+                        error={bulkInputState === "duplicate" ? "Already added" : bulkInputErr}
+                        placeholder="Type ticket number and press Enter…"
+                        noMargin
+                      />
+                    </div>
+                    <button
+                      className={`cc-add-btn${bulkInputState !== "ok" ? " disabled" : ""}`}
+                      onClick={addToBulkList}
+                      disabled={bulkInputState !== "ok"}
+                    >
+                      + Add
+                    </button>
+                  </div>
+
+                  {/* Fetched product preview for current input */}
+                  {bulkInputState === "ok" && bulkFetched && (
+                    <ProductFetchedCard product={bulkFetched} compact />
+                  )}
+
+                  {/* Bulk list table */}
+                  {bulkList.length > 0 && (
+                    <div className="cc-bulk-table">
+                      <div className="cc-bulk-thead">
+                        <span>#</span><span>Ticket Number</span>
+                        <span>Category</span><span>Config</span><span></span>
+                      </div>
+                      {bulkList.map(({ ticketNumber, product }, idx) => (
+                        <div key={ticketNumber} className="cc-bulk-row">
+                          <span className="cc-bulk-idx">{idx + 1}</span>
+                          <span className="cc-mono">{ticketNumber}</span>
+                          <span className="cc-bulk-cat">{product?.categoryName || "—"}</span>
+                          <span className="cc-bulk-configs">
+                            {getConfigs(product?.configurations).slice(0, 2).map(([k, v]) => (
+                              <span key={k} className="cc-chip">
+                                <span className="cc-chip-k">{k}:</span>
+                                <span className="cc-chip-v">{String(v)}</span>
+                              </span>
+                            ))}
+                          </span>
+                          <button className="cc-remove-btn"
+                            onClick={() => setBulkList(p => p.filter(i => i.ticketNumber !== ticketNumber))}>
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      <div className="cc-bulk-total">
+                        <span /><span style={{ color: "#6B7C86", fontSize: 12 }}>
+                          {bulkList.length} unit{bulkList.length > 1 ? "s" : ""} total
+                        </span>
+                        <span /><span /><span />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </FormSection>
+
+            {/* ── Submit ── */}
+            {submitError && (
+              <div className="cc-submit-error">⚠ {submitError}</div>
+            )}
+            <div className="cc-submit-row">
+              <button
+                className={`cc-submit-btn${!canSubmit ? " disabled" : ""}`}
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+              >
+                {submitState === "loading"
+                  ? <><Spin size={14} /> Processing…</>
+                  : "Complete Registration →"}
+              </button>
+              {!canSubmit && (
+                <p className="cc-submit-hint">
+                  {!custOk
+                    ? "Fill in customer name, email and mobile"
+                    : !datesOk && purchaseType === "single"
+                    ? "Select warranty dates"
+                    : purchaseType === "single" && singleState !== "ok"
+                    ? "Enter a valid ticket number"
+                    : purchaseType === "bulk" && bulkList.length < 2
+                    ? "Add at least 2 products for bulk purchase"
+                    : ""}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
+
+// ─── Small sub-components ─────────────────────────────────────────────────────
+
+function FormSection({ step, title, children }) {
+  return (
+    <div className="cc-form-section">
+      <div className="cc-step-label">
+        <span className="cc-step-num">{step}</span>
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function FormField({ label, children }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <label className="cc-field-label">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function TypeCard({ active, color, title, desc, onClick }) {
+  return (
+    <button className="cc-type-card" onClick={onClick}
+      style={{ borderColor: active ? color : "#D9E6ED", background: active ? `${color}0f` : "#fff" }}>
+      <div className="cc-type-title" style={{ color: active ? color : "#1E2A32" }}>{title}</div>
+      <div className="cc-type-desc">{desc}</div>
+      {active && <div className="cc-type-check" style={{ background: color }}>✓</div>}
+    </button>
+  );
+}
+
+function TicketInput({ value, onChange, onKeyDown, state, error, placeholder, noMargin }) {
+  const borderColor = state === "ok" ? "#16a34a" : state === "err" ? "#dc2626" : "#D9E6ED";
+  return (
+    <div style={{ marginBottom: noMargin ? 0 : 12 }}>
+      <div className="cc-ticket-input-wrap" style={{ borderColor }}>
+        <span style={{ color: "#9fb3be", fontSize: 16 }}>⌕</span>
+        <input
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          className="cc-ticket-input-field"
+        />
+        {state === "loading" && <Spin size={14} />}
+        {state === "ok"      && <span style={{ color: "#16a34a", fontWeight: 700 }}>✓</span>}
+        {state === "err"     && <span style={{ color: "#dc2626" }}>✕</span>}
+      </div>
+      {state === "err" && error && <p className="cc-input-err">⚠ {error}</p>}
+    </div>
+  );
+}
+
+function ProductFetchedCard({ product, compact }) {
+  const configs = getConfigs(product?.configurations);
+  return (
+    <div className="cc-fetched-card">
+      <div className="cc-fetched-tag">AUTO-FETCHED · {product?.ticketNumber}</div>
+      <div className="cc-fetched-cat">{product?.categoryName || "—"}</div>
+      {!compact && (
+        <div className="cc-fetched-configs">
+          {configs.map(([k, v]) => (
+            <span key={k} className="cc-chip">
+              <span className="cc-chip-k">{k}:</span>
+              <span className="cc-chip-v">{String(v)}</span>
+            </span>
+          ))}
+        </div>
+      )}
+      {compact && (
+        <div className="cc-fetched-configs">
+          {configs.slice(0, 3).map(([k, v]) => (
+            <span key={k} className="cc-chip">
+              <span className="cc-chip-k">{k}:</span>
+              <span className="cc-chip-v">{String(v)}</span>
+            </span>
+          ))}
+          {configs.length > 3 && <span className="cc-chip-more">+{configs.length - 3} more</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DetailRow({ label, value, accent }) {
+  return (
+    <div className="cc-detail-row">
+      <span>{label}</span>
+      <strong style={{ color: accent || "#1E2A32" }}>{value}</strong>
+    </div>
+  );
+}
+
+// ─── CSS ──────────────────────────────────────────────────────────────────────
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  .cc-root {
+    --primary: #2B6F84; --primary-dark: #1F5668;
+    --bg: #F2F6F9; --card: #fff; --border: #D9E6ED;
+    --text: #1E2A32; --muted: #6B7C86;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg); min-height: 100vh; padding: 20px 20px 60px;
+  }
+  .cc-root *, .cc-root *::before, .cc-root *::after { box-sizing: border-box; }
+
+  @keyframes cc-spin { to { transform: rotate(360deg); } }
+  @keyframes cc-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  @keyframes cc-fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+  /* Tabs */
+  .cc-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: var(--card); border-radius: 12px; padding: 6px; border: 1px solid var(--border); }
+  .cc-tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 9px 16px; border-radius: 9px; border: none; background: transparent;
+    font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer;
+    transition: all .18s; font-family: 'DM Sans', sans-serif; position: relative;
+  }
+  .cc-tab.active { background: var(--primary); color: #fff; }
+  .cc-tab:not(.active):hover { background: #eef5f8; color: var(--primary); }
+  .cc-tab-badge {
+    background: #d97706; color: #fff; border-radius: 20px;
+    font-size: 10px; font-weight: 700; padding: 1px 7px;
+  }
+
+  /* Card */
+  .cc-card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(43,111,132,.07); overflow: hidden; }
+
+  /* Header */
+  .cc-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 20px 24px 16px; }
+  .cc-header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .cc-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 3px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .cc-subtitle { font-size: 12px; color: rgba(255,255,255,.55); margin: 0; }
+  .cc-count-badge { font-size: 11px; font-weight: 600; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.22); border-radius: 20px; padding: 2px 10px; color: #fff; font-family: 'DM Sans', sans-serif; }
+  .cc-refresh { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; transition: all .15s; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .cc-refresh:hover:not(:disabled) { background: rgba(255,255,255,.28); }
+  .cc-refresh:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Selected bar */
+  .cc-sel-bar { background: linear-gradient(135deg,#1a3a45,#1d4a5a); border-bottom: 1px solid #2a5a6e; padding: 12px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .cc-sel-info { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #90cfe0; font-weight: 600; flex-wrap: wrap; flex: 1; }
+  .cc-sel-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; margin-top: 3px; box-shadow: 0 0 6px #4ade80; flex-shrink: 0; }
+  .cc-sel-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; width: 100%; }
+  .cc-sel-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: #e0f2fe; font-family: 'DM Mono', monospace; }
+  .cc-sel-x { background: none; border: none; color: #90cfe0; cursor: pointer; font-size: 10px; padding: 0 2px; }
+  .cc-sel-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+  /* Toolbar */
+  .cc-toolbar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: #fafcfd; }
+  .cc-search { position: relative; max-width: 460px; }
+  .cc-search input { width: 100%; padding: 9px 34px 9px 36px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 13px; outline: none; background: #fff; color: var(--text); font-family: 'DM Sans', sans-serif; transition: border-color .2s; }
+  .cc-search input:focus { border-color: var(--primary); }
+  .cc-search input::placeholder { color: #c0d4dc; }
+  .cc-search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
+  .cc-clear-srch { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; }
+
+  /* Category groups */
+  .cc-groups { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .cc-cat-group { border: 1.5px solid var(--border); border-radius: 11px; overflow: hidden; }
+  .cc-cat-hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fbfc; border-left: 4px solid; cursor: pointer; transition: background .14s; gap: 12px; flex-wrap: wrap; }
+  .cc-cat-hdr:hover { background: #eef5f8; }
+  .cc-cat-left { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .cc-cat-name { font-size: 12px; font-weight: 700; padding: 3px 11px; border-radius: 7px; }
+  .cc-cat-count { font-size: 12px; font-weight: 600; }
+  .cc-cat-sel-badge { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; border-radius: 10px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+  .cc-selall-btn { font-size: 11px; font-weight: 700; padding: 5px 11px; border: 1.5px solid var(--border); border-radius: 7px; background: #fff; color: var(--muted); cursor: pointer; transition: all .14s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .cc-selall-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .cc-selall-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Ticket rows */
+  .cc-ticket-rows { border-top: 1px solid var(--border); }
+  .cc-ticket-thead { display: grid; grid-template-columns: 28px 140px 100px 1fr 130px; padding: 7px 16px; background: #f4f8fa; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); gap: 10px; align-items: center; }
+  .cc-ticket-row { display: grid; grid-template-columns: 28px 140px 100px 1fr 130px; padding: 10px 16px; gap: 10px; align-items: center; border-bottom: 1px solid #f0f5f7; cursor: pointer; transition: background .12s; }
+  .cc-ticket-row:hover { background: #f4fbfd; }
+  .cc-ticket-row.selected { background: #e8f8f0; }
+  .cc-ticket-row.row-open { background: #eef5f8; }
+  .cc-ticket-row:last-child { border-bottom: none; }
+
+  /* Checkbox */
+  .cc-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .14s; font-size: 11px; color: #fff; font-weight: 700; flex-shrink: 0; }
+  .cc-checkbox:hover { border-color: var(--primary); }
+
+  .cc-ticket-badge { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 9px; border-radius: 6px; white-space: nowrap; }
+  .cc-ticket-date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .cc-ticket-configs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .cc-ticket-actions { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+
+  /* Chips */
+  .cc-chip { display: inline-flex; gap: 3px; align-items: center; background: #f0f7fa; border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-size: 11px; white-space: nowrap; }
+  .cc-chip.large { padding: 4px 10px; font-size: 12px; }
+  .cc-chip-k { color: var(--muted); }
+  .cc-chip-v { color: var(--primary); font-weight: 700; }
+  .cc-chip-more { font-size: 11px; color: var(--muted); background: #eef5f8; border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-weight: 600; }
+
+  /* Action buttons */
+  .cc-act-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .14s; border: 1.5px solid; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .cc-act-btn.copy { background: #fff; border-color: var(--border); color: var(--muted); }
+  .cc-act-btn.copy:hover { border-color: var(--primary); color: var(--primary); }
+  .cc-act-btn.copy.copied { background: #dcfce7; border-color: #6ee7b7; color: #15803d; }
+  .cc-act-btn.select { background: #fff; border-color: var(--border); color: var(--muted); }
+  .cc-act-btn.select:hover { border-color: #16a34a; color: #16a34a; }
+  .cc-act-btn.select.selected { background: #dcfce7; border-color: #6ee7b7; color: #15803d; }
+
+  /* Expanded detail */
+  .cc-row-detail { padding: 12px 16px 14px 48px; background: #f0f8fb; border-top: 1px solid var(--border); border-left: 4px solid; }
+  .cc-detail-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .cc-detail-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* Bottom bar */
+  .cc-bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; border-top: 1px solid var(--border); background: #f0fdf4; font-size: 13px; font-weight: 600; color: #15803d; gap: 12px; flex-wrap: wrap; }
+
+  /* Form */
+  .cc-form-body { padding: 20px 24px 28px; display: flex; flex-direction: column; gap: 0; }
+  .cc-form-section { margin-bottom: 28px; }
+  .cc-step-label { display: flex; align-items: center; gap: 9px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 14px; }
+  .cc-step-num { background: #e8f2f6; color: var(--primary); padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+  .cc-field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+  .cc-input { background: #f8fbfc; border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 13px; color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; transition: border-color .18s, box-shadow .18s; width: 100%; }
+  .cc-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(43,111,132,.1); }
+  .cc-input::placeholder { color: #c0d4dc; }
+  .cc-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .cc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .cc-grid3, .cc-grid2 { grid-template-columns: 1fr; } }
+
+  /* Type cards */
+  .cc-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .cc-type-card { border: 2px solid; border-radius: 11px; padding: 18px 16px; text-align: left; cursor: pointer; position: relative; transition: all .18s; font-family: 'DM Sans', sans-serif; }
+  .cc-type-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .cc-type-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .cc-type-check { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* Ticket input */
+  .cc-ticket-input-wrap { display: flex; align-items: center; gap: 10px; background: #f8fbfc; border: 1.5px solid; border-radius: 10px; padding: 11px 13px; transition: border-color .18s; margin-bottom: 0; }
+  .cc-ticket-input-field { flex: 1; background: transparent; border: none; color: var(--text); font-size: 13px; outline: none; font-family: 'DM Mono', monospace; }
+  .cc-ticket-input-field::placeholder { color: #c0d4dc; font-family: 'DM Sans', sans-serif; }
+  .cc-input-err { font-size: 12px; color: #dc2626; margin: 5px 0 0; }
+
+  /* Fetched product card */
+  .cc-fetched-card { margin-top: 12px; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px 16px; animation: cc-fadein .3s ease; }
+  .cc-fetched-tag { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #16a34a; margin-bottom: 5px; }
+  .cc-fetched-cat { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .cc-fetched-configs { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* Bulk */
+  .cc-bulk-hint { background: #f8fbfc; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+  .cc-bulk-input-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+  .cc-add-btn { background: var(--primary); color: #fff; border: none; border-radius: 9px; padding: 11px 18px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+  .cc-add-btn:hover:not(.disabled) { background: var(--primary-dark); }
+  .cc-add-btn.disabled { opacity: .3; cursor: not-allowed; }
+  .cc-bulk-table { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 12px; }
+  .cc-bulk-thead { display: grid; grid-template-columns: 28px 160px 100px 1fr 28px; padding: 8px 14px; background: #f4f8fa; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); gap: 10px; }
+  .cc-bulk-row { display: grid; grid-template-columns: 28px 160px 100px 1fr 28px; padding: 10px 14px; gap: 10px; align-items: center; border-bottom: 1px solid #f0f5f7; animation: cc-fadein .25s ease; }
+  .cc-bulk-row:last-child { border-bottom: none; }
+  .cc-bulk-total { display: grid; grid-template-columns: 28px 160px 100px 1fr 28px; padding: 9px 14px; gap: 10px; background: #f8fbfc; border-top: 1px solid var(--border); }
+  .cc-bulk-idx { font-size: 12px; color: var(--muted); }
+  .cc-bulk-cat { font-size: 12px; color: var(--muted); }
+  .cc-bulk-configs { display: flex; flex-wrap: wrap; gap: 4px; }
+  .cc-remove-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 5px; width: 22px; height: 22px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .cc-remove-btn:hover { border-color: #dc2626; color: #dc2626; }
+
+  /* Submit */
+  .cc-submit-row { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 6px; }
+  .cc-submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; padding: 14px 48px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 8px; transition: opacity .18s; }
+  .cc-submit-btn.disabled { opacity: .3; cursor: not-allowed; }
+  .cc-submit-btn:hover:not(.disabled) { opacity: .88; }
+  .cc-submit-hint { font-size: 12px; color: var(--muted); margin: 0; text-align: center; }
+  .cc-submit-error { background: #fff5f5; border: 1px solid #fca5a5; border-left: 3px solid #dc2626; border-radius: 9px; padding: 10px 14px; font-size: 13px; color: #b91c1c; margin-bottom: 12px; }
+
+  /* Buttons */
+  .cc-btn-green { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .14s; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .cc-btn-green:hover { background: #15803d; }
+  .cc-btn-ghost-light { padding: 7px 13px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .cc-btn-ghost-light:hover { background: rgba(255,255,255,.22); }
+  .cc-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; background: var(--primary); color: #fff; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .14s; font-family: 'DM Sans', sans-serif; }
+  .cc-btn-primary:hover { background: var(--primary-dark); }
+  .cc-btn-outline-dark { padding: 10px 20px; background: #fff; border: 1.5px solid var(--border); color: var(--text); border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* Toast */
+  .cc-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1a3a45; color: #e0f2fe; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 32px rgba(0,0,0,.25); z-index: 9999; white-space: nowrap; font-family: 'DM Sans', sans-serif; animation: cc-fadein .25s ease; }
+
+  /* Skeleton */
+  .cc-skeleton { border-radius: 8px; background: linear-gradient(90deg,#e8f0f4 25%,#d4e4ec 50%,#e8f0f4 75%); background-size: 200% 100%; animation: cc-shimmer 1.4s infinite; }
+
+  /* Error */
+  .cc-error-bar { margin: 14px 20px; padding: 11px 15px; background: #fff5f5; border: 1px solid #fca5a5; border-left: 3px solid #e57373; border-radius: 9px; color: #b91c1c; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .cc-retry-btn { color: var(--primary); font-weight: 700; background: none; border: none; cursor: pointer; }
+  .cc-empty { text-align: center; padding: 48px 24px; color: var(--muted); font-size: 14px; }
+
+  /* Success */
+  .cc-success-wrap { max-width: 560px; margin: 48px auto; background: var(--card); border: 1.5px solid #86efac; border-radius: 18px; padding: 40px 36px; text-align: center; animation: cc-fadein .4s ease; }
+  .cc-success-icon { width: 56px; height: 56px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #16a34a; margin: 0 auto 18px; border: 2px solid #86efac; }
+  .cc-success-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin: 0 0 6px; }
+  .cc-success-sub { color: var(--muted); font-size: 13px; margin: 0 0 24px; }
+  .cc-detail-box { background: #f8fbfc; border-radius: 10px; padding: 16px 18px; margin-bottom: 20px; text-align: left; }
+  .cc-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+  .cc-detail-row:last-child { border-bottom: none; }
+  .cc-saved-tickets { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; text-align: left; }
+  .cc-saved-ticket-row { display: flex; justify-content: space-between; align-items: center; background: #f8fbfc; border: 1px solid var(--border); border-radius: 7px; padding: 7px 12px; gap: 12px; flex-wrap: wrap; }
+  .cc-mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--primary); }
+
+  /* Chevron */
+  .cc-chevron { display: inline-flex; transition: transform .2s; font-size: 11px; }
+  .cc-chevron.open { transform: rotate(90deg); }
+`;
