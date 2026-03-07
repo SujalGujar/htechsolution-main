@@ -10,7 +10,7 @@ import {registerCustomer} from "../controllers/customerRegister/customerRegistra
 import {lookupProduct} from "../controllers/customerRegister/productLookUp.controller.js"
 import { getAllRegistrations, getRegistrationById } from "../controllers/customerRegister/customerHistory.controller.js"
 // import { productHistroy } from "../controllers/customercare.controller.js"  
-import { registerCustomer } from "../controllers/customerRegister/customerRegistration.controller.js";
+// import { registerCustomer } from "../controllers/customerRegister/customerRegistration.controller.js";
 const router = express.Router()
 
 // ✅ correct routes
