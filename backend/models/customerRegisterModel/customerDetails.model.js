@@ -44,7 +44,7 @@
 // export default Customer;
 
 
-// import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 // const customerDetailsSchema = new mongoose.Schema({
 //     customerName: {
