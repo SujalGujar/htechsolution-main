@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 //
 //  USED BY: controllers/productLookupController.js
 // ─────────────────────────────────────────────────────────────────────────────
+import mongoose from "mongoose";
 import Product from "../../models/productsRegisterModel/productRegister.model.js"
 // const Product = mongoose.model("Product");
 
