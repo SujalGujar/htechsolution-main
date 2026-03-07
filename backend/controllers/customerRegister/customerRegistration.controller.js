@@ -466,8 +466,7 @@
 //   }
 // };
 
-import { registerCustomerService } from "../../services/customerRegistrationService.js";
-
+import { registerCustomerService } from "../../services/customerRegister/registerCustomer.service.js";
 // ─────────────────────────────────────────────────────────────────────────────
 //  FILE: controllers/customerRegistrationController.js
 //

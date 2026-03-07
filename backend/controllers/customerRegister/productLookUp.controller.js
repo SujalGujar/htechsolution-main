@@ -1,4 +1,4 @@
-import { lookupProductService } from "../../services/productLookupService.js";
+import { lookupProductService } from "../../services/customerRegister/productLookupService.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  FILE: controllers/productLookupController.js
