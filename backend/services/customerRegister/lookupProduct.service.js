@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 //  USED BY: controllers/productLookupController.js
 // ─────────────────────────────────────────────────────────────────────────────
 import Product from "../../models/productsRegisterModel/productRegister.model.js"
-const Product = mongoose.model("Product");
+// const Product = mongoose.model("Product");
 
 // ── Find product by ticketNumber in DB ────────────────────────────────────────
 const findProductByTicket = async (ticketNumber) => {
