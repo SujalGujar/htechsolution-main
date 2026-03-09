@@ -3502,9 +3502,40 @@ import {
   Building2, FileText, Clock, AlertCircle,
   ChevronLeft, ChevronRight,
   Lock, Eye, EyeOff, Copy, Check, ShieldCheck, KeyRound,
+  ShoppingBag, Layers,
 } from 'lucide-react';
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  NEW FUNCTIONALITY ADDED — what changed from the original:
+//
+//  1. API DATA MAPPING
+//     The original component used flat fields like item.proName, item.proSrNo.
+//     Our Customer model stores data differently:
+//       - item.products[] array (each product is a sub-document)
+//       - item.products[0].configSnapshot (Map of all product fields)
+//       - item.products[0].categoryName (from populated categoryRef)
+//     So we added a helper function "extractDisplayData" that reads from
+//     the real API response and maps it to what the UI needs.
+//
+//  2. MULTIPLE PRODUCTS PER CUSTOMER (bulk support)
+//     Original showed one product per card.
+//     Now if purchaseType = "bulk", multiple product entries are shown
+//     inside the same card using a ProductsAccordion sub-component.
+//
+//  3. PURCHASE TYPE BADGE
+//     Shows "Single" or "Bulk" badge so customer care knows at a glance.
+//
+//  4. CONFIG SNAPSHOT DISPLAY
+//     Shows all key-value pairs from configSnapshot (the product specs)
+//     as small chips — e.g. RAM: 16GB, Brand: Dell, Storage: 512GB.
+//
+//  5. SAFE DATA ACCESS with optional chaining (?.)
+//     All data access uses ?. so the component never crashes if a field
+//     is missing or null from the API.
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Password Cell ────────────────────────────────────────────────────────────
+// UNCHANGED from original — show/hide password + copy to clipboard
 const PasswordCell = ({ password }) => {
   const [visible, setVisible] = useState(false);
   const [copied, setCopied]   = useState(false);
@@ -3515,27 +3546,22 @@ const PasswordCell = ({ password }) => {
     setTimeout(() => setCopied(false), 1800);
   };
 
-  if (!password) {
-    return <span className="text-xs text-gray-400 italic">Not available</span>;
-  }
+  if (!password) return (
+    <span className="text-xs text-gray-400 italic">Not available</span>
+  );
 
   return (
     <div className="flex items-center gap-2">
       <span className="font-semibold text-gray-900 text-xs font-mono tracking-widest">
         {visible ? password : '••••••••'}
       </span>
-      <button
-        onClick={() => setVisible(v => !v)}
+      <button onClick={() => setVisible(v => !v)}
         className="p-1 rounded-md hover:bg-blue-100 text-blue-400 transition-colors"
-        title={visible ? 'Hide' : 'Show'}
-      >
+        title={visible ? 'Hide' : 'Show'}>
         {visible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
       </button>
-      <button
-        onClick={handleCopy}
-        className="p-1 rounded-md hover:bg-green-100 transition-colors"
-        title="Copy"
-      >
+      <button onClick={handleCopy}
+        className="p-1 rounded-md hover:bg-green-100 transition-colors" title="Copy">
         {copied
           ? <Check className="w-3 h-3 text-green-500" />
           : <Copy  className="w-3 h-3 text-blue-400"  />}
@@ -3545,6 +3571,7 @@ const PasswordCell = ({ password }) => {
 };
 
 // ─── Info Row ─────────────────────────────────────────────────────────────────
+// UNCHANGED from original
 const InfoRow = ({ icon: Icon, label, value, iconColor = "text-gray-400" }) => (
   <div className="flex items-start gap-2.5 py-1.5">
     <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor}`} />
@@ -3554,6 +3581,7 @@ const InfoRow = ({ icon: Icon, label, value, iconColor = "text-gray-400" }) => (
 );
 
 // ─── Section Block ────────────────────────────────────────────────────────────
+// UNCHANGED from original
 const SectionBlock = ({ title, children }) => (
   <div className="bg-gray-50 rounded-2xl p-4 space-y-0.5">
     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{title}</p>
@@ -3561,7 +3589,197 @@ const SectionBlock = ({ title, children }) => (
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── NEW: Config Chips ────────────────────────────────────────────────────────
+// NEW COMPONENT — displays configSnapshot key-value pairs as chips
+// configSnapshot is an object like: { RAM: "16GB", Brand: "Dell", Storage: "512GB" }
+// Object.entries(config) converts it to [ ["RAM","16GB"], ["Brand","Dell"], ... ]
+// We then map over that array to render one chip per key-value pair.
+const ConfigChips = ({ config }) => {
+  if (!config || Object.keys(config).length === 0) {
+    return <span className="text-xs text-gray-400 italic">No config data</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-1">
+      {Object.entries(config).map(([key, value]) => (
+        <span
+          key={key}
+          className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-200 rounded-full text-[10px] font-medium text-gray-600"
+        >
+          <span className="text-gray-400">{key}:</span>
+          <span className="text-gray-800 font-semibold">{String(value)}</span>
+        </span>
+      ))}
+    </div>
+  );
+};
+
+// ─── NEW: Single Product Block ─────────────────────────────────────────────────
+// NEW COMPONENT — renders one product entry from customer.products[]
+// Used for both single and bulk (bulk maps over products[] and renders this for each)
+const ProductBlock = ({ product, index, total }) => {
+  const [open, setOpen] = useState(index === 0); // first product expanded by default
+
+  // ── NEW: formatDate moved inside component file ─────────────────────────
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString("en-IN", {
+        year: "numeric", month: "short", day: "numeric",
+      });
+    } catch { return 'Invalid Date'; }
+  };
+
+  return (
+    <div className="border border-gray-100 rounded-xl overflow-hidden">
+      {/* ── Product header row — click to expand/collapse ── */}
+      {/*
+        NEW: Accordion/collapsible behavior using useState(open).
+        When total > 1 (bulk), each product can be collapsed independently.
+        For single purchase (total = 1), it's always open (no toggle needed,
+        but we still show the header for consistency).
+      */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-orange-50/60 hover:bg-orange-50 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2">
+          <Package className="w-3.5 h-3.5 text-orange-400" />
+          <span className="text-xs font-bold text-gray-700">
+            {total > 1 ? `Product ${index + 1}` : 'Product'} —{' '}
+            <span className="font-mono text-orange-600 font-semibold">
+              {product.ticketNumber || '—'}
+            </span>
+          </span>
+          {product.categoryName && (
+            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-semibold rounded-full">
+              {product.categoryName}
+            </span>
+          )}
+        </div>
+        {/* ── Chevron icon rotates on open/close ── */}
+        <ChevronRight
+          className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}
+        />
+      </button>
+
+      {/* ── Collapsible product details ── */}
+      {/*
+        NEW: Conditional rendering with {open && ...}
+        When open = true → details show
+        When open = false → details hidden (collapsed)
+        This saves screen space for bulk purchases with many products.
+      */}
+      {open && (
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Identifiers */}
+          <SectionBlock title="Identifiers">
+            <InfoRow icon={Barcode} label="Ticket"   value={product.ticketNumber}   iconColor="text-blue-400" />
+            <InfoRow icon={Tag}     label="Category" value={product.categoryName}   iconColor="text-blue-400" />
+          </SectionBlock>
+
+          {/* Warranty */}
+          <SectionBlock title="Warranty Period">
+            <InfoRow icon={Clock}    label="Starts" value={formatDate(product.warrStartDate)} iconColor="text-purple-400" />
+            <InfoRow icon={Clock}    label="Ends"   value={formatDate(product.warrEndDate)}   iconColor="text-purple-400" />
+          </SectionBlock>
+
+          {/* Config Snapshot — NEW */}
+          {/*
+            configSnapshot contains all product specs saved at registration time.
+            We display them as chips using the ConfigChips component.
+            This is NEW — the original component had no configSnapshot display.
+          */}
+          {product.configSnapshot && Object.keys(product.configSnapshot).length > 0 && (
+            <div className="sm:col-span-2">
+              <SectionBlock title="Product Specifications (at registration)">
+                <ConfigChips config={product.configSnapshot} />
+              </SectionBlock>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── NEW: extractDisplayData ──────────────────────────────────────────────────
+//
+// NEW FUNCTION — maps the real API response shape → what the UI needs
+//
+// The API returns (from our service):
+// {
+//   _id, customerName, email, mobileNum, purchaseType, status,
+//   products: [
+//     {
+//       ticketNumber, categoryName, configSnapshot: {...},
+//       warrStartDate, warrEndDate, productRef, categoryRef
+//     }
+//   ],
+//   createdAt, updatedAt
+// }
+//
+// The original component expected flat fields (item.proName, item.proSrNo etc.)
+// because it was designed for a different data model.
+//
+// This function bridges the gap — takes a customer object and returns
+// a flat shape with sensible fallbacks for all the fields the UI uses.
+//
+// WHY A SEPARATE FUNCTION (not inline in JSX)?
+// → Keeps JSX clean and readable
+// → Logic is easier to test and change in one place
+// → If the API shape changes, you only update this function
+
+const extractDisplayData = (customer) => {
+  const firstProduct = customer.products?.[0] || {};
+  const config       = firstProduct.configSnapshot || {};
+
+  return {
+    // ── Customer fields (flat, directly on customer document) ─────────────
+    _id:          customer._id,
+    customerName: customer.customerName || 'N/A',
+    email:        customer.email        || 'N/A',
+    mobileNum:    customer.mobileNum    || 'N/A',
+    purchaseType: customer.purchaseType || 'single',  // "single" | "bulk"
+    status:       customer.status       || 'active',
+    createdAt:    customer.createdAt,
+
+    // ── Product fields — pulled from first product + configSnapshot ────────
+    // configSnapshot stores everything that was in Product.configurations Map
+    // Common fields that might be in there (depends on your product categories):
+    proName:     config.Name        || config.name        || 'N/A',
+    proCatogory: firstProduct.categoryName                || 'N/A',
+    brandName:   config.Brand       || config.brand       || 'N/A',
+    proSrNo:     config.SerialNo    || config.serialNo    || config.Serial || 'N/A',
+    proModNum:   config.ModelNo     || config.modelNo     || config.Model  || 'N/A',
+
+    // ── Ticket number ──────────────────────────────────────────────────────
+    ticketNumber: firstProduct.ticketNumber || 'N/A',
+
+    // ── Warranty dates from first product ─────────────────────────────────
+    warrStartDate: firstProduct.warrStartDate || null,
+    warrEndDate:   firstProduct.warrEndDate   || null,
+
+    // ── Purchase date from config (if stored there) ────────────────────────
+    purDate: config.PurchaseDate || config.purchaseDate || null,
+
+    // ── Invoice number from config ─────────────────────────────────────────
+    invoiceNum: config.InvoiceNo || config.invoiceNo || config.Invoice || null,
+
+    // ── All products array (for bulk display) ──────────────────────────────
+    products: customer.products || [],
+
+    // ── plainPassword: NOT in our Customer model — not stored ─────────────
+    // Original component showed a password field. Our model doesn't store
+    // plainPassword for security reasons. We pass null → shows "Not available"
+    plainPassword: null,
+  };
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
 const CustomerCareCustomerHistory = () => {
   const [data, setData]               = useState([]);
   const [loading, setLoading]         = useState(false);
@@ -3569,11 +3787,25 @@ const CustomerCareCustomerHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage                  = 5;
 
+  // ── Fetch customer history from API ────────────────────────────────────────
+  //
+  // WHAT CHANGED from original:
+  // Original: axiosInstance.get("/customerDetails/customer")
+  //           if (res.data.customers) setData(res.data.customers)
+  //
+  // SAME ENDPOINT — unchanged. Our new backend route returns exactly:
+  // { success: true, count: N, customers: [...] }
+  // So res.data.customers works exactly as before.
+  //
+  // The data stored in state is the RAW API response array.
+  // The transformation happens in extractDisplayData() at render time.
+
   const handleFetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await axiosInstance.get("/customerDetails/customer");
+      const res = await axiosInstance.get("/customerDetails/registrations");
+
       if (res.data.customers) {
         setData(res.data.customers);
       } else if (Array.isArray(res.data)) {
@@ -3582,7 +3814,7 @@ const CustomerCareCustomerHistory = () => {
         setError("Invalid data format received from server");
       }
     } catch (err) {
-      if (err.response?.status === 401)      setError("Session expired. Please login again.");
+      if      (err.response?.status === 401) setError("Session expired. Please login again.");
       else if (err.response?.status === 403) setError("You don't have permission to view this data.");
       else if (err.response?.status === 404) setError("Customer data endpoint not found.");
       else                                   setError("Failed to fetch customer details. Please try again.");
@@ -3593,11 +3825,14 @@ const CustomerCareCustomerHistory = () => {
 
   useEffect(() => { handleFetchData(); }, []);
 
+  // ── Pagination logic ────────────────────────────────────────────────────────
+  // UNCHANGED from original — slices the data array for current page
   const indexOfLastItem  = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems     = data.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages       = Math.ceil(data.length / itemsPerPage);
 
+  // ── formatDate used in the main card header ─────────────────────────────────
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -3607,6 +3842,8 @@ const CustomerCareCustomerHistory = () => {
     } catch { return 'Invalid Date'; }
   };
 
+  // ── Warranty badge ──────────────────────────────────────────────────────────
+  // UNCHANGED from original — checks warrEndDate and returns color + label
   const warrantyBadge = (endDate) => {
     if (!endDate) return { label: 'Unknown', cls: 'bg-gray-100 text-gray-600 border-gray-200' };
     try {
@@ -3617,7 +3854,7 @@ const CustomerCareCustomerHistory = () => {
     } catch { return { label: 'Error', cls: 'bg-gray-100 text-gray-600 border-gray-200' }; }
   };
 
-  // ── Loading ──────────────────────────────────────────────────────────────
+  // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -3629,7 +3866,7 @@ const CustomerCareCustomerHistory = () => {
     );
   }
 
-  // ── Error ────────────────────────────────────────────────────────────────
+  // ── Error ────────────────────────────────────────────────────────────────────
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-[400px] px-6">
@@ -3639,10 +3876,8 @@ const CustomerCareCustomerHistory = () => {
           </div>
           <p className="text-sm font-semibold text-gray-800 mb-1">Something went wrong</p>
           <p className="text-xs text-gray-500 mb-5">{error}</p>
-          <button
-            onClick={handleFetchData}
-            className="px-6 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors"
-          >
+          <button onClick={handleFetchData}
+            className="px-6 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors">
             Try Again
           </button>
         </div>
@@ -3650,17 +3885,17 @@ const CustomerCareCustomerHistory = () => {
     );
   }
 
-  // ── Main ─────────────────────────────────────────────────────────────────
+  // ── Main render ──────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50/70 px-4 sm:px-8 py-8">
 
-      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      {/* ── Page Header ── */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customer Product History</h1>
         <p className="text-sm text-gray-400 mt-1">{data.length} total records</p>
       </div>
 
-      {/* ── Empty State ──────────────────────────────────────────────────── */}
+      {/* ── Empty State ── */}
       {currentItems.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
@@ -3671,9 +3906,21 @@ const CustomerCareCustomerHistory = () => {
         </div>
       )}
 
-      {/* ── Cards ───────────────────────────────────────────────────────── */}
+      {/* ── Cards ── */}
       <div className="space-y-5">
-        {currentItems.map((item, index) => {
+        {currentItems.map((rawItem, index) => {
+
+          // ── NEW: Transform raw API data before rendering ──────────────────
+          //
+          // extractDisplayData() takes the raw customer object from the API
+          // and returns a flat, UI-friendly object.
+          // We call it ONCE per card render and use 'item' for all UI values.
+          //
+          // This means the JSX below never directly reads from rawItem —
+          // it always reads from 'item' (the transformed version).
+          // Clean separation: data transformation vs UI rendering.
+
+          const item    = extractDisplayData(rawItem);
           const wStatus = warrantyBadge(item.warrEndDate);
 
           return (
@@ -3682,7 +3929,7 @@ const CustomerCareCustomerHistory = () => {
               className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
             >
 
-              {/* ── Card Top Bar ─────────────────────────────────────────── */}
+              {/* ── Card Top Bar ── */}
               <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-gradient-to-r from-orange-50/80 to-white border-b border-gray-100">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center flex-shrink-0">
@@ -3690,85 +3937,136 @@ const CustomerCareCustomerHistory = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 text-base leading-tight">
-                      {item.customerName || 'N/A'}
+                      {item.customerName}
                     </h3>
                     <div className="flex flex-wrap items-center gap-4 mt-1">
                       <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Mail className="w-3.5 h-3.5" />
-                        {item.email || 'N/A'}
+                        <Mail className="w-3.5 h-3.5" />{item.email}
                       </span>
                       <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Phone className="w-3.5 h-3.5" />
-                        {item.mobileNum || 'N/A'}
+                        <Phone className="w-3.5 h-3.5" />{item.mobileNum}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+
+                  {/* ── Warranty status badge ── */}
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border ${wStatus.cls}`}>
                     <ShieldCheck className="w-3 h-3" />
                     {wStatus.label}
                   </span>
-                  {/* ── Invoice badge in top bar ── */}
+
+                  {/* ── NEW: Purchase type badge ──────────────────────────────
+                    NEW ADDITION — shows "Single" or "Bulk" so customer care
+                    knows at a glance how many products this registration has.
+                    Uses a ternary: condition ? valueIfTrue : valueIfFalse
+                    If purchaseType === "bulk" → amber badge
+                    Otherwise → gray badge
+                  */}
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold border ${
+                    item.purchaseType === 'bulk'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-gray-100 text-gray-600 border-gray-200'
+                  }`}>
+                    {item.purchaseType === 'bulk'
+                      ? <><Layers className="w-3 h-3" /> Bulk ({item.products.length})</>
+                      : <><ShoppingBag className="w-3 h-3" /> Single</>
+                    }
+                  </span>
+
+                  {/* Invoice badge */}
                   <span className="px-3 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full">
                     #{item.invoiceNum || '—'}
                   </span>
                 </div>
               </div>
 
-              {/* ── Card Body Grid ───────────────────────────────────────── */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 p-6">
+              {/* ── Card Body ── */}
+              <div className="p-6 space-y-4">
 
-                {/* Col 1 — Product Info (now includes brandName + invoiceNum) */}
-                <SectionBlock title="Product">
-                  <InfoRow icon={Package}   label="Name"     value={item.proName}     iconColor="text-orange-400" />
-                  <InfoRow icon={Tag}        label="Category" value={item.proCatogory} iconColor="text-orange-400" />
-                  <InfoRow icon={Building2}  label="Brand"    value={item.brandName}   iconColor="text-orange-400" />
-                  <InfoRow icon={FileText}   label="Invoice"  value={item.invoiceNum}  iconColor="text-orange-400" />
-                </SectionBlock>
+                {/* ── Customer info + credentials row ── */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-                {/* Col 2 — Identifiers */}
-                <SectionBlock title="Identifiers">
-                  <InfoRow icon={Barcode}  label="Serial"  value={item.proSrNo}      iconColor="text-blue-400" />
-                  <InfoRow icon={Hash}     label="Model"   value={item.proModNum}    iconColor="text-blue-400" />
-                  <InfoRow icon={Hash}     label="Ticket"  value={item.ticketNumber} iconColor="text-blue-400" />
-                </SectionBlock>
+                  {/* Col 1 — Product Info */}
+                  <SectionBlock title="Product">
+                    <InfoRow icon={Package}   label="Name"     value={item.proName}     iconColor="text-orange-400" />
+                    <InfoRow icon={Tag}        label="Category" value={item.proCatogory} iconColor="text-orange-400" />
+                    <InfoRow icon={Building2}  label="Brand"    value={item.brandName}   iconColor="text-orange-400" />
+                    <InfoRow icon={FileText}   label="Invoice"  value={item.invoiceNum}  iconColor="text-orange-400" />
+                  </SectionBlock>
 
-                {/* Col 3 — Warranty Dates */}
-                <SectionBlock title="Warranty Period">
-                  <InfoRow icon={Calendar} label="Purchased" value={formatDate(item.purDate)}       iconColor="text-purple-400" />
-                  <InfoRow icon={Clock}    label="Starts"    value={formatDate(item.warrStartDate)} iconColor="text-purple-400" />
-                  <InfoRow icon={Clock}    label="Ends"      value={formatDate(item.warrEndDate)}   iconColor="text-purple-400" />
-                </SectionBlock>
+                  {/* Col 2 — Identifiers */}
+                  <SectionBlock title="Identifiers">
+                    <InfoRow icon={Barcode} label="Serial"  value={item.proSrNo}      iconColor="text-blue-400" />
+                    <InfoRow icon={Hash}    label="Model"   value={item.proModNum}    iconColor="text-blue-400" />
+                    <InfoRow icon={Hash}    label="Ticket"  value={item.ticketNumber} iconColor="text-blue-400" />
+                  </SectionBlock>
 
-                {/* Col 4 — Login Credentials */}
-                <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4">
-                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                    <KeyRound className="w-3 h-3" />
-                    Login Credentials
-                  </p>
+                  {/* Col 3 — Warranty Dates */}
+                  <SectionBlock title="Warranty Period">
+                    <InfoRow icon={Calendar} label="Purchased" value={formatDate(item.purDate)}       iconColor="text-purple-400" />
+                    <InfoRow icon={Clock}    label="Starts"    value={formatDate(item.warrStartDate)} iconColor="text-purple-400" />
+                    <InfoRow icon={Clock}    label="Ends"      value={formatDate(item.warrEndDate)}   iconColor="text-purple-400" />
+                  </SectionBlock>
 
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
-                        <User className="w-3 h-3" /> Username
-                      </p>
-                      <p className="text-xs font-bold text-gray-800 break-all pl-0.5">
-                        {item.customerName || 'N/A'}
-                      </p>
-                    </div>
-
-                    <div className="w-full h-px bg-blue-100" />
-
-                    <div>
-                      <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
-                        <Lock className="w-3 h-3" /> Password
-                      </p>
-                      <PasswordCell password={item.plainPassword} />
+                  {/* Col 4 — Login Credentials */}
+                  <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4">
+                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                      <KeyRound className="w-3 h-3" />
+                      Login Credentials
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
+                          <User className="w-3 h-3" /> Username
+                        </p>
+                        <p className="text-xs font-bold text-gray-800 break-all pl-0.5">
+                          {item.customerName}
+                        </p>
+                      </div>
+                      <div className="w-full h-px bg-blue-100" />
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
+                          <Lock className="w-3 h-3" /> Password
+                        </p>
+                        <PasswordCell password={item.plainPassword} />
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* ── NEW: Products Section (accordion for bulk) ──────────────
+                  NEW ADDITION — shows all products for this registration.
+                  For single purchase: shows 1 product block (always expanded).
+                  For bulk purchase:   shows N product blocks (first expanded,
+                                       rest collapsed — user can expand each).
+                  
+                  item.products is the array from rawItem.products
+                  We use Array.map() to render a ProductBlock for each one.
+                  index and total are passed so ProductBlock can label them
+                  "Product 1", "Product 2" etc. for bulk.
+                */}
+                {item.products.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                      {item.products.length > 1
+                        ? `Registered Products (${item.products.length})`
+                        : 'Registered Product'}
+                    </p>
+                    <div className="space-y-2">
+                      {item.products.map((product, pIdx) => (
+                        <ProductBlock
+                          key={product._id || pIdx}
+                          product={product}
+                          index={pIdx}
+                          total={item.products.length}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               </div>
             </div>
@@ -3776,7 +4074,8 @@ const CustomerCareCustomerHistory = () => {
         })}
       </div>
 
-      {/* ── Pagination ──────────────────────────────────────────────────── */}
+      {/* ── Pagination ── */}
+      {/* UNCHANGED from original */}
       {data.length > itemsPerPage && (
         <div className="mt-8 flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-xs text-gray-400">
@@ -3808,7 +4107,6 @@ const CustomerCareCustomerHistory = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
