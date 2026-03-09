@@ -117,7 +117,7 @@ import mongoose, { Schema } from "mongoose";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  MAIN SCHEMA: Customer Registration
-// ─────────────────────────────────────────────────────────────────────────────
+import {registeredProductSchema} from "./registerProduct.model.js";
 const customerDetailsSchema = new mongoose.Schema(
   {
     // ── Customer Info (entered manually in form) ───────────────────────────
