@@ -4448,13 +4448,15 @@ export default function CustomerCareRegistration() {
 
   const handleDeleteProduct = async (productId, ticketNumber, e) => {
     e.stopPropagation(); // prevent row expand/collapse from triggering
-
+    console.log("Deleting product ID:", productId);           // ← what ID is being sent?
+  console.log("Full URL:", `/customerDetails/products/${productId}`);
     if (!window.confirm(`Deactivate product "${ticketNumber}"?\nIt will be hidden from this list.`)) return;
 
     setDeletingProductId(productId);
     try {
       // DELETE /api/category/:id → sets isActive: false in DB
-      await axiosInstance.delete(`/category/${productId}`);
+      
+      await axiosInstance.delete(`/customerDetails/products/${productId}`);
 
       // Remove from local state instantly — no full re-fetch needed
       setProducts(prev => prev.filter(p => p._id !== productId));
