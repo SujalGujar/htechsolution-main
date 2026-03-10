@@ -1,13 +1,13 @@
-import Product from "../../models/productsRegisterModel/productRegister.model.js";
-export const deleteProduct = async (id) => {
-  const product = await Product.findByIdAndUpdate(
-    id,
-    { isActive: false },  
-    { new: true }
-  );
+// import Product from "../../models/productsRegisterModel/productRegister.model.js"
+import Category from "../../models/productsRegisterModel/catogory.js";
+export const deleteCategory = async (req, res) => {
+    const category = await Category.findByIdAndDelete(
+        req.params.id
+    );
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
-  return product;
-};
+    if(!category){
+        return res.status(404).json({success:false,message:"Category not found"})
+    }
+    return res.status(200).json({success:true,message:"Category deleted successfully",data:category})
+
+}
