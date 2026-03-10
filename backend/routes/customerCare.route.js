@@ -11,6 +11,8 @@ import {lookupProduct} from "../controllers/customerRegister/productLookUp.contr
 import { getAllRegistrations, getRegistrationById } from "../controllers/customerRegister/customerHistory.controller.js"
 // import { productHistroy } from "../controllers/customercare.controller.js"  
 // import { registerCustomer } from "../controllers/customerRegister/customerRegistration.controller.js";
+import { customerDeleteController } from "../controllers/customerRegister/customerDelete.controller.js";
+
 const router = express.Router()
 
 // ✅ correct routes
@@ -31,4 +33,5 @@ router.get("/registrations",verifyToken,authorizeRoles("admin","manager"), getAl
 
 // View one registration by ID      
 router.get("/registrations/:id",verifyToken,authorizeRoles("admin","manager"), getRegistrationById);
+router.delete("/registrations/:id", verifyToken, authorizeRoles("admin", "manager"), customerDeleteController);
 export default router;

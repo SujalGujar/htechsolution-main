@@ -1,360 +1,5 @@
-// // import axios from 'axios';
-// // import React, { useEffect, useState } from 'react';
 
-// // // ✅ import shadcn table components
-// // import {
-// //   Table,
-// //   TableBody,
-// //   TableCaption,
-// //   TableCell,
-// //   TableHead,
-// //   TableHeader,
-// //   TableRow,
-// // } from "../ui/table";
 
-// // // ✅ import shadcn card components
-// // import {
-// //   Card,
-// //   CardContent,
-// //   CardHeader,
-// //   CardTitle,
-// // } from "../ui/card";
-
-// // // ✅ import shadcn badge
-// // import { Badge } from "../ui/badge";
-
-// // // ✅ component name starts with uppercase
-// // const CustomerCareProductHistory = () => {
-// //   const [data, setData] = useState([]);
-// //   const [loading, setLoading] = useState(false);
-// //   const [error, setError] = useState(null);
-
-// //   // ✅ no req,res in frontend - just async()
-// //   const handleFetchData = async () => {
-// //     try {
-// //       setLoading(true); // show loading before fetch
-// //       setError(null);
-
-// //       const API = "/api/customerDetails/customer";
-// //       const res = await axios.get(API);
-
-// //       setData(res.data.customers);
-
-// //     } catch (error) {
-// //       console.error("error fetching data:", error);
-// //       setError("Failed to fetch customer details"); // show error to user
-// //     } finally {
-// //       setLoading(false); // hide loading after fetch
-// //     }
-// //   };
-
-// //   useEffect(() => {
-// //     handleFetchData();
-// //   }, []);
-
-// //   // ✅ show loading state
-// //   if (loading) {
-// //     return (
-// //       <div className="flex justify-center items-center h-40">
-// //         <p className="text-gray-500">Loading customers...</p>
-// //       </div>
-// //     );
-// //   }
-
-// //   // ✅ show error state
-// //   if (error) {
-// //     return (
-// //       <div className="flex justify-center items-center h-40">
-// //         <p className="text-red-500">{error}</p>
-// //       </div>
-// //     );
-// //   }
-
-// //   return (
-// //     <div className="p-6">
-// //       {/* Card wraps the whole table */}
-// //       <Card>
-// //         <CardHeader>
-// //           <CardTitle>Customer History</CardTitle>
-// //         </CardHeader>
-
-// //         <CardContent>
-// //           {/* Shadcn Table */}
-// //           <Table>
-// //             <TableCaption>
-// //               List of all customers — Total: {data.length}
-// //             </TableCaption>
-
-// //             {/* Table Header */}
-// //             <TableHeader>
-// //               <TableRow>
-// //                 <TableHead>#</TableHead>
-// //                 <TableHead>Name</TableHead>
-// //                 <TableHead>Email</TableHead>
-// //                 <TableHead>Phone</TableHead>
-// //                 <TableHead>Status</TableHead>
-// //                 <TableHead>Joined Date</TableHead>
-// //               </TableRow>
-// //             </TableHeader>
-
-// //             {/* Table Body */}
-// //             <TableBody>
-// //               {data.length === 0 ? (
-// //                 // show this if no customers found
-// //                 <TableRow>
-// //                   <TableCell colSpan={6} className="text-center text-gray-500">
-// //                     No customers found
-// //                   </TableCell>
-// //                 </TableRow>
-// //               ) : (
-// //                 // loop through each customer
-// //                 data.map((customer, index) => (
-// //                   <TableRow key={customer._id}>
-// //                     <TableCell>{index + 1}</TableCell>
-// //                     <TableCell>{customer.name}</TableCell>
-// //                     <TableCell>{customer.email}</TableCell>
-// //                     <TableCell>{customer.phone}</TableCell>
-// //                     <TableCell>
-// //                       {/* Badge shows status with color */}
-// //                       <Badge variant={customer.isActive ? "success" : "destructive"}>
-// //                         {customer.isActive ? "Active" : "Inactive"}
-// //                       </Badge>
-// //                     </TableCell>
-// //                     <TableCell>
-// //                       {/* Format the date nicely */}
-// //                       {new Date(customer.createdAt).toLocaleDateString("en-IN", {
-// //                         year: "numeric",
-// //                         month: "short",
-// //                         day: "numeric",
-// //                       })}
-// //                     </TableCell>
-// //                   </TableRow>
-// //                 ))
-// //               )}
-// //             </TableBody>
-// //           </Table>
-// //         </CardContent>
-// //       </Card>
-// //     </div>
-// //   );
-// // };
-
-// // export default CustomerCareProductHistory;
-
-// // CutomerCareProductHis.jsx
-// // import { useEffect, useState } from 'react';
-// // import axios from 'axios';
-// import React from 'react';
-// // ✅ CHANGED: import axiosInstance instead of axios
-// //
-// // ❌ OLD: import axios from 'axios'
-// //    Plain axios has NO interceptors
-// //    It sends requests with ZERO headers
-// //    Your backend sees no Authorization header → returns 401 immediately
-// //
-// // ✅ NEW: import axiosInstance from '../utils/axiosInstance'
-// //    axiosInstance has a REQUEST INTERCEPTOR that:
-// //    1. Reads token from localStorage.getItem("user")
-// //    2. Attaches Authorization: Bearer <token> to every request automatically
-// //    3. Handles 401/403/500 errors globally
-// // import axiosInstance from '../../Utils/axiosIntance'; // ← adjust path if needed
-// // import {
-// //   Table,
-// //   TableBody,
-// //   TableCaption,
-// //   TableCell,
-// //   TableHead,
-// //   TableHeader,
-// //   TableRow,
-// // } from "../ui/table";
-
-// // import {
-// //   Card,
-// //   CardContent,
-// //   CardHeader,
-// //   CardTitle,
-// // } from "../ui/card";
-
-// // import { Badge } from "../ui/badge";
-
-// // const CustomerCareProductHistory = () => {
-// //   const [data, setData] = useState([]);
-// //   const [loading, setLoading] = useState(false);
-// //   const [error, setError] = useState(null);
-
-// //   const handleFetchData = async () => {
-// //     try {
-// //       setLoading(true);
-// //       setError(null);
-
-// //       // ✅ CHANGED: use axiosInstance.get() instead of axios.get()
-// //       //
-// //       // ❌ OLD: const res = await axios.get("/api/customerDetails/customer")
-// //       //    → No token attached → 401 error
-// //       //
-// //       // ✅ NEW: const res = await axiosInstance.get("/customerDetails/customer")
-// //       //    → axiosInstance interceptor adds token automatically
-// //       //    → Note: baseURL in axiosInstance is already "/api"
-// //       //      so you only write the path AFTER /api here
-// //       //      "/api" + "/customerDetails/customer" = "/api/customerDetails/customer" ✅
-// //       const res = await axiosInstance.get("/customerDetails/customer");
-
-// //       setData(res.data.customers);
-
-// //     } catch (error) {
-// //       console.error("error fetching data:", error);
-
-// //       // ✅ IMPROVED: Show specific error messages instead of generic one
-// //       if (error.response?.status === 401) {
-// //         setError("Session expired. Please login again.");
-// //       } else if (error.response?.status === 403) {
-// //         setError("You don't have permission to view this data.");
-// //       } else if (error.response?.status === 404) {
-// //         setError("No customer data found.");
-// //       } else {
-// //         setError("Failed to fetch customer details. Please try again.");
-// //       }
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   };
-
-// //   useEffect(() => {
-// //     handleFetchData();
-// //   }, []);
-
-// //   // Loading state
-// //   if (loading) {
-// //     return (
-// //       <div style={{
-// //         display: 'flex',
-// //         justifyContent: 'center',
-// //         alignItems: 'center',
-// //         height: '200px',
-// //         background: 'transparent'
-// //       }}>
-// //         <div style={{ textAlign: 'center' }}>
-// //           <div style={{
-// //             width: '36px',
-// //             height: '36px',
-// //             border: '3px solid rgba(255,112,64,0.2)',
-// //             borderTop: '3px solid #ff7040',
-// //             borderRadius: '50%',
-// //             animation: 'spin 0.8s linear infinite',
-// //             margin: '0 auto 12px'
-// //           }} />
-// //           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-// //           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', fontFamily: 'Figtree, sans-serif' }}>
-// //             Loading customers...
-// //           </p>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-// //   // Error state
-// //   if (error) {
-// //     return (
-// //       <div style={{
-// //         display: 'flex',
-// //         justifyContent: 'center',
-// //         alignItems: 'center',
-// //         height: '200px'
-// //       }}>
-// //         <div style={{
-// //           background: 'rgba(255,60,60,0.08)',
-// //           border: '1px solid rgba(255,60,60,0.2)',
-// //           borderRadius: '12px',
-// //           padding: '20px 28px',
-// //           textAlign: 'center'
-// //         }}>
-// //           <p style={{ color: '#ff6060', fontSize: '14px', fontFamily: 'Figtree, sans-serif' }}>
-// //             ⚠ {error}
-// //           </p>
-// //           <button
-// //             onClick={handleFetchData}
-// //             style={{
-// //               marginTop: '12px',
-// //               padding: '8px 18px',
-// //               borderRadius: '8px',
-// //               border: 'none',
-// //               background: 'rgba(255,112,64,0.15)',
-// //               color: '#ff7040',
-// //               fontSize: '13px',
-// //               fontWeight: '600',
-// //               cursor: 'pointer',
-// //               fontFamily: 'Figtree, sans-serif'
-// //             }}
-// //           >
-// //             Retry
-// //           </button>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-// //   return (
-// //     <div className="p-6">
-// //       <Card>
-// //         <CardHeader>
-// //           <CardTitle>Customer History</CardTitle>
-// //         </CardHeader>
-
-// //         <CardContent>
-// //           <Table>
-// //             <TableCaption>
-// //               List of all customers — Total: {data.length}
-// //             </TableCaption>
-
-// //             <TableHeader>
-// //               <TableRow>
-// //                 <TableHead>#</TableHead>
-// //                 <TableHead>Name</TableHead>
-// //                 <TableHead>Email</TableHead>
-// //                 <TableHead>Phone</TableHead>
-// //                 <TableHead>Status</TableHead>
-// //                 <TableHead>Joined Date</TableHead>
-// //               </TableRow>
-// //             </TableHeader>
-
-// //             <TableBody>
-// //               {data.length === 0 ? (
-// //                 <TableRow>
-// //                   <TableCell colSpan={6} className="text-center text-gray-500">
-// //                     No customers found
-// //                   </TableCell>
-// //                 </TableRow>
-// //               ) : (
-// //                 data.map((customer, index) => (
-// //                   <TableRow key={customer._id}>
-// //                     <TableCell>{index + 1}</TableCell>
-// //                     <TableCell>{customer.name}</TableCell>
-// //                     <TableCell>{customer.email}</TableCell>
-// //                     <TableCell>{customer.phone}</TableCell>
-// //                     <TableCell>
-// //                       <Badge variant={customer.isActive ? "success" : "destructive"}>
-// //                         {customer.isActive ? "Active" : "Inactive"}
-// //                       </Badge>
-// //                     </TableCell>
-// //                     <TableCell>
-// //                       {new Date(customer.createdAt).toLocaleDateString("en-IN", {
-// //                         year: "numeric",
-// //                         month: "short",
-// //                         day: "numeric",
-// //                       })}
-// //                     </TableCell>
-// //                   </TableRow>
-// //                 ))
-// //               )}
-// //             </TableBody>
-// //           </Table>
-// //         </CardContent>
-// //       </Card>
-// //     </div>
-// //   );
-// // };
-
-// // export default CustomerCareProductHistory;
 
 
 // import { useState, useEffect } from "react";
@@ -3498,7 +3143,7 @@ import {
   Calendar, Phone, Mail, User, Package, Clock, AlertCircle,
   ChevronLeft, ChevronRight, ChevronDown,
   Eye, EyeOff, Copy, Check, ShieldCheck,
-  ShoppingBag, Layers,
+  ShoppingBag, Layers, Trash2,
 } from 'lucide-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -3695,7 +3340,47 @@ const CustomerCareCustomerHistory = () => {
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingId,  setDeletingId]  = useState(null); // tracks which card is being deleted
   const itemsPerPage = 5;
+
+  // ── handleDelete ────────────────────────────────────────────────────────────
+  //
+  // WHAT IT DOES:
+  // 1. Shows a confirm dialog — prevents accidental deletes
+  // 2. Sets deletingId = customer._id → makes that card's button show a spinner
+  // 3. Calls DELETE /customerDetails/registrations/:id
+  // 4. On success → removes that customer from local state immediately
+  //    (no need to re-fetch the whole list — just filter it out)
+  // 5. On error → shows alert with the error message
+  // 6. Always clears deletingId when done (spinner goes away)
+  //
+  // WHY remove from state instead of re-fetching?
+  // Re-fetching makes the whole list reload (loading spinner, flicker).
+  // Removing from state is instant and feels smoother.
+  // setData(prev => prev.filter(c => c._id !== id))
+  //   prev = current data array
+  //   .filter() returns new array keeping everything EXCEPT the deleted id
+
+  const handleDelete = async (id, customerName) => {
+    if (!window.confirm(`Deactivate "${customerName}"? This will hide them from the list.`)) return;
+
+    setDeletingId(id); // show spinner on this specific card
+    try {
+      await axiosInstance.delete(`/customerDetails/registrations/${id}`);
+
+      // Remove from local state instantly — no full re-fetch needed
+      setData(prev => prev.filter(c => c._id !== id));
+
+      // Reset to page 1 if current page becomes empty after deletion
+      setCurrentPage(1);
+
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to deactivate customer";
+      alert(msg);
+    } finally {
+      setDeletingId(null); // always clear spinner
+    }
+  };
 
   const handleFetchData = async () => {
     try {
@@ -3823,6 +3508,25 @@ const CustomerCareCustomerHistory = () => {
                     style={{ background: 'rgba(255,255,255,0.12)', color: '#b2dce8', borderColor: 'rgba(255,255,255,0.2)' }}>
                     <Calendar className="w-3 h-3" />{fmt(item.createdAt)}
                   </span>
+
+                  {/* ── Delete button ─────────────────────────────────────────
+                    Calls handleDelete(id, name) on click.
+                    While this specific card is being deleted (deletingId === item._id),
+                    shows a spinning circle instead of the trash icon.
+                    e.stopPropagation() prevents any parent onClick from firing.
+                  */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(item._id, item.customerName); }}
+                    disabled={deletingId === item._id}
+                    className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: 'rgba(239,68,68,0.18)', border: '1px solid rgba(239,68,68,0.35)' }}
+                    title="Deactivate customer"
+                  >
+                    {deletingId === item._id
+                      ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      : <Trash2 className="w-3.5 h-3.5 text-red-300" />
+                    }
+                  </button>
                 </div>
               </div>
 

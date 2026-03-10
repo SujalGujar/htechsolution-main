@@ -1,13 +1,13 @@
-import Category from "../../models/productsRegisterModel/catogory.js";
-export const deleteCategory = async (id) => {
-  const category = await Category.findByIdAndUpdate(
+import Product from "../../models/productsRegisterModel/productRegister.model.js";
+export const deleteProduct = async (id) => {
+  const product = await Product.findByIdAndUpdate(
     id,
     { isActive: false },  
     { new: true }
   );
 
-  if (!category) {
-    throw new Error("Category not found");
+  if (!product) {
+    throw new Error("Product not found");
   }
-  return category;
+  return product;
 };
