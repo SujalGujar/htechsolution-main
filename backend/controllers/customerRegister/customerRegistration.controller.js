@@ -467,93 +467,173 @@
 // };
 
 import { registerCustomerService } from "../../services/customerRegister/registerCustomer.service.js";
+// // ─────────────────────────────────────────────────────────────────────────────
+// //  FILE: controllers/customerRegistrationController.js
+// //
+// //  PURPOSE:
+// //  Handles ONLY the POST /register endpoint.
+// //  Validates request body → calls service → returns saved registration.
+// //
+// //  ROUTE:   POST /api/customer/register
+// //  SERVICE: customerRegistrationService.js
+// //
+// //  Request body shape:
+// //
+// //  SINGLE purchase:
+// //  {
+// //    "customerName":  "Rahul Shah",
+// //    "email":         "rahul@example.com",
+// //    "mobileNum":     "9876543210",
+// //    "purchaseType":  "single",
+// //    "products": [
+// //      {
+// //        "ticketNumber":  "PRD-20250101-12345",
+// //        "warrStartDate": "2025-01-01",
+// //        "warrEndDate":   "2027-01-01"
+// //      }
+// //    ]
+// //  }
+// //
+// //  BULK purchase: (same shape, more items in products array)
+// //  {
+// //    "customerName":  "Rahul Shah",
+// //    "email":         "rahul@example.com",
+// //    "mobileNum":     "9876543210",
+// //    "purchaseType":  "bulk",
+// //    "products": [
+// //      { "ticketNumber": "PRD-20250101-11111", "warrStartDate": "...", "warrEndDate": "..." },
+// //      { "ticketNumber": "PRD-20250101-22222", "warrStartDate": "...", "warrEndDate": "..." },
+// //      { "ticketNumber": "PRD-20250101-33333", "warrStartDate": "...", "warrEndDate": "..." }
+// //    ]
+// //  }
+// // ─────────────────────────────────────────────────────────────────────────────
+
+// // ── Validate required fields in request body ──────────────────────────────────
+// const validateBody = ({ customerName, email, mobileNum, purchaseType, products }) => {
+//   const missing = [];
+
+//   if (!customerName?.trim())                              missing.push("customerName");
+//   if (!email?.trim())                                     missing.push("email");
+//   if (!mobileNum)                                         missing.push("mobileNum");
+//   if (!purchaseType)                                      missing.push("purchaseType");
+//   if (!Array.isArray(products) || products.length === 0) missing.push("products");
+
+//   if (missing.length > 0) {
+//     throw new Error(`Missing required fields: ${missing.join(", ")}`);
+//   }
+
+//   if (!["single", "bulk"].includes(purchaseType)) {
+//     throw new Error("purchaseType must be either 'single' or 'bulk'");
+//   }
+// };
+
+// // ── Controller ────────────────────────────────────────────────────────────────
+// export const registerCustomer = async (req, res) => {
+//   try {
+//     // Validate body first (throws if invalid)
+//     validateBody(req.body);
+
+//     const { customerName, email, mobileNum, purchaseType, products } = req.body;
+
+//     const registration = await registerCustomerService({
+//       customerName,
+//       email,
+//       mobileNum,
+//       purchaseType,
+//       products,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: `Customer registered successfully — ${purchaseType} purchase with ${products.length} product(s)`,
+//       data: registration,
+//     });
+
+//   } catch (err) {
+//     const is400 = [
+//       "missing", "must have", "must be", "duplicate",
+//       "at least", "exactly", "required",
+//     ].some(keyword => err.message.toLowerCase().includes(keyword));
+
+//     return res.status(is400 ? 400 : 500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// };
+
+// import { registerProductBatch } from "../../services/catogoryServices/registerProductBatch.service.js";
+
 // ─────────────────────────────────────────────────────────────────────────────
-//  FILE: controllers/customerRegistrationController.js
+//  FILE: controllers/catogoryControllers/registerProductBatch.js
 //
 //  PURPOSE:
-//  Handles ONLY the POST /register endpoint.
-//  Validates request body → calls service → returns saved registration.
+//  Reads req.body → validates → calls service → sends response
 //
-//  ROUTE:   POST /api/customer/register
-//  SERVICE: customerRegistrationService.js
+//  ROUTE:  POST /api/category/register
+//  BODY:   { category: "64abc...", units: [...], quantity: 3 }
 //
-//  Request body shape:
+//  WHAT CHANGED:
+//  OLD → req.body had { category, configurations, quantity }
+//        controller passed same configurations to service for all units
 //
-//  SINGLE purchase:
-//  {
-//    "customerName":  "Rahul Shah",
-//    "email":         "rahul@example.com",
-//    "mobileNum":     "9876543210",
-//    "purchaseType":  "single",
-//    "products": [
-//      {
-//        "ticketNumber":  "PRD-20250101-12345",
-//        "warrStartDate": "2025-01-01",
-//        "warrEndDate":   "2027-01-01"
-//      }
-//    ]
-//  }
-//
-//  BULK purchase: (same shape, more items in products array)
-//  {
-//    "customerName":  "Rahul Shah",
-//    "email":         "rahul@example.com",
-//    "mobileNum":     "9876543210",
-//    "purchaseType":  "bulk",
-//    "products": [
-//      { "ticketNumber": "PRD-20250101-11111", "warrStartDate": "...", "warrEndDate": "..." },
-//      { "ticketNumber": "PRD-20250101-22222", "warrStartDate": "...", "warrEndDate": "..." },
-//      { "ticketNumber": "PRD-20250101-33333", "warrStartDate": "...", "warrEndDate": "..." }
-//    ]
-//  }
+//  NEW → req.body has { category, units: [...] }
+//        each unit in the array has its own configurations object
+//        controller passes units array directly to service
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Validate required fields in request body ──────────────────────────────────
-const validateBody = ({ customerName, email, mobileNum, purchaseType, products }) => {
-  const missing = [];
-
-  if (!customerName?.trim())                              missing.push("customerName");
-  if (!email?.trim())                                     missing.push("email");
-  if (!mobileNum)                                         missing.push("mobileNum");
-  if (!purchaseType)                                      missing.push("purchaseType");
-  if (!Array.isArray(products) || products.length === 0) missing.push("products");
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required fields: ${missing.join(", ")}`);
-  }
-
-  if (!["single", "bulk"].includes(purchaseType)) {
-    throw new Error("purchaseType must be either 'single' or 'bulk'");
-  }
-};
-
-// ── Controller ────────────────────────────────────────────────────────────────
 export const registerCustomer = async (req, res) => {
   try {
-    // Validate body first (throws if invalid)
-    validateBody(req.body);
+    const { category, units, quantity } = req.body;
 
-    const { customerName, email, mobileNum, purchaseType, products } = req.body;
+    // ── Validate required fields ────────────────────────────────────────────
+    //
+    // Controller is responsible for reading req.body and validating it.
+    // If validation fails → return 400 (bad request) immediately.
+    // Never let invalid data reach the service.
+    //
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: "Category is required",
+      });
+    }
 
-    const registration = await registerCustomerService({
-      customerName,
-      email,
-      mobileNum,
-      purchaseType,
-      products,
-    });
+    if (!units || !Array.isArray(units) || units.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Units array is required — each unit must have its own configurations",
+      });
+    }
 
+    // ── Call service with plain data (not req/res) ──────────────────────────
+    //
+    // SERVICE RULE: service receives only plain data, never req or res.
+    // Controller extracts from req, passes plain values to service.
+    // Service does DB work, returns plain data or throws Error.
+    // Controller takes that data and writes res.
+    //
+    const products = await registerCustomerService({ category, units });
+
+    // ── Send success response ───────────────────────────────────────────────
     return res.status(201).json({
       success: true,
-      message: `Customer registered successfully — ${purchaseType} purchase with ${products.length} product(s)`,
-      data: registration,
+      message: `${products.length} product${products.length > 1 ? "s" : ""} registered successfully`,
+      data: products,
+      // Return ticket numbers so frontend can show them immediately
+      ticketNumbers: products.map(p => p.ticketNumber),
     });
 
   } catch (err) {
-    const is400 = [
-      "missing", "must have", "must be", "duplicate",
-      "at least", "exactly", "required",
-    ].some(keyword => err.message.toLowerCase().includes(keyword));
+    // ── Error handling ──────────────────────────────────────────────────────
+    //
+    // Check if error is a "user error" (400) or a "server error" (500)
+    // 400 = bad input — the request itself was wrong
+    // 500 = something broke on our side
+    //
+    const is400 = ["required", "must", "invalid", "missing"].some(
+      keyword => err.message.toLowerCase().includes(keyword)
+    );
 
     return res.status(is400 ? 400 : 500).json({
       success: false,
