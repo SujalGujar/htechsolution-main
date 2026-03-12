@@ -10,6 +10,6 @@ import productRegister from "../../models/productsRegisterModel/productRegister.
 
 export const getAllProducts = async () => {
   return await productRegister.find({ isActive: true })  // ← add this filter
-    .populate("category")
+    // .populate("category")
     .sort({ createdAt: -1 });
 };
