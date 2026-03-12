@@ -582,62 +582,34 @@ import { registerCustomerService } from "../../services/customerRegister/registe
 //        controller passes units array directly to service
 // ─────────────────────────────────────────────────────────────────────────────
 
+// controllers/catogoryControllers/registerProductBatch.js
+
+// import { registerCustomerService } from "../../services/catogoryServices/registerProductBatch.service.js";
+
 export const registerCustomer = async (req, res) => {
   try {
     const { category, units, quantity } = req.body;
 
-    // ── Validate required fields ────────────────────────────────────────────
-    //
-    // Controller is responsible for reading req.body and validating it.
-    // If validation fails → return 400 (bad request) immediately.
-    // Never let invalid data reach the service.
-    //
     if (!category) {
-      return res.status(400).json({
-        success: false,
-        message: "Category is required",
-      });
+      return res.status(400).json({ success: false, message: "Category is required" });
     }
-
     if (!units || !Array.isArray(units) || units.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Units array is required — each unit must have its own configurations",
-      });
+      return res.status(400).json({ success: false, message: "Units array is required" });
     }
 
-    // ── Call service with plain data (not req/res) ──────────────────────────
-    //
-    // SERVICE RULE: service receives only plain data, never req or res.
-    // Controller extracts from req, passes plain values to service.
-    // Service does DB work, returns plain data or throws Error.
-    // Controller takes that data and writes res.
-    //
     const products = await registerCustomerService({ category, units });
 
-    // ── Send success response ───────────────────────────────────────────────
     return res.status(201).json({
       success: true,
       message: `${products.length} product${products.length > 1 ? "s" : ""} registered successfully`,
       data: products,
-      // Return ticket numbers so frontend can show them immediately
       ticketNumbers: products.map(p => p.ticketNumber),
     });
 
   } catch (err) {
-    // ── Error handling ──────────────────────────────────────────────────────
-    //
-    // Check if error is a "user error" (400) or a "server error" (500)
-    // 400 = bad input — the request itself was wrong
-    // 500 = something broke on our side
-    //
     const is400 = ["required", "must", "invalid", "missing"].some(
       keyword => err.message.toLowerCase().includes(keyword)
     );
-
-    return res.status(is400 ? 400 : 500).json({
-      success: false,
-      message: err.message,
-    });
+    return res.status(is400 ? 400 : 500).json({ success: false, message: err.message });
   }
 };
