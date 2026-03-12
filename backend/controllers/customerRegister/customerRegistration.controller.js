@@ -587,6 +587,7 @@ import { registerCustomerService } from "../../services/customerRegister/registe
 // import { registerCustomerService } from "../../services/catogoryServices/registerProductBatch.service.js";
 
 export const registerCustomer = async (req, res) => {
+   console.log("BODY:", JSON.stringify(req.body));
   try {
     const { category, units, quantity } = req.body;
 
