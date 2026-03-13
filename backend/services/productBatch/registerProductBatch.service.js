@@ -157,13 +157,61 @@ import Product from "../../models/productsRegisterModel/productRegister.model.js
 import CategoryConfig from "../../models/productsRegisterModel/catogoryConfig.js";
 import mongoose from "mongoose";
 
+// export const registerProductsBatch = async (data) => {
+//   try {
+//     // productName and companyName intentionally NOT destructured
+//     const { category, configurations = {}, quantity } = data;
+
+//     if (!category) throw new Error("Category is required");
+//     if (!quantity || quantity <= 0) throw new Error("Quantity must be greater than 0");
+
+//     const categoryConfig = await CategoryConfig.findOne({
+//       category: new mongoose.Types.ObjectId(category),
+//     });
+
+//     if (!categoryConfig) throw new Error("Category configuration not found");
+
+//     // Validate required fields from config
+//     categoryConfig.fields.forEach((field) => {
+//       if (field.isRequired && !configurations[field.fieldKey]) {
+//         throw new Error(`${field.fieldName} is required`);
+//       }
+//     });
+
+//     const createdProducts = [];
+
+//     for (let i = 0; i < quantity; i++) {
+//       const configMap = new Map(Object.entries(configurations));
+
+//       const product = new Product({
+//         category,
+//         configurations: configMap,
+//         // NO productName, NO companyName
+//       });
+
+//       await product.save(); // triggers pre-save ticketNumber generation
+
+//       createdProducts.push(product);
+//     }
+
+//     return createdProducts;
+
+//   } catch (err) {
+//     console.error("💥 SERVICE ERROR:", err.stack);
+//     throw err;
+//   }
+// };
+// import mongoose from 'mongoose'
+// // import P
+// import CategoryConfig from '../../models/productsRegisterModel/catogoryConfig.js'
 export const registerProductsBatch = async (data) => {
   try {
-    // productName and companyName intentionally NOT destructured
-    const { category, configurations = {}, quantity } = data;
+    const { category, units, quantity } = data;
 
     if (!category) throw new Error("Category is required");
-    if (!quantity || quantity <= 0) throw new Error("Quantity must be greater than 0");
+    if (!units || !Array.isArray(units) || units.length === 0) {
+      throw new Error("Units array is required");
+    }
 
     const categoryConfig = await CategoryConfig.findOne({
       category: new mongoose.Types.ObjectId(category),
@@ -171,26 +219,27 @@ export const registerProductsBatch = async (data) => {
 
     if (!categoryConfig) throw new Error("Category configuration not found");
 
-    // Validate required fields from config
-    categoryConfig.fields.forEach((field) => {
-      if (field.isRequired && !configurations[field.fieldKey]) {
-        throw new Error(`${field.fieldName} is required`);
-      }
-    });
-
     const createdProducts = [];
 
-    for (let i = 0; i < quantity; i++) {
+    for (const unit of units) {
+      const configurations = unit.configurations || {};
+
+      // ✅ Validate required fields per unit
+      categoryConfig.fields.forEach((field) => {
+        if (field.isRequired && !configurations[field.fieldKey]) {
+          throw new Error(`${field.fieldName} is required`);
+        }
+      });
+
       const configMap = new Map(Object.entries(configurations));
 
       const product = new Product({
         category,
         configurations: configMap,
-        // NO productName, NO companyName
+        isActive: true,
       });
 
-      await product.save(); // triggers pre-save ticketNumber generation
-
+      await product.save();
       createdProducts.push(product);
     }
 

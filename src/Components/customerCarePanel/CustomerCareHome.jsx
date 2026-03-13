@@ -3498,7 +3498,7 @@ export default function CustomerCareHome() {
  const handleRegisterSubmit = async () => {
   const fields = configs[registerCategory?._id]?.fields || [];
 
-  // ── STEP 1: Validate FIRST before building anything ──────────────────────
+  // ── STEP 1: Validate shared fields first ─────────────────────────────────
   const requiredShared = fields.filter(f => f.isRequired && !isUniqueField(f.fieldKey));
   for (const f of requiredShared) {
     if (!sharedForm[f.fieldKey]?.toString().trim()) {
@@ -3507,10 +3507,10 @@ export default function CustomerCareHome() {
     }
   }
 
+  // ── STEP 2: Validate unique fields per unit ───────────────────────────────
   const requiredUnique = fields.filter(f => f.isRequired && isUniqueField(f.fieldKey));
   for (let i = 0; i < unitRows.length; i++) {
     for (const f of requiredUnique) {
-      // Check both the original fieldKey AND lowercase version
       const val = unitRows[i][f.fieldKey] || unitRows[i][f.fieldKey.toLowerCase()];
       if (!val?.toString().trim()) {
         addToast(`Unit ${i + 1}: "${f.fieldName}" is required`, "error");
@@ -3519,22 +3519,19 @@ export default function CustomerCareHome() {
     }
   }
 
-  // ── STEP 2: Build units array AFTER validation passes ────────────────────
+  // ── STEP 3: Build units array ─────────────────────────────────────────────
   const units = unitRows.map(unit => {
     const configurations = { ...sharedForm };
-
     fields
       .filter(f => isUniqueField(f.fieldKey))
       .forEach(f => {
         const val = unit[f.fieldKey] || unit[f.fieldKey.toLowerCase()] || "";
-        // Preserve the exact fieldKey casing from your config (e.g. SERIALNUMBER)
         configurations[f.fieldKey] = val;
       });
-
     return { configurations };
   });
 
-  // ── STEP 3: Send to backend ───────────────────────────────────────────────
+  // ── STEP 4: Send to backend ───────────────────────────────────────────────
   try {
     await axiosInstance.post("/category/register", {
       category: registerCategory._id,
@@ -4021,12 +4018,44 @@ export default function CustomerCareHome() {
           </div>
 
           {/* Quantity */}
-          <Input
-            label="Quantity"
-            type="number" min="1"
-            value={quantity}
-            onChange={e => handleQuantityChange(e.target.value)}
-          />
+          {/* Quantity */}
+<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+  <label style={{ fontSize: 11, fontWeight: 600, color: C.textSecondary,
+    letterSpacing: "0.05em", textTransform: "uppercase",
+    fontFamily: "'DM Sans', sans-serif" }}>
+    Quantity
+  </label>
+  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <button
+      onClick={() => handleQuantityChange(quantity - 1)}
+      style={{ width: 32, height: 32, borderRadius: 8,
+        border: `1.5px solid ${C.border}`, background: C.inputBg,
+        color: C.textPrimary, fontSize: 18, cursor: "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontWeight: 700 }}>
+      −
+    </button>
+    <input
+      type="number" min="1"
+      value={quantity}
+      onChange={e => handleQuantityChange(e.target.value)}
+      style={{ width: 70, textAlign: "center", background: C.inputBg,
+        border: `1.5px solid ${C.border}`, borderRadius: 8,
+        padding: "8px", fontSize: 15, fontWeight: 700,
+        color: C.textPrimary, outline: "none",
+        fontFamily: "'DM Sans', sans-serif" }}
+    />
+    <button
+      onClick={() => handleQuantityChange(quantity + 1)}
+      style={{ width: 32, height: 32, borderRadius: 8,
+        border: `1.5px solid ${C.border}`, background: C.inputBg,
+        color: C.textPrimary, fontSize: 18, cursor: "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontWeight: 700 }}>
+      +
+    </button>
+  </div>
+</div>
 
           {/* ── SHARED FIELDS SECTION ────────────────────────────────────────
             These fields are the same for ALL units.

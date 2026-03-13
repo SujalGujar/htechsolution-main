@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import sectionRoutes from "./routes/section.routes.js";
-import deliverableRoutes from "./routes/deliverable.routes.js";
+import deliverableRoutes from "./routes/uploadedcontent/heroSection.route.js";
 import authRoutes from "./routes/auth.routes.js";  // or authRoutes.js
 import userRoutes from "./routes/user.routes.js";
 
@@ -12,6 +12,9 @@ import categoryRoutes from "./routes/productCatogory.route.js";
 import categoryConfigRoutes from "./routes/productConfig.route.js";
 // import customerDetailRoutes from "./routes/customerDetails.routes.js"
 import customerDetailRoutes from "./routes/customerCare.route.js"
+
+import heroSectionRoutes from "./routes/uploadedcontent/heroSection.route.js"
+import hardwareSolutionRoutes from "./routes/uploadedcontent/hardwareSolution.route.js";
 // import customerRoutes from "./routes/customer.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,13 +32,18 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ ROUTES SECOND - AFTER MIDDLEWARE!
 app.use("/sections", sectionRoutes);
-app.use("/project-deliverables", deliverableRoutes);
+app.use("/hero-section", heroSectionRoutes);  
+app.use("/hardware-solutions", hardwareSolutionRoutes);
+
+
+// app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users",userRoutes);
 app.use("/api/customerDetails",customerDetailRoutes);
 // app.use("/api/customer",customerRoutes)
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", categoryConfigRoutes);
+
   // Dynamic import for productConfig.route.js
 // app.use("/api/customerDetails",customerDetailRoutes)
 // app.use("/api/product", await import("./routes/productConfig.route.js").then(m => m.default))
