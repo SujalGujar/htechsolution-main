@@ -140,6 +140,28 @@ import Product from "../../models/productsRegisterModel/productRegister.model.js
 
 // import Product from "../../models/productsRegisterModel/productRegister.model.js";
 
+// export const registerCustomerService = async ({ category, units }) => {
+//   if (!category) throw new Error("Category is required");
+//   if (!units || !Array.isArray(units) || units.length === 0) {
+//     throw new Error("Units array is required and must not be empty");
+//   }
+
+//   const savedProducts = [];
+
+//   for (const unit of units) {
+//     const product = new Product({
+//       category,
+//       configurations: unit.configurations || {},
+//       isActive: true,
+//     });
+
+//     const saved = await product.save();
+//     savedProducts.push(saved);
+//   }
+
+//   return savedProducts;
+// };
+
 export const registerCustomerService = async ({ category, units }) => {
   if (!category) throw new Error("Category is required");
   if (!units || !Array.isArray(units) || units.length === 0) {
@@ -149,11 +171,18 @@ export const registerCustomerService = async ({ category, units }) => {
   const savedProducts = [];
 
   for (const unit of units) {
+    // ── LOG EXACTLY WHAT EACH UNIT LOOKS LIKE BEFORE SAVING ──
+    console.log("UNIT RECEIVED:", JSON.stringify(unit, null, 2));
+    console.log("CONFIGURATIONS:", JSON.stringify(unit.configurations, null, 2));
+
     const product = new Product({
       category,
       configurations: unit.configurations || {},
       isActive: true,
     });
+
+    // ── LOG THE PRODUCT OBJECT BEFORE SAVE ──
+    console.log("PRODUCT TO SAVE:", JSON.stringify(product.toObject(), null, 2));
 
     const saved = await product.save();
     savedProducts.push(saved);

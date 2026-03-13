@@ -586,8 +586,39 @@ import { registerCustomerService } from "../../services/customerRegister/registe
 
 // import { registerCustomerService } from "../../services/catogoryServices/registerProductBatch.service.js";
 
+// export const registerCustomer = async (req, res) => {
+//    console.log("BODY:", JSON.stringify(req.body));
+//   try {
+//     const { category, units, quantity } = req.body;
+
+//     if (!category) {
+//       return res.status(400).json({ success: false, message: "Category is required" });
+//     }
+//     if (!units || !Array.isArray(units) || units.length === 0) {
+//       return res.status(400).json({ success: false, message: "Units array is required" });
+//     }
+
+//     const products = await registerCustomerService({ category, units });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: `${products.length} product${products.length > 1 ? "s" : ""} registered successfully`,
+//       data: products,
+//       ticketNumbers: products.map(p => p.ticketNumber),
+//       // SERIALNUMBER: { type: String, required: false }
+//     });
+
+//   } catch (err) {
+//     const is400 = ["required", "must", "invalid", "missing"].some(
+//       keyword => err.message.toLowerCase().includes(keyword)
+//     );
+//     return res.status(is400 ? 400 : 500).json({ success: false, message: err.message });
+//   }
+// };
+
 export const registerCustomer = async (req, res) => {
-   console.log("BODY:", JSON.stringify(req.body));
+  console.log("BODY:", JSON.stringify(req.body, null, 2));
+  
   try {
     const { category, units, quantity } = req.body;
 
@@ -608,9 +639,19 @@ export const registerCustomer = async (req, res) => {
     });
 
   } catch (err) {
+    // ── PRINT THE FULL ERROR SO YOU CAN SEE EXACTLY WHAT'S FAILING ──
+    console.error("FULL ERROR:", err);          // ← ADD THIS
+    console.error("ERROR NAME:", err.name);     // ← ADD THIS  
+    console.error("ERROR MSG:", err.message);   // ← ADD THIS
+
     const is400 = ["required", "must", "invalid", "missing"].some(
       keyword => err.message.toLowerCase().includes(keyword)
     );
-    return res.status(is400 ? 400 : 500).json({ success: false, message: err.message });
+    return res.status(is400 ? 400 : 500).json({ 
+      success: false, 
+      message: err.message,
+      // ── TEMPORARILY show full error details for debugging ──
+      debug: err.errors || err.stack  // ← ADD THIS (remove after fix)
+    });
   }
 };

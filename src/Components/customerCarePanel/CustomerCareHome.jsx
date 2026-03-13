@@ -3295,9 +3295,10 @@ const CategoryAvatar = ({ name }) => {
 // All other fields (RAM, color, company etc.) are shared across all units
 // ─────────────────────────────────────────────────────────────────────────────
 const UNIQUE_KEYS = [
-  "serialnumber", "serial_number", "serial_numebr", // keep typo — matches your DB
-  "modelnumber",  "model_number",
-  "invoicenumber", "invoice_number",
+  "serialnumber", "serial_number", "serial_numebr",
+  "SERIALNUMBER", "SERIAL_NUMBER",   // ← add uppercase versions
+  "modelnumber",  "model_number",    "MODELNUMBER",
+  "invoicenumber", "invoice_number", "INVOICENUMBER",
 ];
 
 // Returns true if this field must be unique per unit
@@ -3494,59 +3495,62 @@ export default function CustomerCareHome() {
   // 4. Send to backend: { category, units }
   // 5. Backend creates one Product document per unit with unique configs
   //
-  const handleRegisterSubmit = async () => {
-    const fields = configs[registerCategory?._id]?.fields || [];
+ const handleRegisterSubmit = async () => {
+  const fields = configs[registerCategory?._id]?.fields || [];
 
-    // Build units array — each unit gets its own configurations object
-    const units = unitRows.map(unit => {
-      // Start with shared fields (same for all units)
-      const configurations = { ...sharedForm };
+  // ── STEP 1: Validate FIRST before building anything ──────────────────────
+  const requiredShared = fields.filter(f => f.isRequired && !isUniqueField(f.fieldKey));
+  for (const f of requiredShared) {
+    if (!sharedForm[f.fieldKey]?.toString().trim()) {
+      addToast(`"${f.fieldName}" is required`, "error");
+      return;
+    }
+  }
 
-      // Add this unit's unique fields on top
-      fields
-        .filter(f => isUniqueField(f.fieldKey))
-        .forEach(f => {
-          configurations[f.fieldKey] = unit[f.fieldKey] || "";
-        });
-
-      return { configurations };
-    });
-
-    // Validate: check required fields are filled
-    const requiredShared = fields.filter(f => f.isRequired && !isUniqueField(f.fieldKey));
-    for (const f of requiredShared) {
-      if (!sharedForm[f.fieldKey]) {
-        addToast(`"${f.fieldName}" is required`, "error");
+  const requiredUnique = fields.filter(f => f.isRequired && isUniqueField(f.fieldKey));
+  for (let i = 0; i < unitRows.length; i++) {
+    for (const f of requiredUnique) {
+      // Check both the original fieldKey AND lowercase version
+      const val = unitRows[i][f.fieldKey] || unitRows[i][f.fieldKey.toLowerCase()];
+      if (!val?.toString().trim()) {
+        addToast(`Unit ${i + 1}: "${f.fieldName}" is required`, "error");
         return;
       }
     }
+  }
 
-    const requiredUnique = fields.filter(f => f.isRequired && isUniqueField(f.fieldKey));
-    for (let i = 0; i < unitRows.length; i++) {
-      for (const f of requiredUnique) {
-        if (!unitRows[i][f.fieldKey]) {
-          addToast(`Unit ${i + 1}: "${f.fieldName}" is required`, "error");
-          return;
-        }
-      }
-    }
+  // ── STEP 2: Build units array AFTER validation passes ────────────────────
+  const units = unitRows.map(unit => {
+    const configurations = { ...sharedForm };
 
-    try {
-      await axiosInstance.post("/category/register", {
-        category: registerCategory._id,
-        units,           // array of units, each with its own configurations
-        quantity: units.length,
+    fields
+      .filter(f => isUniqueField(f.fieldKey))
+      .forEach(f => {
+        const val = unit[f.fieldKey] || unit[f.fieldKey.toLowerCase()] || "";
+        // Preserve the exact fieldKey casing from your config (e.g. SERIALNUMBER)
+        configurations[f.fieldKey] = val;
       });
 
-      addToast(`${units.length} product${units.length > 1 ? "s" : ""} registered successfully!`);
-      setShowRegisterModal(false);
-      setSharedForm({});
-      setUnitRows([{ id: 1 }]);
-      setQuantity(1);
-    } catch (e) {
-      addToast(e.response?.data?.message || "Registration failed", "error");
-    }
-  };
+    return { configurations };
+  });
+
+  // ── STEP 3: Send to backend ───────────────────────────────────────────────
+  try {
+    await axiosInstance.post("/category/register", {
+      category: registerCategory._id,
+      units,
+      quantity: units.length,
+    });
+
+    addToast(`${units.length} product${units.length > 1 ? "s" : ""} registered successfully!`);
+    setShowRegisterModal(false);
+    setSharedForm({});
+    setUnitRows([{ id: 1 }]);
+    setQuantity(1);
+  } catch (e) {
+    addToast(e.response?.data?.message || "Registration failed", "error");
+  }
+};
 
   const activeCount = categories.filter(c => c.isActive !== false).length;
   const configCount = Object.values(configs).filter(Boolean).length;
