@@ -1,74 +1,76 @@
-// import { readDeliverables, writeDeliverables } from "../models/heroSection.model.js";
+import * as service from "../../services/uploadContent/heroSection.service.js";
 
-// export const getDeliverables = async (_, res) => {
-//   res.json(await readDeliverables());
-// };
-
-// export const saveDeliverable = async (req, res) => {
-//   let data = await readDeliverables();
-//   const { id, title, review, methodology } = req.body;
-//   const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
-
-//   if (id) {
-//     data = data.map(d =>
-//       d.id === id ? { ...d, title, review, methodology, image } : d
-//     );
-//   } else {
-//     data.push({ id: Date.now().toString(), title, review, methodology, image });
-//   }
-
-//   await writeDeliverables(data);
-//   res.json({ success: true });
-// };
-
-// export const deleteDeliverable = async (req, res) => {
-//   let data = await readDeliverables();
-//   data = data.filter(d => d.id !== req.params.id);
-//   await writeDeliverables(data);
-//   res.json({ success: true });
-// };
-
-
-import { readHeroSections, writeHeroSections } from "../../models/uploadedcontent/heroSection.model.js";
-
-export const getHeroSections = async (_, res) => {
-  const data = await readHeroSections();
-  // Prefix full image URL so frontend can display it
-  const result = data.map(item => ({
-    ...item,
-    image: item.image ? `http://localhost:5000${item.image}` : null,
-  }));
-  res.json(result);
+// GET all
+export const getAll = async (req, res) => {
+  try {
+    const data = await service.getAll();
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-export const saveHeroSection = async (req, res) => {
-  let data = await readHeroSections();
-  const { id, heading, description } = req.body;
-  const image = req.file ? `/uploads/${req.file.filename}` : req.body.image || null;
+// POST create
+export const create = async (req, res) => {
+  try {
+    const { heading, description } = req.body;
 
-  if (id) {
-    // Update existing
-    data = data.map(item =>
-      item.id === id ? { ...item, heading, description, image } : item
-    );
-  } else {
-    // Add new
-    data.push({
-      id: Date.now().toString(),
+    if (!heading || !description) {
+      return res.status(400).json({
+        message: "Heading and description are required",
+      });
+    }
+
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : "";
+
+    const saved = await service.create({
       heading,
       description,
-      image,
-      createdAt: new Date(),
+      image: imagePath,
     });
-  }
 
-  await writeHeroSections(data);
-  res.json({ success: true });
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-export const deleteHeroSection = async (req, res) => {
-  let data = await readHeroSections();
-  data = data.filter(item => item.id !== req.params.id);
-  await writeHeroSections(data);
-  res.json({ success: true });
+// PUT update
+export const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { heading, description } = req.body;
+
+    const updateData = { heading, description };
+
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+
+    const updated = await service.update(id, updateData);
+
+    if (!updated) {
+      return res.status(404).json({ message: "Hero section not found" });
+    }
+
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// DELETE
+export const remove = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await service.remove(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Hero section not found" });
+    }
+
+    res.status(200).json({ message: "Deleted successfully", id });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };

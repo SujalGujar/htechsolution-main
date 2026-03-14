@@ -1,12 +1,43 @@
 import express from "express";
-import upload from "../../config/multer.js";
-import { getSolutions, saveSolution, deleteSolutionById } from "../../controllers/uploadedcontent/hardwareSolution.controller.js";
+import multer from "multer";
+import path from "path";
+
+import {
+  getAllSolutions,
+  createSolution,
+  updateSolution,
+  deleteSolution,
+} from "../../controllers/uploadedcontent/hardwareSolution.controller.js";
 
 const router = express.Router();
 
-router.get("/", getSolutions);
-router.post("/", upload.single("image"), saveSolution);
-router.put("/:id", upload.single("image"), saveSolution);
-router.delete("/:id", deleteSolutionById);
+// STORAGE
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + path.extname(file.originalname);
+    cb(null, uniqueName);
+  },
+});
+
+// IMAGE FILTER
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files allowed"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+// ROUTES
+router.get("/", getAllSolutions);
+router.post("/", upload.single("image"), createSolution);
+router.put("/:id", upload.single("image"), updateSolution);
+router.delete("/:id", deleteSolution);
 
 export default router;

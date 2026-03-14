@@ -149,54 +149,26 @@
 
 // export default AboutUs;
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
-import gsap from "gsap";
-import { fetchAboutUs } from "../store/HomepageSlices/AboutUsSlice"; // Adjust path as needed
+import { fetchAboutUs } from "../store/HomepageSlices/AboutUsSlice";
+
+const BASE_URL = "http://localhost:5000";
 
 const AboutUs = () => {
   const dispatch = useDispatch();
-  const imageRef = useRef(null);
-  const textRef = useRef(null);
-
-  /* ✅ Get data from Redux */
   const { aboutUsList, status, error } = useSelector(
     (state) => state.aboutUsSection
   );
 
-  // Fetch About Us data on component mount
   useEffect(() => {
-    if (status === 'idle') {
+    if (status === "idle") {
       dispatch(fetchAboutUs());
     }
   }, [dispatch, status]);
 
-  useEffect(() => {
-    if (aboutUsList && aboutUsList.length > 0) {
-      gsap.fromTo(
-        imageRef.current,
-        { x: -50, opacity: 0 },
-        { x: 0, opacity: 1, duration: 1, ease: "power3.out" }
-      );
-
-      gsap.fromTo(
-        textRef.current?.children,
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          delay: 0.3,
-          ease: "power3.out",
-        }
-      );
-    }
-  }, [aboutUsList]);
-
-  // Loading state
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="py-16 md:py-24 px-4 md:px-8 text-center">
         <div className="animate-pulse">Loading...</div>
@@ -204,23 +176,18 @@ const AboutUs = () => {
     );
   }
 
-  // Error state
-  if (status === 'failed') {
+  if (status === "failed") {
     return (
       <div className="py-16 md:py-24 px-4 md:px-8 text-center text-red-600">
-        Error loading content: {error}
+        Error: {error}
       </div>
     );
   }
 
-  /* If no data added by admin */
-  if (!aboutUsList || aboutUsList.length === 0) {
-    return null;
-  }
+  if (!aboutUsList || aboutUsList.length === 0) return null;
 
-  /* ✅ Use latest entry (or sort by date if needed) */
-  const aboutData = aboutUsList.sort((a, b) => 
-    new Date(b.createdAt) - new Date(a.createdAt)
+  const aboutData = [...aboutUsList].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   )[0];
 
   return (
@@ -230,48 +197,49 @@ const AboutUs = () => {
     >
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
-          
+
           {/* IMAGE */}
           <motion.div
-            ref={imageRef}
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="relative"
           >
             <div className="relative overflow-hidden rounded-xl shadow-xl">
-              <img
-                src={aboutData.image || aboutData.imageUrl} // Adjust based on your API response
-                alt="About Us"
-                className="w-full h-auto object-cover"
-              />
+              {aboutData.image && (
+                <img
+                  // ✅ Full image URL fix
+                  src={
+                    aboutData.image.startsWith("http")
+                      ? aboutData.image
+                      : `${BASE_URL}${aboutData.image}`
+                  }
+                  alt="About Us"
+                  className="w-full h-auto object-cover"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-r from-[#1F6E8C]/10 to-transparent" />
             </div>
 
             {/* Badge */}
             <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-4 shadow-lg">
               <div className="text-center">
-                <div
-                  className="text-2xl font-bold"
-                  style={{ color: "#1F6E8C" }}
-                >
+                <div className="text-2xl font-bold" style={{ color: "#1F6E8C" }}>
                   10+
                 </div>
-                <div className="text-xs text-gray-600">
-                  Years Experience
-                </div>
+                <div className="text-xs text-gray-600">Years Experience</div>
               </div>
             </div>
           </motion.div>
 
           {/* TEXT */}
-          <div ref={textRef}>
+          <div>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
               className="mb-8"
             >
               <h2
@@ -281,38 +249,44 @@ const AboutUs = () => {
                 {aboutData.heading}
               </h2>
 
-              <p
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-lg leading-relaxed mt-4"
                 style={{ color: "#2E2E2E" }}
               >
                 {aboutData.description}
-              </p>
+              </motion.p>
             </motion.div>
 
             {/* FEATURES */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-              {aboutData.features && aboutData.features.map((item, idx) => (
+              {aboutData.features?.map((item, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
+                  transition={{ delay: 0.3 + idx * 0.1, duration: 0.5 }}
                   className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm"
                 >
                   <div
                     className="w-2 h-8 rounded"
                     style={{ backgroundColor: "#1F6E8C" }}
                   />
-                  <span className="font-medium text-gray-800">
-                    {item}
-                  </span>
+                  <span className="font-medium text-gray-800">{item}</span>
                 </motion.div>
               ))}
             </div>
 
             {/* BUTTON */}
             <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.5 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-6 py-3 rounded-lg font-semibold text-white"

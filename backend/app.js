@@ -15,6 +15,11 @@ import customerDetailRoutes from "./routes/customerCare.route.js"
 
 import heroSectionRoutes from "./routes/uploadedcontent/heroSection.route.js"
 import hardwareSolutionRoutes from "./routes/uploadedcontent/hardwareSolution.route.js";
+import aboutUsRoutes from "./routes/uploadedcontent/aboutUs.routes.js"
+import softwareProjectRoutes from "./routes/uploadedcontent/softwareProject.route.js"
+import projectDeliverableRoutes from "./routes/uploadedcontent/projectDeliverable.route.js"
+import ourAchievementRoutes from "./routes/uploadedcontent/ourAchievement.route.js"
+import clientExperienceRoutes from "./routes/uploadedcontent/clientExperience.route.js"
 // import customerRoutes from "./routes/customer.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,8 +38,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ ROUTES SECOND - AFTER MIDDLEWARE!
 app.use("/sections", sectionRoutes);
 app.use("/hero-section", heroSectionRoutes);  
-app.use("/hardware-solutions", hardwareSolutionRoutes);
-
+app.use("/api/hardware-solutions", hardwareSolutionRoutes);
+app.use("/api/about-us", aboutUsRoutes);
+app.use("/api/software-projects", softwareProjectRoutes);
+app.use("/api/project-deliverables", projectDeliverableRoutes);
+app.use("/api/our-achievements", ourAchievementRoutes);
+app.use("/api/client-experiences", clientExperienceRoutes);
 
 // app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);

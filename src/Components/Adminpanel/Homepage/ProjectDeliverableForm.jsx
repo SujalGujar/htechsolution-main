@@ -6,18 +6,24 @@ import {
   deleteDeliverable,
 } from "../../store/HomepageSlices/ProjectDeliverableSlice";
 
+const BASE_URL = "http://localhost:5000";
+
 const ProjectDeliverableForm = () => {
   const dispatch = useDispatch();
-  const { list } = useSelector((state) => state.projectDeliverables);
+  const { list, loading, error } = useSelector(
+    (state) => state.projectDeliverables
+  );
 
   const [form, setForm] = useState({
-    id: "",
+    id: "",      // stores _id when editing
     title: "",
     review: "",
     methodology: "",
   });
-  const [image, setImage] = useState(null);
+  const [image, setImage]   = useState(null);
+  const [preview, setPreview] = useState("");
 
+  // Fetch deliverables on mount
   useEffect(() => {
     dispatch(fetchDeliverables());
   }, [dispatch]);
@@ -29,33 +35,46 @@ const ProjectDeliverableForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("id", form.id);
+    formData.append("id", form.id);           // empty string if new
     formData.append("title", form.title);
     formData.append("review", form.review);
     formData.append("methodology", form.methodology);
     if (image) formData.append("image", image);
 
-    dispatch(saveDeliverable(formData)).then(() => {
-      dispatch(fetchDeliverables());
-    });
+    // ✅ No need to call fetchDeliverables after save
+    // Redux state updates automatically from saveDeliverable.fulfilled
+    dispatch(saveDeliverable(formData));
 
+    // Reset form
     setForm({ id: "", title: "", review: "", methodology: "" });
     setImage(null);
+    setPreview("");
   };
 
   const editDeliverable = (d) => {
+    // ✅ Use _id not id
     setForm({
-      id: d.id,
+      id: d._id,
       title: d.title,
       review: d.review,
       methodology: d.methodology,
     });
+    // Show existing image as preview
+    setPreview(
+      d.image
+        ? d.image.startsWith("http")
+          ? d.image
+          : `${BASE_URL}${d.image}`
+        : ""
+    );
     setImage(null);
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this deliverable?")) {
-      dispatch(deleteDeliverable(id)).then(() => dispatch(fetchDeliverables()));
+      // ✅ No need to fetchDeliverables after delete
+      // Redux state updates automatically from deleteDeliverable.fulfilled
+      dispatch(deleteDeliverable(id));
     }
   };
 
@@ -64,6 +83,11 @@ const ProjectDeliverableForm = () => {
       <h2 className="text-2xl font-bold text-center mb-6 text-indigo-800">
         Project Deliverables
       </h2>
+
+      {/* Error message */}
+      {error && (
+        <div className="bg-red-100 text-red-600 p-3 rounded mb-4">{error}</div>
+      )}
 
       {/* FORM */}
       <div className="grid gap-4 mb-4">
@@ -88,24 +112,53 @@ const ProjectDeliverableForm = () => {
         />
         <input
           type="file"
-          onChange={(e) => setImage(e.target.files[0])}
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              setImage(file);
+              setPreview(URL.createObjectURL(file));
+            }
+          }}
           className="border p-2 rounded-lg"
         />
-        {image && (
+        {/* Image preview */}
+        {preview && (
           <img
-            src={URL.createObjectURL(image)}
+            src={preview}
             alt="preview"
             className="w-32 h-32 object-cover rounded-lg mt-2 shadow-md"
           />
         )}
       </div>
 
-      <button
-        onClick={submit}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
-      >
-        {form.id ? "Update Deliverable" : "Add Deliverable"}
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={submit}
+          disabled={loading}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50"
+        >
+          {loading
+            ? "Saving..."
+            : form.id
+            ? "Update Deliverable"
+            : "Add Deliverable"}
+        </button>
+
+        {/* Cancel button — only shows in edit mode */}
+        {form.id && (
+          <button
+            onClick={() => {
+              setForm({ id: "", title: "", review: "", methodology: "" });
+              setPreview("");
+              setImage(null);
+            }}
+            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
 
       <hr className="my-6 border-gray-300" />
 
@@ -117,21 +170,30 @@ const ProjectDeliverableForm = () => {
 
         {list.map((d) => (
           <div
-            key={d.id}
+            key={d._id} // ✅ use _id
             className="flex flex-col md:flex-row md:justify-between items-start md:items-center bg-white p-4 rounded-xl shadow hover:shadow-lg transition"
           >
             <div className="flex items-center space-x-4">
               <img
-                src={d.image ? `http://localhost:5000${d.image}` : "/placeholder.png"}
+                src={
+                  d.image
+                    ? d.image.startsWith("http")
+                      ? d.image
+                      : `${BASE_URL}${d.image}`
+                    : "/placeholder.png"
+                }
                 alt={d.title}
                 className="w-24 h-24 object-cover rounded-lg"
               />
               <div>
                 <h4 className="font-semibold text-lg">{d.title}</h4>
                 <p className="text-gray-600">{d.review}</p>
-                <span className="text-gray-500 text-sm italic">{d.methodology}</span>
+                <span className="text-gray-500 text-sm italic">
+                  {d.methodology}
+                </span>
               </div>
             </div>
+
             <div className="flex space-x-2 mt-2 md:mt-0">
               <button
                 onClick={() => editDeliverable(d)}
@@ -140,7 +202,7 @@ const ProjectDeliverableForm = () => {
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(d.id)}
+                onClick={() => handleDelete(d._id)} // ✅ use _id
                 className="bg-red-500 hover:bg-red-600 px-4 py-1 rounded text-white font-semibold"
               >
                 Delete

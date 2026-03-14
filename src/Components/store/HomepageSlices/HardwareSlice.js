@@ -1,110 +1,118 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API = "http://localhost:5000/hardware-solutions";
-
-/* ── THUNKS ──────────────────────────────────────────────────────────────── */
+const API = "http://localhost:5000/api/hardware-solutions";
 
 export const fetchSolutions = createAsyncThunk(
-  "softwareSolutions/fetch",
+  "hardwareSolutions/fetch",
   async (_, { rejectWithValue }) => {
     try {
       const res = await axios.get(API);
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch");
+      return rejectWithValue(err.response?.data?.message || "Fetch failed");
     }
   }
 );
 
 export const addSolution = createAsyncThunk(
-  "softwareSolutions/add",
+  "hardwareSolutions/add",
   async (formData, { rejectWithValue }) => {
     try {
       const res = await axios.post(API, formData, {
+        // ✅ Required for Multer to receive the file
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to add");
+      return rejectWithValue(err.response?.data?.message || "Add failed");
     }
   }
 );
 
 export const updateSolution = createAsyncThunk(
-  "softwareSolutions/update",
+  "hardwareSolutions/update",
   async ({ id, formData }, { rejectWithValue }) => {
     try {
       const res = await axios.put(`${API}/${id}`, formData, {
+        // ✅ Required for Multer to receive the file
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to update");
+      return rejectWithValue(err.response?.data?.message || "Update failed");
     }
   }
 );
 
 export const deleteSolution = createAsyncThunk(
-  "softwareSolutions/delete",
+  "hardwareSolutions/delete",
   async (id, { rejectWithValue }) => {
     try {
       await axios.delete(`${API}/${id}`);
       return id;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to delete");
+      return rejectWithValue(err.response?.data?.message || "Delete failed");
     }
   }
 );
 
-/* ── SLICE ───────────────────────────────────────────────────────────────── */
-
-const softwareSolutionSlice = createSlice({
-  name: "softwareSolutions",
+const hardwareSlice = createSlice({
+  name: "hardwareSolutions",
   initialState: {
     solutions: [],
-    loading: false,
-    error: null,
+    loading:   false,
+    error:     null,
   },
-  reducers: {
-    clearError: (state) => { state.error = null; },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       // FETCH
-      .addCase(fetchSolutions.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(fetchSolutions.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(fetchSolutions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading   = false;
         state.solutions = action.payload;
       })
-      .addCase(fetchSolutions.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
-
+      .addCase(fetchSolutions.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      })
       // ADD
-      .addCase(addSolution.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(addSolution.pending,   (state) => { state.loading = true; })
       .addCase(addSolution.fulfilled, (state, action) => {
         state.loading = false;
-        state.solutions.push(action.payload);
+        state.solutions.unshift(action.payload);
       })
-      .addCase(addSolution.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
-
-      // UPDATE
-      .addCase(updateSolution.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(updateSolution.fulfilled, (state, action) => {
+      .addCase(addSolution.rejected,  (state, action) => {
         state.loading = false;
-        const index = state.solutions.findIndex(s => s.id === action.payload.id);
+        state.error   = action.payload;
+      })
+      // UPDATE
+      .addCase(updateSolution.pending,   (state) => { state.loading = true; })
+      .addCase(updateSolution.fulfilled, (state, action) => {
+        state.loading    = false;
+        const index = state.solutions.findIndex(
+          (item) => item._id === action.payload._id
+        );
         if (index !== -1) state.solutions[index] = action.payload;
       })
-      .addCase(updateSolution.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
-
-      // DELETE
-      .addCase(deleteSolution.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(deleteSolution.fulfilled, (state, action) => {
+      .addCase(updateSolution.rejected,  (state, action) => {
         state.loading = false;
-        state.solutions = state.solutions.filter(s => s.id !== action.payload);
+        state.error   = action.payload;
       })
-      .addCase(deleteSolution.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
+      // DELETE
+      .addCase(deleteSolution.pending,   (state) => { state.loading = true; })
+      .addCase(deleteSolution.fulfilled, (state, action) => {
+        state.loading   = false;
+        state.solutions = state.solutions.filter(
+          (item) => item._id !== action.payload
+        );
+      })
+      .addCase(deleteSolution.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      });
   },
 });
 
-export const { clearError } = softwareSolutionSlice.actions;
-export default softwareSolutionSlice.reducer;
+export default hardwareSlice.reducer;

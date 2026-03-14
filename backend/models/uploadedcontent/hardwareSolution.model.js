@@ -1,12 +1,22 @@
-import fs from "fs-extra";
-import path from "path";
-import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const hardwareSolutionSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String, // stores file path like "/uploads/filename.jpg"
+      default: "",
+    },
+  },
+  { timestamps: true } // adds createdAt & updatedAt automatically
+);
 
-const FILE = path.join(__dirname, "../hardwareSolutions.json");
-if (!fs.existsSync(FILE)) fs.writeJsonSync(FILE, []);
-
-export const readSolutions = () => fs.readJson(FILE);
-export const writeSolutions = (data) => fs.writeJson(FILE, data);
+export default mongoose.model("HardwareSolution", hardwareSolutionSchema);

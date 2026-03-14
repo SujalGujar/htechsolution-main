@@ -45,7 +45,7 @@ const Home = () => {
       <ProjectDeliverablesHome/>
       
       {/* <OurService /> */}
-      <OurTeam />
+      {/* <OurTeam /> */}
       <OurAchievements />
       <ClientExperience/>
     </main>
