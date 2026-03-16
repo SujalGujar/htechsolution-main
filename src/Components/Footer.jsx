@@ -266,7 +266,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Mail, Phone, MapPin } from "lucide-react";
-import logo from "../icons/logo.png";
+import logo from "../icons/logo (2).png";
+
 import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../icons/logo.png";
+import logo from "../icons/logo (2).png";
 
 export default function Header() {
   const [open, setOpen] = useState(false);

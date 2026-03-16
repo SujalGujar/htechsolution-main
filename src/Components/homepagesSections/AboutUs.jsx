@@ -192,7 +192,7 @@ const AboutUs = () => {
 
   return (
     <div
-      className="py-16 md:py-24 px-4 md:px-8"
+      className="py-8 md:py-12 px-4 md:px-8"
       style={{ backgroundColor: "#F7F7F2" }}
     >
       <div className="max-w-6xl mx-auto">

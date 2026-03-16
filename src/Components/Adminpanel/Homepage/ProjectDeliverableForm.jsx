@@ -15,7 +15,7 @@ const ProjectDeliverableForm = () => {
   );
 
   const [form, setForm] = useState({
-    id: "",      // stores _id when editing
+    id: "",      
     title: "",
     review: "",
     methodology: "",
@@ -35,7 +35,7 @@ const ProjectDeliverableForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("id", form.id);           // empty string if new
+    formData.append("id", form.id);          
     formData.append("title", form.title);
     formData.append("review", form.review);
     formData.append("methodology", form.methodology);

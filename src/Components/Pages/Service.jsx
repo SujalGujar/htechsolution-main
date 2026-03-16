@@ -1,328 +1,381 @@
-import React from "react";
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Service = () => {
-  const servicesData = [
+  const [activeSellingItem, setActiveSellingItem] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef(null);
+
+  const sellingItems = [
+    { name: "CCTV", icon: "📹", detail: "High-definition surveillance cameras with night vision, motion detection, and remote monitoring. We supply dome, bullet, and PTZ cameras from trusted brands, suitable for homes, offices, and commercial establishments." },
+    { name: "HDD / SSD", icon: "💾", detail: "Internal and external storage drives including SATA HDDs, NVMe SSDs, and portable drives. Available in capacities from 500 GB to 20 TB for desktops, laptops, NAS servers, and surveillance DVRs." },
+    { name: "Desktop PC", icon: "🖥️", detail: "Pre-built and custom-assembled desktop computers for office work, graphic design, gaming, and server use. Each unit includes chassis, PSU, motherboard, RAM, CPU, storage, and OS installation as per requirement." },
+    { name: "CPU / Processor", icon: "⚡", detail: "Intel Core i3/i5/i7/i9 and AMD Ryzen processors for desktop and laptop upgrades. We supply OEM and retail-boxed units with compatibility guidance for your motherboard and workload." },
+    { name: "Mouse", icon: "🖱️", detail: "Wired and wireless mice including office-use optical mice, ergonomic vertical mice, and high-DPI gaming mice. Available from Logitech, HP, Dell, and other leading brands." },
+    { name: "Keyboard", icon: "⌨️", detail: "Membrane, mechanical, and wireless keyboards for office, data entry, and gaming use. We carry slim compact keyboards, full-size layouts, and backlit mechanical variants." },
+    { name: "Laptop", icon: "💻", detail: "Laptops from brands like HP, Dell, Lenovo, Acer, and ASUS across budget, mid-range, and premium segments. Configurations available for business use, software development, creative work, and general productivity." },
+    { name: "Printer", icon: "🖨️", detail: "Inkjet, laser, and all-in-one multifunction printers. We supply models suitable for home printing, office document handling, and high-volume commercial printing — from HP, Canon, Epson, and Brother." },
+    { name: "All-in-One PC", icon: "🖥️", detail: "Space-saving AIO computers with integrated display and computing unit. Ideal for reception desks, billing counters, and office workstations. Available in 21.5\" and 23.8\" sizes from HP and Lenovo." },
+    { name: "HDMI Cable", icon: "🔌", detail: "HDMI cables and adapters supporting 4K, 8K, and HDR output. We supply standard, high-speed, and ultra-high-speed HDMI cables in lengths from 1.5 m to 10 m for monitors, projectors, and TVs." },
+    { name: "Router", icon: "📡", detail: "Wi-Fi routers with 802.11ac (Wi-Fi 5) and 802.11ax (Wi-Fi 6) standards. Suitable for home networks, offices, and mesh setups. Brands include TP-Link, Netgear, and D-Link." },
+    { name: "LAN Cable", icon: "🔗", detail: "Cat5e, Cat6, and Cat6A Ethernet cables sold by the metre or in pre-terminated patch leads. Used for structured cabling in offices, labs, and CCTV networks." },
+  ];
+
+  const visibleCount = 4;
+  const maxSlide = Math.ceil(sellingItems.length / visibleCount) - 1;
+
+  const goNext = () => setCurrentSlide((p) => Math.min(p + 1, maxSlide));
+  const goPrev = () => setCurrentSlide((p) => Math.max(p - 1, 0));
+
+  const visibleItems = sellingItems.slice(
+    currentSlide * visibleCount,
+    currentSlide * visibleCount + visibleCount
+  );
+
+  const [activeSoftware, setActiveSoftware] = useState(null);
+
+  const softwareTypes = [
+    { icon: "🛍️", label: "E-Commerce Platforms", detail: "Custom online stores with payment gateway integration (Razorpay, Stripe, PayPal), product catalog management, cart & checkout flows, order tracking, and admin dashboards. Built on modern stacks like React + Node or Next.js." },
+    { icon: "📊", label: "CRM Systems", detail: "Tailored Customer Relationship Management tools to track leads, manage pipelines, automate follow-ups, and analyse sales performance. Integrated with email, WhatsApp, and third-party tools." },
+    { icon: "🏥", label: "Hospital Management (HMS)", detail: "End-to-end HMS covering patient registration, OPD/IPD management, appointment scheduling, doctor panels, billing, pharmacy stock, lab reports, and discharge summaries." },
+    { icon: "☁️", label: "Cloud Solutions", detail: "Cloud infrastructure setup on AWS, Azure, or Google Cloud — including VM provisioning, S3/blob storage, CI/CD pipelines, auto-scaling, and managed database configuration." },
+    { icon: "🌐", label: "Web Development", detail: "Responsive websites and web applications using React, Next.js, Vue, or plain HTML/CSS/JS. We handle UI design, API integration, SEO-friendly structure, and cross-browser compatibility." },
+    { icon: "🏢", label: "Enterprise Web Applications", detail: "Scalable internal tools and portals for businesses — ERP modules, inventory management, HR systems, workflow automation, role-based access, and audit trails." },
+    { icon: "🎨", label: "UI/UX Design", detail: "User research, wireframing, prototyping in Figma, and final UI design focused on usability, accessibility (WCAG), and brand consistency. Delivered as developer-ready design systems." },
+    { icon: "🚀", label: "Product Development", detail: "Full product lifecycle from discovery and MVP scoping to development, QA, launch, and iteration. We work with startups and enterprises using agile sprints and clear milestone tracking." },
+  ];
+
+  const servicingHeadings = [
     {
-      sectionTitle: "Selling",
-      sectionKey: "selling",
-      description: "IT hardware sales and accessories",
-      icon: "🛒",
-      gradient: "from-blue-500 to-cyan-400",
-      services: [
-        {
-          name: "CCTV",
-          icon: "📹",
-          detail: "High-definition surveillance systems with night vision, remote monitoring, and motion detection for complete security coverage."
-        },
-        {
-          name: "HDD",
-          icon: "💾",
-          detail: "High-capacity storage solutions with varying speeds and reliability ratings for different computing needs."
-        },
-        {
-          name: "Desktop",
-          icon: "🖥️",
-          detail: "Complete desktop systems for office, gaming, and professional applications with customizable configurations."
-        },
-        {
-          name: "CPU",
-          icon: "⚡",
-          detail: "Latest generation processors from Intel and AMD for optimal performance and energy efficiency."
-        },
-        {
-          name: "Mouse",
-          icon: "🖱️",
-          detail: "Wired and wireless options including ergonomic designs and precision gaming mice."
-        },
-        {
-          name: "Keyboard",
-          icon: "⌨️",
-          detail: "Mechanical, membrane, and wireless keyboards for office, gaming, and specialized applications."
-        },
-        {
-          name: "Laptop",
-          icon: "💻",
-          detail: "Portable computing solutions from leading brands with various specifications for different user requirements."
-        },
-        {
-          name: "Printer",
-          icon: "🖨️",
-          detail: "Inkjet, laser, and multifunction printers for home, office, and commercial printing needs."
-        },
-        {
-          name: "All-in-One",
-          icon: "🖥️",
-          detail: "Space-saving integrated computer systems combining monitor and processing unit in one device."
-        },
-        {
-          name: "HDMI",
-          icon: "🔌",
-          detail: "High-speed cables and connectors for 4K/8K video transmission and audio support."
-        },
-        {
-          name: "Router",
-          icon: "📡",
-          detail: "Wireless networking equipment with dual-band support, mesh capabilities, and enhanced security features."
-        },
-        {
-          name: "LAN Cable",
-          icon: "🔗",
-          detail: "Category 5e, 6, and 7 Ethernet cables for reliable wired network connections."
-        }
-      ]
+      icon: "👁️",
+      title: "CCTV Surveillance",
+      desc: "Professional installation and configuration of IP cameras, DVR/NVR systems, and remote monitoring solutions for homes and businesses.",
     },
     {
-      sectionTitle: "Servicing",
-      sectionKey: "servicing",
-      description: "Installation, repair and maintenance services",
-      icon: "🔧",
-      gradient: "from-emerald-500 to-green-400",
-      services: [
-        {
-          name: "CCTV Surveillance",
-          icon: "👁️",
-          detail: "Professional installation and configuration of surveillance systems including IP cameras, DVR/NVR setup, and monitoring solutions."
-        },
-        {
-          name: "Laptop Repair",
-          icon: "🔩",
-          detail: "Comprehensive repair services including screen replacement, motherboard repair, keyboard issues, and battery replacement."
-        },
-        {
-          name: "CCTV Maintenance",
-          icon: "🛠️",
-          detail: "Regular maintenance, camera cleaning, software updates, and system optimization for continuous security monitoring."
-        },
-        {
-          name: "Network Maintenance",
-          icon: "🌐",
-          detail: "Proactive network monitoring, troubleshooting, performance optimization, and security patch management."
-        },
-        {
-          name: "Printer",
-          icon: "⚙️",
-          detail: "Printer setup, maintenance, repair, and consumables replacement for uninterrupted printing operations."
-        },
-        {
-          name: "Projector",
-          icon: "📽️",
-          detail: "Installation, alignment, lamp replacement, and maintenance of projection systems for presentations and entertainment."
-        },
-        {
-          name: "Lab Setup",
-          icon: "🧪",
-          detail: "Complete computer lab installation including hardware setup, network configuration, and software deployment."
-        }
-      ]
+      icon: "🔩",
+      title: "Laptop & Hardware Repair",
+      desc: "Screen replacement, motherboard diagnostics, keyboard repair, battery replacement, and component-level servicing for all major brands.",
     },
     {
-      sectionTitle: "Software & IT Solutions",
-      sectionKey: "software",
-      description: "Custom software and enterprise solutions",
-      icon: "💻",
-      gradient: "from-purple-500 to-pink-400",
-      services: [
-        {
-          name: "E-Commerce",
-          icon: "🛍️",
-          detail: "Custom online store development with payment integration, inventory management, and customer relationship features."
-        },
-        {
-          name: "CRM",
-          icon: "📊",
-          detail: "Customer Relationship Management systems tailored to manage interactions, sales pipelines, and customer data."
-        },
-        {
-          name: "HMS",
-          icon: "🏥",
-          detail: "Hospital Management Systems for patient records, appointment scheduling, billing, and inventory management."
-        },
-        {
-          name: "Cloud",
-          icon: "☁️",
-          detail: "Cloud migration, setup, and management services for scalable and secure data storage and applications."
-        },
-        {
-          name: "Web Development",
-          icon: "🌐",
-          detail: "Responsive website design and development using modern frameworks for optimal user experience."
-        },
-        {
-          name: "Product Development",
-          icon: "🚀",
-          detail: "End-to-end software product development from concept to deployment with agile methodologies."
-        },
-        {
-          name: "Enterprise Web Software",
-          icon: "🏢",
-          detail: "Scalable web applications for business processes, workflow automation, and enterprise resource planning."
-        },
-        {
-          name: "UI/UX",
-          icon: "🎨",
-          detail: "User interface and experience design focusing on usability, accessibility, and engaging interactions."
-        }
-      ]
+      icon: "🌐",
+      title: "Network Setup & Maintenance",
+      desc: "Structured cabling, router/switch configuration, LAN deployment, and ongoing network monitoring and troubleshooting.",
     },
     {
-      sectionTitle: "Digital Marketing",
-      sectionKey: "digital-marketing",
-      description: "Online growth and marketing solutions",
-      icon: "📈",
-      gradient: "from-orange-500 to-amber-400",
-      services: [
-        {
-          name: "SEO",
-          icon: "🔍",
-          detail: "Search Engine Optimization strategies to improve website visibility and organic search rankings."
-        },
-        {
-          name: "Social Media Marketing",
-          icon: "📱",
-          detail: "Strategic social media campaigns, content creation, and community management across platforms."
-        },
-        {
-          name: "Paid Ads",
-          icon: "💰",
-          detail: "PPC campaigns, display advertising, and social media ads with performance tracking and optimization."
-        }
-      ]
+      icon: "🧪",
+      title: "Lab & Projector Setup",
+      desc: "End-to-end computer lab installation, projector mounting and alignment, and classroom/office AV system deployment.",
     },
-    {
-      sectionTitle: "Software Maintenance & Testing",
-      sectionKey: "testing",
-      description: "Support, testing and maintenance",
-      icon: "✅",
-      gradient: "from-indigo-500 to-violet-400",
-      services: [
-        {
-          name: "Software Maintenance",
-          icon: "🔧",
-          detail: "Ongoing support, bug fixes, updates, and performance optimization for existing software systems."
-        },
-        {
-          name: "Testing",
-          icon: "🧪",
-          detail: "Comprehensive software testing including functional, performance, security, and user acceptance testing."
-        }
-      ]
-    }
   ];
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Header Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Our <span className="text-blue-600">Services</span>
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Comprehensive IT solutions tailored to meet your business needs with excellence
-          </p>
+    <div className="max-w-7xl mx-auto px-4 py-16 font-sans">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-20"
+      >
+        <h1 className="text-5xl font-extrabold text-gray-900 mb-3 tracking-tight">
+          Our <span className="text-blue-600">Services</span>
+        </h1>
+        <p className="text-gray-500 text-lg max-w-xl mx-auto">
+          Comprehensive IT solutions crafted to power your business forward.
+        </p>
+      </motion.div>
+
+      {/* ─── SECTION 1: SELLING ─── */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mb-24"
+      >
+        <div className="flex items-center gap-3 mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-cyan-400 p-3 rounded-2xl shadow-lg">
+            <span className="text-3xl">🛒</span>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Selling</h2>
+            <p className="text-gray-500 text-sm mt-0.5">IT hardware &amp; accessories</p>
+          </div>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {servicesData.map((section, index) => (
-            <div
-              key={section.sectionKey}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
+        {/* Slider */}
+        <div className="relative">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <AnimatePresence mode="wait">
+              {visibleItems.map((item, idx) => (
+                <motion.div
+                  key={`${currentSlide}-${idx}`}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                  onClick={() =>
+                    setActiveSellingItem(
+                      activeSellingItem?.name === item.name ? null : item
+                    )
+                  }
+                  className="cursor-pointer group bg-white border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center
+                    hover:border-blue-400 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-semibold text-gray-800 text-base">{item.name}</h3>
+                  <p className="text-xs text-blue-500 mt-2 font-medium">Click for details →</p>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Detail Panel */}
+          <AnimatePresence>
+            {activeSellingItem && (
+              <motion.div
+                key={activeSellingItem.name}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.3 }}
+                className="mt-5 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6 flex items-start gap-5"
+              >
+                <span className="text-5xl">{activeSellingItem.icon}</span>
+                <div>
+                  <h4 className="text-xl font-bold text-blue-700 mb-1">{activeSellingItem.name}</h4>
+                  <p className="text-gray-700 leading-relaxed">{activeSellingItem.detail}</p>
+                </div>
+                <button
+                  onClick={() => setActiveSellingItem(null)}
+                  className="ml-auto text-gray-400 hover:text-gray-600 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-center gap-4 mt-8">
+            <button
+              onClick={goPrev}
+              disabled={currentSlide === 0}
+              className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600
+                disabled:opacity-30 hover:bg-blue-50 hover:border-blue-400 transition-all"
             >
-              {/* Section Header */}
-              <div className={`bg-gradient-to-r ${section.gradient} p-6`}>
-                <div className="flex items-center gap-4">
-                  <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                    <span className="text-2xl">{section.icon}</span>
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {section.sectionTitle}
-                    </h2>
-                    <p className="text-white/90 mt-1">{section.description}</p>
-                  </div>
-                </div>
-              </div>
+              ‹
+            </button>
+            {Array.from({ length: maxSlide + 1 }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentSlide(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  i === currentSlide ? "bg-blue-500 w-6" : "bg-gray-300"
+                }`}
+              />
+            ))}
+            <button
+              onClick={goNext}
+              disabled={currentSlide === maxSlide}
+              className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600
+                disabled:opacity-30 hover:bg-blue-50 hover:border-blue-400 transition-all"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </motion.section>
 
-              {/* Services List */}
-              <div className="p-6">
-                {/* Special layout for Selling section */}
-                {section.sectionKey === "selling" ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {section.services.map((service, idx) => (
-                      <div
-                        key={idx}
-                        className="group/item bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 
-                                  hover:shadow-lg transition-all duration-300 
-                                  hover:-translate-y-1 cursor-pointer
-                                  hover:border-blue-200"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="bg-blue-50 p-2 rounded-lg">
-                            <span className="text-xl">{service.icon}</span>
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-800 mb-1">
-                              {service.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 line-clamp-3">
-                              {service.detail}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  /* Layout for other sections */
-                  <div className="grid grid-cols-1 gap-4">
-                    {section.services.map((service, idx) => (
-                      <div
-                        key={idx}
-                        className="group/item relative"
-                      >
-                        <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 
-                                    hover:shadow-md transition-all duration-200 
-                                    hover:-translate-y-0.5 cursor-pointer
-                                    group-hover/item:border-blue-200"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="mt-1">
-                              <span className="text-xl">{service.icon}</span>
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-800 mb-2">
-                                {service.name}
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                {service.detail}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 group-hover/item:w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent transition-all duration-300"></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+      {/* ─── SECTION 2: SERVICING ─── */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mb-24"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+          {/* Left: headings */}
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-r from-emerald-500 to-green-400 p-3 rounded-2xl shadow-lg">
+                <span className="text-3xl">🔧</span>
               </div>
-
-              
-              <div className="px-6 pb-4">
-                <div className="inline-flex items-center gap-2 text-sm text-gray-500">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  <span>{section.services.length} {section.services.length === 1 ? 'service' : 'services'} available</span>
-                </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Servicing</h2>
+                <p className="text-gray-500 text-sm mt-0.5">Installation, repair &amp; maintenance</p>
               </div>
             </div>
+
+            <div className="space-y-5">
+              {servicingHeadings.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className="flex items-start gap-4 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="text-3xl mt-0.5">{item.icon}</div>
+                  <div>
+                    <h3 className="font-bold text-gray-800 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: image */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[400px]"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
+              alt="IT Servicing"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/50 to-transparent" />
+            <div className="absolute bottom-6 left-6 text-white">
+              <p className="text-2xl font-bold">Expert Technicians</p>
+              <p className="text-white/80 text-sm mt-1">On-site &amp; remote support available</p>
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* ─── SECTION 3: SOFTWARE & IT ─── */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mb-24"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-gradient-to-r from-purple-500 to-pink-400 p-3 rounded-2xl shadow-lg">
+            <span className="text-3xl">💻</span>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Software &amp; IT Solutions</h2>
+            <p className="text-gray-500 text-sm mt-0.5">Projects we build &amp; deliver</p>
+          </div>
+        </div>
+
+        <p className="text-gray-600 mb-8 max-w-2xl">
+          We develop custom digital products across multiple domains — from web platforms to enterprise-grade management systems.
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {softwareTypes.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.85 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: i * 0.07 }}
+              onClick={() => setActiveSoftware(activeSoftware?.label === s.label ? null : s)}
+              className={`cursor-pointer bg-white border rounded-2xl p-5 flex flex-col items-center text-center
+                transition-all duration-300 hover:-translate-y-1 group
+                ${activeSoftware?.label === s.label
+                  ? "border-purple-500 shadow-lg ring-2 ring-purple-200"
+                  : "border-purple-100 hover:border-purple-400 hover:shadow-lg"
+                }`}
+            >
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">{s.icon}</div>
+              <p className="text-sm font-semibold text-gray-800">{s.label}</p>
+              <p className="text-xs text-purple-400 mt-1.5 font-medium">
+                {activeSoftware?.label === s.label ? "Close ×" : "Details →"}
+              </p>
+            </motion.div>
           ))}
         </div>
 
-        
-       
-      </div>
-    </>
+        {/* Software Detail Panel */}
+        <AnimatePresence>
+          {activeSoftware && (
+            <motion.div
+              key={activeSoftware.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.3 }}
+              className="mt-5 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6 flex items-start gap-5"
+            >
+              <span className="text-5xl">{activeSoftware.icon}</span>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-purple-700 mb-1">{activeSoftware.label}</h4>
+                <p className="text-gray-700 leading-relaxed">{activeSoftware.detail}</p>
+              </div>
+              <button
+                onClick={() => setActiveSoftware(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.section>
+
+      {/* ─── SECTION 4: DIGITAL MARKETING ─── */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex items-center gap-3 mb-8">
+          <div className="bg-gradient-to-r from-orange-500 to-amber-400 p-3 rounded-2xl shadow-lg">
+            <span className="text-3xl">📈</span>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Digital Marketing</h2>
+            <p className="text-gray-500 text-sm mt-0.5">Online growth &amp; visibility</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* SEO */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="bg-white border border-orange-100 rounded-2xl p-7 hover:shadow-xl transition-shadow group"
+          >
+            <div className="text-4xl mb-4">🔍</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">SEO</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Search Engine Optimization strategies to improve website visibility and drive consistent organic traffic through keyword research, on-page optimization, and technical SEO improvements.
+            </p>
+          </motion.div>
+
+          {/* Social Media Marketing */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="bg-white border border-orange-100 rounded-2xl p-7 hover:shadow-xl transition-shadow group"
+          >
+            <div className="text-4xl mb-4">📱</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Social Media Marketing</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Strategic campaigns, content creation, and community management across Instagram, Facebook, LinkedIn, and other platforms to grow your brand and engage your audience.
+            </p>
+          </motion.div>
+        </div>
+      </motion.section>
+    </div>
   );
 };
 

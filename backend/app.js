@@ -3,8 +3,8 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import sectionRoutes from "./routes/section.routes.js";
-import deliverableRoutes from "./routes/uploadedcontent/heroSection.route.js";
+// import sectionRoutes from "./routes/section.routes.js";
+// import deliverableRoutes from "./routes/uploadedcontent/heroSection.route.js";
 import authRoutes from "./routes/auth.routes.js";  // or authRoutes.js
 import userRoutes from "./routes/user.routes.js";
 
@@ -20,6 +20,11 @@ import softwareProjectRoutes from "./routes/uploadedcontent/softwareProject.rout
 import projectDeliverableRoutes from "./routes/uploadedcontent/projectDeliverable.route.js"
 import ourAchievementRoutes from "./routes/uploadedcontent/ourAchievement.route.js"
 import clientExperienceRoutes from "./routes/uploadedcontent/clientExperience.route.js"
+import visionMissionRoutes from "./routes/uploadedcontent/aboutuscontent/visionMission.route.js"
+import expertiseRoutes from "./routes/uploadedcontent/aboutuscontent/expertise.route.js"
+import ourTeamRoutes from "./routes/uploadedcontent/aboutuscontent/ourTeam.route.js"
+import blogHeroRoutes from "./routes/uploadedcontent/Blogs/blogHero.route.js"
+import blogRoutes from "./routes/uploadedcontent/aboutuscontent/blog.route.js"
 // import customerRoutes from "./routes/customer.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +41,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ ROUTES SECOND - AFTER MIDDLEWARE!
-app.use("/sections", sectionRoutes);
+// app.use("/sections", sectionRoutes);
 app.use("/hero-section", heroSectionRoutes);  
 app.use("/api/hardware-solutions", hardwareSolutionRoutes);
 app.use("/api/about-us", aboutUsRoutes);
@@ -44,6 +49,11 @@ app.use("/api/software-projects", softwareProjectRoutes);
 app.use("/api/project-deliverables", projectDeliverableRoutes);
 app.use("/api/our-achievements", ourAchievementRoutes);
 app.use("/api/client-experiences", clientExperienceRoutes);
+app.use("/sections", visionMissionRoutes);
+app.use("/api/expertise", expertiseRoutes);
+app.use("/api/our-team", ourTeamRoutes);
+app.use("/api/blog-hero", blogHeroRoutes);
+app.use("/api/blogs", blogRoutes);
 
 // app.use("/project-deliverables", deliverableRoutes);
 app.use("/api/auth", authRoutes);

@@ -1,158 +1,125 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/sections";
+// ✅ New dedicated API
+const API = "http://localhost:5000/api/expertise";
 
-/* ---------- THUNKS ---------- */
-
-// Fetch only expertise sections
+// FETCH ALL
 export const fetchExpertise = createAsyncThunk(
   "expertise/fetch",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(API_URL);
-      return res.data.filter(item => item.type === "expertise");
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch expertise");
+      const res = await axios.get(API);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Fetch failed");
     }
   }
 );
 
-// Add new expertise
+// ADD
 export const saveExpertise = createAsyncThunk(
   "expertise/save",
   async (formData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(API_URL, formData, {
+      const res = await axios.post(API, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to save expertise");
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Save failed");
     }
   }
 );
 
-// Update existing expertise
+// UPDATE
 export const updateExpertise = createAsyncThunk(
   "expertise/update",
-  async (formData, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const id = formData.get("id");
-      const res = await axios.put(`${API_URL}/${id}`, formData, {
+      const res = await axios.put(`${API}/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update expertise");
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Update failed");
     }
   }
 );
 
-// Delete expertise
+// DELETE
 export const deleteExpertise = createAsyncThunk(
   "expertise/delete",
   async (id, { rejectWithValue }) => {
+    // ✅ Guard against undefined id
+    if (!id) {
+      return rejectWithValue("Invalid ID");
+    }
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API}/${id}`);
       return id;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to delete expertise");
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Delete failed");
     }
   }
 );
-
-/* ---------- SLICE ---------- */
 
 const expertiseSlice = createSlice({
   name: "expertise",
   initialState: {
-    list: [],
+    list:    [],
     loading: false,
-    error: null,
-    success: false
+    error:   null,
   },
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-    clearSuccess: (state) => {
-      state.success = false;
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Expertise
-      .addCase(fetchExpertise.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // FETCH
+      .addCase(fetchExpertise.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(fetchExpertise.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
-        state.error = null;
+        state.list    = action.payload;
       })
-      .addCase(fetchExpertise.rejected, (state, action) => {
+      .addCase(fetchExpertise.rejected,  (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error   = action.payload;
       })
-      
-      // Save Expertise (Create)
-      .addCase(saveExpertise.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
+      // SAVE
+      .addCase(saveExpertise.pending,   (state) => { state.loading = true; })
       .addCase(saveExpertise.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
-        // Add new expertise
-        state.list.push(action.payload);
+        state.list.unshift(action.payload);
       })
-      .addCase(saveExpertise.rejected, (state, action) => {
+      .addCase(saveExpertise.rejected,  (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-        state.success = false;
+        state.error   = action.payload;
       })
-      
-      // Update Expertise
-      .addCase(updateExpertise.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
+      // UPDATE
+      .addCase(updateExpertise.pending,   (state) => { state.loading = true; })
       .addCase(updateExpertise.fulfilled, (state, action) => {
+        state.loading    = false;
+        const index = state.list.findIndex(
+          (item) => item._id === action.payload._id
+        );
+        if (index !== -1) state.list[index] = action.payload;
+      })
+      .addCase(updateExpertise.rejected,  (state, action) => {
         state.loading = false;
-        state.success = true;
-        // Update existing expertise
-        const updatedExpertise = action.payload;
-        const index = state.list.findIndex(item => item.id === updatedExpertise.id);
-        if (index !== -1) {
-          state.list[index] = updatedExpertise;
-        }
+        state.error   = action.payload;
       })
-      .addCase(updateExpertise.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.success = false;
-      })
-      
-      // Delete Expertise
-      .addCase(deleteExpertise.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // DELETE
+      .addCase(deleteExpertise.pending,   (state) => { state.loading = true; })
       .addCase(deleteExpertise.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = state.list.filter(item => item.id !== action.payload);
-        state.error = null;
+        state.list    = state.list.filter(
+          (item) => item._id !== action.payload
+        );
       })
-      .addCase(deleteExpertise.rejected, (state, action) => {
+      .addCase(deleteExpertise.rejected,  (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error   = action.payload;
       });
   },
 });
 
-export const { clearError, clearSuccess } = expertiseSlice.actions;
 export default expertiseSlice.reducer;

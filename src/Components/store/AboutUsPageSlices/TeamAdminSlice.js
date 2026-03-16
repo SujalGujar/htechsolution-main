@@ -1,68 +1,121 @@
-// src/store/OurTeamSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Base URL
-const API_URL = "http://localhost:5000/sections";
+// ✅ New dedicated API
+const API = "http://localhost:5000/api/our-team";
 
-// Fetch team members
-export const fetchTeam = createAsyncThunk("team/fetchTeam", async () => {
-  const res = await axios.get(API_URL);
-  return res.data;
-});
-
-// Add / Update a team member
-export const saveTeamMember = createAsyncThunk(
-  "team/saveTeamMember",
-  async (member) => {
-    const formData = new FormData();
-    formData.append("id", member.id || "");
-    formData.append("title", member.name);
-    formData.append("content", member.about);
-    formData.append("color", member.role); // we can store role in color for demo
-    if (member.imageFile) formData.append("image", member.imageFile);
-
-    const res = await axios.post(API_URL, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return res.data;
+// FETCH ALL
+export const fetchTeam = createAsyncThunk(
+  "ourTeam/fetch",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(API);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Fetch failed");
+    }
   }
 );
 
-// Delete a member
+// ADD
+export const saveTeamMember = createAsyncThunk(
+  "ourTeam/save",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(API, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Save failed");
+    }
+  }
+);
+
+// UPDATE
+export const updateTeamMember = createAsyncThunk(
+  "ourTeam/update",
+  async ({ id, formData }, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(`${API}/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Update failed");
+    }
+  }
+);
+
+// DELETE
 export const deleteTeamMember = createAsyncThunk(
-  "team/deleteTeamMember",
-  async (id) => {
-    const res = await axios.delete(`${API_URL}/${id}`);
-    return res.data;
+  "ourTeam/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${API}/${id}`);
+      return id;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Delete failed");
+    }
   }
 );
 
 const ourTeamSlice = createSlice({
   name: "ourTeam",
   initialState: {
-    members: [],  
-    status: "idle",
+    members: [],
+    loading: false,
+    error:   null,
   },
   reducers: {},
- extraReducers: (builder) => {
-  builder
-    .addCase(fetchTeam.fulfilled, (state, action) => {
-      state.members = Array.isArray(action.payload)
-        ? action.payload
-        : action.payload?.data || [];
-    })
-    .addCase(saveTeamMember.fulfilled, (state, action) => {
-      state.members = Array.isArray(action.payload)
-        ? action.payload
-        : action.payload?.data || [];
-    })
-    .addCase(deleteTeamMember.fulfilled, (state, action) => {
-      state.members = Array.isArray(action.payload)
-        ? action.payload
-        : action.payload?.data || [];
-    });
-}
+  extraReducers: (builder) => {
+    builder
+      // FETCH
+      .addCase(fetchTeam.pending,   (state) => { state.loading = true; state.error = null; })
+      .addCase(fetchTeam.fulfilled, (state, action) => {
+        state.loading = false;
+        state.members = action.payload;
+      })
+      .addCase(fetchTeam.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      })
+      // SAVE
+      .addCase(saveTeamMember.pending,   (state) => { state.loading = true; })
+      .addCase(saveTeamMember.fulfilled, (state, action) => {
+        state.loading = false;
+        state.members.unshift(action.payload);
+      })
+      .addCase(saveTeamMember.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      })
+      // UPDATE
+      .addCase(updateTeamMember.pending,   (state) => { state.loading = true; })
+      .addCase(updateTeamMember.fulfilled, (state, action) => {
+        state.loading    = false;
+        const index = state.members.findIndex(
+          (m) => m._id === action.payload._id
+        );
+        if (index !== -1) state.members[index] = action.payload;
+      })
+      .addCase(updateTeamMember.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      })
+      // DELETE
+      .addCase(deleteTeamMember.pending,   (state) => { state.loading = true; })
+      .addCase(deleteTeamMember.fulfilled, (state, action) => {
+        state.loading = false;
+        state.members = state.members.filter(
+          (m) => m._id !== action.payload
+        );
+      })
+      .addCase(deleteTeamMember.rejected,  (state, action) => {
+        state.loading = false;
+        state.error   = action.payload;
+      });
+  },
 });
 
 export default ourTeamSlice.reducer;
