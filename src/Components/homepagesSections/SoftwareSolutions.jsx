@@ -121,7 +121,7 @@ const SoftwareSolutions = () => {
                   </p>
 
                   {/* Bottom CTA line */}
-                  <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+                  {/* <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
                     <span className="text-xs text-[#1F6E8C] font-semibold tracking-wide uppercase">
                       Learn More
                     </span>
@@ -130,7 +130,7 @@ const SoftwareSolutions = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             ))}

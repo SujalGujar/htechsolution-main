@@ -226,7 +226,7 @@ const AboutUs = () => {
             <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-4 shadow-lg">
               <div className="text-center">
                 <div className="text-2xl font-bold" style={{ color: "#1F6E8C" }}>
-                  10+
+                  14+
                 </div>
                 <div className="text-xs text-gray-600">Years Experience</div>
               </div>
@@ -282,7 +282,7 @@ const AboutUs = () => {
             </div>
 
             {/* BUTTON */}
-            <motion.button
+            {/* <motion.button
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -295,7 +295,7 @@ const AboutUs = () => {
               }}
             >
               Discover Our Solutions
-            </motion.button>
+            </motion.button> */}
           </div>
         </div>
       </div>

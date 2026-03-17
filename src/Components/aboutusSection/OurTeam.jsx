@@ -34,7 +34,7 @@ const OurTeam = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-10 w-48 bg-gray-100 rounded-xl animate-pulse mx-auto mb-14" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -65,7 +65,7 @@ const OurTeam = () => {
         .team-card:hover .team-img { transform: scale(1.03); }
       `}</style>
 
-      <section className="team-root relative py-24 bg-white overflow-hidden">
+      <section className="team-root relative py-12 bg-white overflow-hidden">
 
         {/* Dot grid */}
         <div className="absolute inset-0 pointer-events-none"

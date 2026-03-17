@@ -11,14 +11,14 @@ const Service = () => {
     { name: "HDD / SSD", icon: "💾", detail: "Internal and external storage drives including SATA HDDs, NVMe SSDs, and portable drives. Available in capacities from 500 GB to 20 TB for desktops, laptops, NAS servers, and surveillance DVRs." },
     { name: "Desktop PC", icon: "🖥️", detail: "Pre-built and custom-assembled desktop computers for office work, graphic design, gaming, and server use. Each unit includes chassis, PSU, motherboard, RAM, CPU, storage, and OS installation as per requirement." },
     { name: "CPU / Processor", icon: "⚡", detail: "Intel Core i3/i5/i7/i9 and AMD Ryzen processors for desktop and laptop upgrades. We supply OEM and retail-boxed units with compatibility guidance for your motherboard and workload." },
-    { name: "Mouse", icon: "🖱️", detail: "Wired and wireless mice including office-use optical mice, ergonomic vertical mice, and high-DPI gaming mice. Available from Logitech, HP, Dell, and other leading brands." },
-    { name: "Keyboard", icon: "⌨️", detail: "Membrane, mechanical, and wireless keyboards for office, data entry, and gaming use. We carry slim compact keyboards, full-size layouts, and backlit mechanical variants." },
+    // { name: "Mouse", icon: "🖱️", detail: "Wired and wireless mice including office-use optical mice, ergonomic vertical mice, and high-DPI gaming mice. Available from Logitech, HP, Dell, and other leading brands." },
+    // { name: "Keyboard", icon: "⌨️", detail: "Membrane, mechanical, and wireless keyboards for office, data entry, and gaming use. We carry slim compact keyboards, full-size layouts, and backlit mechanical variants." },
     { name: "Laptop", icon: "💻", detail: "Laptops from brands like HP, Dell, Lenovo, Acer, and ASUS across budget, mid-range, and premium segments. Configurations available for business use, software development, creative work, and general productivity." },
     { name: "Printer", icon: "🖨️", detail: "Inkjet, laser, and all-in-one multifunction printers. We supply models suitable for home printing, office document handling, and high-volume commercial printing — from HP, Canon, Epson, and Brother." },
     { name: "All-in-One PC", icon: "🖥️", detail: "Space-saving AIO computers with integrated display and computing unit. Ideal for reception desks, billing counters, and office workstations. Available in 21.5\" and 23.8\" sizes from HP and Lenovo." },
     { name: "HDMI Cable", icon: "🔌", detail: "HDMI cables and adapters supporting 4K, 8K, and HDR output. We supply standard, high-speed, and ultra-high-speed HDMI cables in lengths from 1.5 m to 10 m for monitors, projectors, and TVs." },
     { name: "Router", icon: "📡", detail: "Wi-Fi routers with 802.11ac (Wi-Fi 5) and 802.11ax (Wi-Fi 6) standards. Suitable for home networks, offices, and mesh setups. Brands include TP-Link, Netgear, and D-Link." },
-    { name: "LAN Cable", icon: "🔗", detail: "Cat5e, Cat6, and Cat6A Ethernet cables sold by the metre or in pre-terminated patch leads. Used for structured cabling in offices, labs, and CCTV networks." },
+    // { name: "LAN Cable", icon: "🔗", detail: "Cat5e, Cat6, and Cat6A Ethernet cables sold by the metre or in pre-terminated patch leads. Used for structured cabling in offices, labs, and CCTV networks." },
   ];
 
   const visibleCount = 4;
@@ -35,15 +35,55 @@ const Service = () => {
   const [activeSoftware, setActiveSoftware] = useState(null);
 
   const softwareTypes = [
-    { icon: "🛍️", label: "E-Commerce Platforms", detail: "Custom online stores with payment gateway integration (Razorpay, Stripe, PayPal), product catalog management, cart & checkout flows, order tracking, and admin dashboards. Built on modern stacks like React + Node or Next.js." },
-    { icon: "📊", label: "CRM Systems", detail: "Tailored Customer Relationship Management tools to track leads, manage pipelines, automate follow-ups, and analyse sales performance. Integrated with email, WhatsApp, and third-party tools." },
-    { icon: "🏥", label: "Hospital Management (HMS)", detail: "End-to-end HMS covering patient registration, OPD/IPD management, appointment scheduling, doctor panels, billing, pharmacy stock, lab reports, and discharge summaries." },
-    { icon: "☁️", label: "Cloud Solutions", detail: "Cloud infrastructure setup on AWS, Azure, or Google Cloud — including VM provisioning, S3/blob storage, CI/CD pipelines, auto-scaling, and managed database configuration." },
-    { icon: "🌐", label: "Web Development", detail: "Responsive websites and web applications using React, Next.js, Vue, or plain HTML/CSS/JS. We handle UI design, API integration, SEO-friendly structure, and cross-browser compatibility." },
-    { icon: "🏢", label: "Enterprise Web Applications", detail: "Scalable internal tools and portals for businesses — ERP modules, inventory management, HR systems, workflow automation, role-based access, and audit trails." },
-    { icon: "🎨", label: "UI/UX Design", detail: "User research, wireframing, prototyping in Figma, and final UI design focused on usability, accessibility (WCAG), and brand consistency. Delivered as developer-ready design systems." },
-    { icon: "🚀", label: "Product Development", detail: "Full product lifecycle from discovery and MVP scoping to development, QA, launch, and iteration. We work with startups and enterprises using agile sprints and clear milestone tracking." },
-  ];
+  {
+    icon: "💻",
+    label: "Custom Software Development",
+    detail:
+      "We develop custom software solutions based on your business needs. Our systems are designed to improve efficiency, automate tasks, and support business growth.",
+  },
+  {
+    icon: "🌐",
+    label: "Web Application Development",
+    detail:
+      "We build modern and responsive web applications that work smoothly across all devices. Our solutions are fast, secure, and user-friendly.",
+  },
+  {
+    icon: "📱",
+    label: "Mobile Application Development",
+    detail:
+      "We create mobile apps for Android and iOS that help businesses connect with customers and manage operations on the go.",
+  },
+  {
+    icon: "🏢",
+    label: "ERP & Business Management Systems",
+    detail:
+      "We develop ERP systems to manage business operations like inventory, sales, accounts, and employee data in one place.",
+  },
+  {
+    icon: "📊",
+    label: "Management Systems",
+    detail:
+      "We build systems like school management, financial management, and other custom platforms to handle daily operations efficiently.",
+  },
+  {
+    icon: "☁️",
+    label: "Cloud Solutions",
+    detail:
+      "We provide cloud-based solutions for secure data storage, backup, and remote access to your business systems anytime, anywhere.",
+  },
+  {
+    icon: "🔗",
+    label: "Enterprise Solutions",
+    detail:
+      "We develop large-scale applications for businesses and organizations with secure access, automation, and high performance.",
+  },
+  {
+    icon: "🛠️",
+    label: "Support & Maintenance",
+    detail:
+      "We provide ongoing support, updates, and maintenance to ensure your software runs smoothly without any issues.",
+  },
+];
 
   const servicingHeadings = [
     {
@@ -355,8 +395,8 @@ const Service = () => {
             <div className="text-4xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">SEO</h3>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Search Engine Optimization strategies to improve website visibility and drive consistent organic traffic through keyword research, on-page optimization, and technical SEO improvements.
-            </p>
+  We provide professional Search Engine Optimization (SEO) services to improve your website ranking on search engines like Google. Our approach includes keyword research, on-page optimization, technical improvements, and performance tracking to increase organic traffic and generate quality leads for your business.
+</p>
           </motion.div>
 
           {/* Social Media Marketing */}
@@ -369,8 +409,9 @@ const Service = () => {
           >
             <div className="text-4xl mb-4">📱</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">Social Media Marketing</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              Strategic campaigns, content creation, and community management across Instagram, Facebook, LinkedIn, and other platforms to grow your brand and engage your audience.
+            <p className="text-gray-500 text-sm leading-relaxed"><p className="text-gray-500 text-sm leading-relaxed">
+  We provide professional Search Engine Optimization (SEO) services to improve your website ranking on search engines like Google. Our approach includes keyword research, on-page optimization, technical improvements, and performance tracking to increase organic traffic and generate quality leads for your business.
+</p> Strategic campaigns, content creation, and community management across Instagram, Facebook, LinkedIn, and other platforms to grow your brand and engage your audience.
             </p>
           </motion.div>
         </div>

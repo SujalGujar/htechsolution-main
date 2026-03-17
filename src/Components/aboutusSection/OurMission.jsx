@@ -48,7 +48,7 @@ const OurMission = () => {
   if (error || !list || list.length === 0) return null;
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-6xl mx-auto px-4">
 
         {/* ✅ Section Header */}

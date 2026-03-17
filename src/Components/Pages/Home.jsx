@@ -12,6 +12,7 @@ import ProjectDeliverablesHome from "../homepagesSections/ProjectDeliverablesHom
 import ClientExperience from "../homepagesSections/ClientExperience";
 // import { useNavigate } from "react-router-dom";
 import TrendingPopup from "../homepagesSections/TrendingPopup";
+import PartnersSection from "../homepagesSections/PartnersSection";
 const Home = () => {
   
 
@@ -47,6 +48,7 @@ const Home = () => {
       {/* <OurService /> */}
       {/* <OurTeam /> */}
       <OurAchievements />
+      <PartnersSection/>
       <ClientExperience/>
     </main>
   );

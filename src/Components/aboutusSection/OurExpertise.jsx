@@ -228,7 +228,7 @@ const OurExpertise = () => {
   /* ── Skeleton ── */
   if (loading) {
     return (
-      <section className="py-16 bg-white">
+      <section className="py-8 md:py-8 bg-white">
         <div className="max-w-7xl mx-auto px-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse border border-gray-100">
