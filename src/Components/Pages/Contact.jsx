@@ -102,8 +102,8 @@ const Contact = () => {
       icon: FaClock,
       heading: "Business Hours",
       features: [
-        "Mon-Fri: 9:00 AM - 6:00 PM",
-        "Saturday: 10:00 AM - 4:00 PM",
+        "Mon-Fri: 10:00 AM - 7:00 PM",
+        "Saturday: 10:00 AM - 7:00 PM",
         "Sunday: Closed",
       ],
       gradient: "linear-gradient(135deg, #1F6E8C 0%, #6BA368 100%)",

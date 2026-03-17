@@ -146,7 +146,7 @@ const HeroSection = () => {
                       initial={{ opacity: 0, y: 28 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.18, duration: 0.6 }}
-                      className="text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12] font-extrabold text-gray-900 mb-5"
+                      className="text-4xl md:text-5xl lg:text-[3rem] leading-[1.12] font-extrabold text-gray-900 mb-5"
                     >
                       {card.title
                         .split(" ")

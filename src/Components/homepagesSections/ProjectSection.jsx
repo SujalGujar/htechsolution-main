@@ -92,7 +92,7 @@ const ProjectSection = () => {
         }
       `}</style>
 
-      <section className="proj-root py-12 bg-white relative overflow-hidden">
+      <section className="proj-root py-8 bg-white relative overflow-hidden">
 
         <div className="absolute top-0 right-0 w-[420px] h-[420px] rounded-full bg-[#1F6E8C]/4 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-[#2AA8D0]/5 translate-y-1/2 -translate-x-1/3 pointer-events-none" />
@@ -117,13 +117,13 @@ const ProjectSection = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-[#1F6E8C] animate-pulse" />
               What We've Built
             </span>
-            <h2 className="display-font text-3xl md:text-4xl lg:text-6xl font-extrabold text-gray-900 leading-[1.05] mb-5">
+            <h2 className="display-font text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-[1.05] mb-5">
               Our Software <br />
               <span className="text-[#1F6E8C]">Projects</span>
             </h2>
-            <p className="text-gray-400 text-base max-w-md mx-auto leading-relaxed">
+            {/* <p className="text-gray-400 text-base max-w-md mx-auto leading-relaxed">
               Real-world solutions we've designed, built, and deployed — from CRMs to hospital management systems.
-            </p>
+            </p> */}
           </motion.div>
 
           {/* Cards Grid */}
