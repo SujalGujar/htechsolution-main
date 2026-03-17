@@ -87,7 +87,7 @@ const Contact = () => {
       id: 2,
       icon: FaPhoneAlt,
       heading: "Call Us",
-      features: ["+91 7984649969", "+91 8460525318"],
+      features: ["+91 94289 46527"],
       gradient: "linear-gradient(135deg, #D9A441 0%, #F7F7F2 100%)",
     },
     {
@@ -102,8 +102,8 @@ const Contact = () => {
       icon: FaClock,
       heading: "Business Hours",
       features: [
-        "Mon-Fri: 10:00 AM - 7:00 PM",
-        "Saturday: 10:00 AM - 7:00 PM",
+        "Mon-Sat: 10:00 AM - 7:00 PM",
+        
         "Sunday: Closed",
       ],
       gradient: "linear-gradient(135deg, #1F6E8C 0%, #6BA368 100%)",

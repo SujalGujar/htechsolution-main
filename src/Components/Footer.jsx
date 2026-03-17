@@ -303,22 +303,21 @@ const Footer = () => {
             </div>
 
             <p className="text-gray-400 mb-6">
-              Delivering cutting-edge software & hardware solutions tailored for
-              modern digital growth.
+             We deliver reliable software and hardware solutions for your business.
             </p>
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-orange-400" />
-                contact@htechsolutions.com
+                htechsolution98@gmail.com
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-orange-400" />
-                +1 (555) 123-4567
+               +94289 46527
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-orange-400" />
-                San Francisco, CA
+                Naroda,Ahmedabad
               </div>
             </div>
           </div>
