@@ -428,7 +428,7 @@ import dns from "node:dns/promises";
 dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 app.use(cors({
-  origin: ["https://h-techsolution.in", // your real domain
+  origin: ["https://h-techsolutions.in/", // your real domain
   "https://htechsolution-main-d7ku.vercel.app", // your vercel domain
   "http://localhost:5000", // for local development
   "http://localhost:5173", ],// for local development (Vite)
