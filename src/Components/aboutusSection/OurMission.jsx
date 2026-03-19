@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { fetchSections } from "../store/AboutUsPageSlices/VisionMisionSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 // ✅ Icon based on title keyword
 const getSectionIcon = (title = "") => {

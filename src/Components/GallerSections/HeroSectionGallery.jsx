@@ -10,7 +10,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const getImageUrl = (image) =>
   image?.startsWith("http") ? image : `${BASE_URL}${image}`;

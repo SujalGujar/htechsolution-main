@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { fetchDeliverables } from "../store/HomepageSlices/ProjectDeliverableSlice";
 import { FiChevronLeft, FiChevronRight, FiExternalLink, FiClock, FiTrendingUp } from "react-icons/fi";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const ProjectDeliverablesHome = () => {
   const dispatch = useDispatch();

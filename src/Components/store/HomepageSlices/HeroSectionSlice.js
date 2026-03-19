@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ This matches app.use("/hero-section")
-const API = "http://localhost:5000/hero-section";
+const API = "https://htechsolution-main.onrender.com/hero-section";
 
 export const fetchHeroSections = createAsyncThunk(
   "heroSection/fetch",

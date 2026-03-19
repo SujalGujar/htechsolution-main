@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { fetchTeam } from "../store/AboutUsPageSlices/TeamAdminSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const LinkedinIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

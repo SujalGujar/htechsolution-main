@@ -7,7 +7,7 @@ import {
   deleteExperience,
 } from "../../store/HomepageSlices/ClientExperienceSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 // ✅ Star Rating Selector Component
 const StarSelector = ({ value, onChange }) => {

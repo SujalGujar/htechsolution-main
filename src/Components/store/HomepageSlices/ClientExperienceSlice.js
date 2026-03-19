@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ Backend API - no more localStorage
-const API = "http://localhost:5000/api/client-experiences";
+const API = "https://htechsolution-main.onrender.com/api/client-experiences";
 
 // FETCH ALL
 export const fetchExperiences = createAsyncThunk(

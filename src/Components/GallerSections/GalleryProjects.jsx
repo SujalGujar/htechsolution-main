@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSections } from "../store/Blogs/BlogsSlice";
 import { motion } from "framer-motion";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const GalleryProjects = () => {
   const dispatch = useDispatch();

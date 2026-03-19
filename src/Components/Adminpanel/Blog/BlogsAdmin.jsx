@@ -7,7 +7,7 @@ import {
   deleteSection,
 } from "../../store/Blogs/BlogsSlice";
 
-const BASE_URL   = "http://localhost:5000";
+const BASE_URL   = "https://htechsolution-main.onrender.com";
 const EMPTY_FORM = { title: "", content: "" };
 
 const BlogsAdmin = () => {

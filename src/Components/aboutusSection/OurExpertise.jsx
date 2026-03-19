@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { fetchExpertise } from "../store/AboutUsPageSlices/OurExpertiseSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 /* ── Local fallback expertise data ───────────────────────────────── */
 const LOCAL_EXPERTISE = [

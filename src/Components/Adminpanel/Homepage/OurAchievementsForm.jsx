@@ -7,7 +7,7 @@ import {
   deleteAchievement,
 } from "../../store/HomepageSlices/OurAchievementsSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const OurAchievementsForm = () => {
   const dispatch = useDispatch();

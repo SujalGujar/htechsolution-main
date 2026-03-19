@@ -18,7 +18,7 @@ const WhatWeAreForm = () => {
   const [preview, setPreview] = useState("");
 
   const fetchSections = async () => {
-    const res = await axios.get("http://localhost:5000/sections");
+    const res = await axios.get("https://htechsolution-main.onrender.com/sections");
     setSections(res.data);
   };
 
@@ -40,7 +40,7 @@ const WhatWeAreForm = () => {
     form.append("image", imageFile);
   }
 
-  await axios.post("http://localhost:5000/sections", form);
+  await axios.post("https://htechsolution-main.onrender.com/sections", form);
   fetchSections();
 };
 
@@ -56,13 +56,13 @@ const WhatWeAreForm = () => {
     setEditingId(section.id);
     setActiveId(section.id);
     setFormData(section);
-    setPreview(section.image ? `http://localhost:5000${section.image}` : "");
+    setPreview(section.image ? `https://htechsolution-main.onrender.com${section.image}` : "");
   };
 
   /* ---------- DELETE ---------- */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this section?")) return;
-    await axios.delete(`http://localhost:5000/sections/${id}`);
+    await axios.delete(`https://htechsolution-main.onrender.com/sections/${id}`);
     fetchSections();
   };
 
@@ -156,7 +156,7 @@ const WhatWeAreForm = () => {
 
             {section.image && (
               <img
-                src={`http://localhost:5000${section.image}`}
+                src={`https://htechsolution-main.onrender.com${section.image}`}
                 className="mt-4 rounded-xl"
               />
             )}
@@ -168,3 +168,4 @@ const WhatWeAreForm = () => {
 };
 
 export default WhatWeAreForm;
+

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ Dedicated API - no more /sections
-const API = "http://localhost:5000/api/blog-hero";
+const API = "https://htechsolution-main.onrender.com/api/blog-hero";
 
 // FETCH ALL
 export const fetchBlogs = createAsyncThunk(

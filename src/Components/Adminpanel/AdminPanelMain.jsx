@@ -130,7 +130,7 @@
 //   console.log(data)
 //     try{
 //       const response = await axios.post(
-//         "http://localhost:5000/api/auth/login",data
+//         "https://htechsolution-main.onrender.com/api/auth/login",data
 //       )
 //       if(response.status == 200){
         
@@ -500,3 +500,4 @@ const AdminPanelMain = () => {
 };
 
 export default AdminPanelMain;
+

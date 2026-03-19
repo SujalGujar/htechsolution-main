@@ -82,8 +82,8 @@
 // src/utils/axiosInstance.js
 import axios from "axios";
 
-// ✅ Create axios instanceconst baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-// const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// ✅ Create axios instanceconst baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
+// const baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
 
 const axiosInstance = axios.create({
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,
@@ -178,5 +178,6 @@ export default axiosInstance;
 // Now that Login.jsx writes to "user", this file works perfectly.
 // Added one comment to make the key contract crystal clear.
 // ============================================================
+
 
 

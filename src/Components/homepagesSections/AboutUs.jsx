@@ -154,7 +154,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { fetchAboutUs } from "../store/HomepageSlices/AboutUsSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const AboutUs = () => {
   const dispatch = useDispatch();

@@ -7,7 +7,7 @@ import {
   deleteTeamMember,
 } from "../../store/AboutUsPageSlices/TeamAdminSlice";
 
-const BASE_URL   = "http://localhost:5000";
+const BASE_URL   = "https://htechsolution-main.onrender.com";
 const EMPTY_FORM = {
   name:        "",
   designation: "",

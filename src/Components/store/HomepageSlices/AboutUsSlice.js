@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API = "http://localhost:5000/api/about-us";
+const API = "https://htechsolution-main.onrender.com/api/about-us";
 
 // FETCH ALL
 export const fetchAboutUs = createAsyncThunk(

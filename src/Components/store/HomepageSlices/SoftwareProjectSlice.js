@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ Backend API URL
-const API = "http://localhost:5000/api/software-projects";
+const API = "https://htechsolution-main.onrender.com/api/software-projects";
 
 // FETCH ALL
 export const fetchProjects = createAsyncThunk(
@@ -125,4 +125,4 @@ export default projectSlice.reducer;
 
 // Open this in browser:
 // ```
-// http://localhost:5000/api/software-projects
+// https://htechsolution-main.onrender.com/api/software-projects

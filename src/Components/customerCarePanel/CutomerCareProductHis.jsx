@@ -4425,7 +4425,7 @@ export default function CustomerCareRegistration() {
   //    Only that one button shows loading; everything else stays normal.
   //
   // 4. axiosInstance.delete(`/category/${productId}`)
-  //    Calls:  DELETE http://localhost:5000/api/category/:id
+  //    Calls:  DELETE https://htechsolution-main.onrender.com/api/category/:id
   //    Route:  router.delete("/:id", verifyToken, authorizeRoles(...), deleteCategoryProduct)
   //    Service: Category.findByIdAndUpdate(id, { isActive: false }, { new: true })
   //    Result: isActive becomes false in MongoDB (soft delete — data stays)
@@ -5258,4 +5258,5 @@ const CSS = `
   .cc-chevron { display:inline-flex; transition:transform .2s; font-size:11px; }
   .cc-chevron.open { transform:rotate(90deg); }
 `; 
+
 

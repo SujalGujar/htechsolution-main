@@ -243,7 +243,7 @@ const TrendingTopicForm = () => {
                     {t.image && (
                       <div className="mt-2">
                         <img 
-                          src={`http://localhost:5000${t.image}`} 
+                          src={`https://htechsolution-main.onrender.com${t.image}`} 
                           alt={t.title}
                           className="w-24 h-16 object-cover rounded border"
                           onError={(e) => {
@@ -259,7 +259,7 @@ const TrendingTopicForm = () => {
                       className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-sm"
                       onClick={() => {
                         setForm(t);
-                        setImagePreview(t.image ? `http://localhost:5000${t.image}` : null);
+                        setImagePreview(t.image ? `https://htechsolution-main.onrender.com${t.image}` : null);
                       }}
                     >
                       Edit

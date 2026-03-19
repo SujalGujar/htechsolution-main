@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProjects } from "../store/HomepageSlices/SoftwareProjectSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 const ProjectSection = () => {
   const dispatch = useDispatch();

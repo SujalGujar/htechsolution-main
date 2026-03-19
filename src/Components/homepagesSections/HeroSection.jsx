@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHeroSections } from "../../Components/store/HomepageSlices/HeroSectionSlice";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://htechsolution-main.onrender.com";
 
 /* ── Diagonal clip shapes ───────────────────────────────────────────── */
 const CLIP_MAIN  = "polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%)";

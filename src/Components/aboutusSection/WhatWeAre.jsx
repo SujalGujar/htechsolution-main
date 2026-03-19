@@ -10,7 +10,7 @@ const WhatWeAre = () => {
     const fetchSections = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/sections/type/whatWeAre"
+          "https://htechsolution-main.onrender.com/sections/type/whatWeAre"
         );
 
         setSections(res.data);
@@ -76,7 +76,7 @@ const WhatWeAre = () => {
 
                     {section.image && (
                       <img
-                        src={`http://localhost:5000${section.image}`}
+                        src={`https://htechsolution-main.onrender.com${section.image}`}
                         alt={section.title}
                         className="mt-4 rounded-xl"
                       />
@@ -93,3 +93,4 @@ const WhatWeAre = () => {
 };
 
 export default WhatWeAre;
+

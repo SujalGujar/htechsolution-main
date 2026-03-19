@@ -54,7 +54,7 @@ const TrendingPopup = () => {
             <div className="h-full bg-gray-100 flex items-center justify-center">
               {t.image ? (
                 <img
-                  src={`http://localhost:5000${t.image}`}
+                  src={`https://htechsolution-main.onrender.com${t.image}`}
                   alt={t.title}
                   className="w-full h-full object-cover"
                 />
@@ -103,3 +103,4 @@ const TrendingPopup = () => {
 };
 
 export default TrendingPopup;
+

@@ -6,7 +6,7 @@ import {
   deleteSection,
 } from "../../store/AboutUsPageSlices/VisionMisionSlice";
 
-const BASE_URL  = "http://localhost:5000";
+const BASE_URL  = "https://htechsolution-main.onrender.com";
 const EMPTY_FORM = { id: "", title: "", content: "" };
 
 const MissionVisionAdmin = () => {
