@@ -83,12 +83,13 @@
 import axios from "axios";
 
 // ✅ Create axios instanceconst baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const axiosInstance = axios.create({
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,
   
-    baseURL: `${baseURL}/api`,
+      baseURL: "https://htechsolution-main.onrender.com/api",
+
 
   timeout: 1000000,
   headers: {
