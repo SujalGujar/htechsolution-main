@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
-import WarrantyCheckSection from "./Warrentychecksection"; // ← adjust path if needed
+import WarrantyCheckSection from "./WarrentyCheckSection"; // ← adjust path if needed
 
 const Contact = () => {
   const formRef = useRef();
