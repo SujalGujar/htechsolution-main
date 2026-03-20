@@ -118,3 +118,4 @@ const heroSectionSlice = createSlice({
 
 export const { clearError } = heroSectionSlice.actions;
 export default heroSectionSlice.reducer;
+

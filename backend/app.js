@@ -26,6 +26,9 @@ import ourTeamRoutes from "./routes/uploadedcontent/aboutuscontent/ourTeam.route
 import blogHeroRoutes from "./routes/uploadedcontent/Blogs/blogHero.route.js"
 import blogRoutes from "./routes/uploadedcontent/aboutuscontent/blog.route.js"
 // import customerRoutes from "./routes/customer.route.js"
+
+//complain user routes
+import complainRoutes from "./routes/complainUser.route.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -66,7 +69,8 @@ app.use("/api/product", categoryConfigRoutes);
   // Dynamic import for productConfig.route.js
 // app.use("/api/customerDetails",customerDetailRoutes)
 // app.use("/api/product", await import("./routes/productConfig.route.js").then(m => m.default))
-
+//complain user routes
+app.use("/api/complaint", complainRoutes);
 // Test route
 app.get("/", (_, res) => {
   res.send("🚀 Backend is running");
