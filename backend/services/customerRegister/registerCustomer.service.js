@@ -1,18 +1,10 @@
-import mongoose from "mongoose";
 import Customer from "../../models/customerRegisterModel/customerDetails.model.js";
+import {
+  generateCustomerProductId,
+  isCustomerProductIdExists,
+} from "../../utils/customerId.js";
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  FILE: services/customerRegistration.service.js
-//
-//  PURPOSE:
-//  Handles ONLY the customer registration logic — both single and bulk.
-//  Each product entry uses ticketNumber + warrStartDate + warrEndDate
-//  sent directly from the frontend (no DB product lookup needed).
-//
-//  USED BY: controllers/customerDetails.controller.js
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Validate purchase type vs product count ───────────────────────────────────
+// Validate purchase type
 const validatePurchaseType = (purchaseType, products) => {
   if (!products || products.length === 0) {
     throw new Error("At least one product is required");
@@ -25,64 +17,56 @@ const validatePurchaseType = (purchaseType, products) => {
   }
 };
 
-// ── Check for duplicate ticket numbers in same registration ───────────────────
+// Check duplicate tickets
 const checkDuplicateTickets = (products) => {
-  const tickets = products.map((p) => p.ticketNumber?.trim()).filter(Boolean);
+  const tickets = products.map((p) => p.ticketNumber);
   const unique = new Set(tickets);
   if (unique.size !== tickets.length) {
-    throw new Error(
-      "Duplicate ticket numbers found — each unit must have a unique ticket"
-    );
+    throw new Error("Duplicate ticket numbers found");
   }
 };
 
-// ── Resolve each product entry for saving ────────────────────────────────────
-// No DB lookup needed — frontend sends ticketNumber + dates directly.
-// configSnapshot is built from whatever extra fields the frontend passes.
-const resolveProduct = ({ ticketNumber, warrStartDate, warrEndDate, configSnapshot }) => {
-  if (!ticketNumber?.trim()) {
-    throw new Error("Each product entry must have a ticketNumber");
-  }
-  if (!warrStartDate) {
-    throw new Error(`warrStartDate missing for ticket: ${ticketNumber}`);
-  }
-  if (!warrEndDate) {
-    throw new Error(`warrEndDate missing for ticket: ${ticketNumber}`);
-  }
+// 🔥 Resolve Product
+const resolveProduct = async (product) => {
+  let customerProductId;
+
+  // 🔁 Ensure unique ID
+  do {
+    customerProductId = generateCustomerProductId();
+  } while (await isCustomerProductIdExists(customerProductId));
 
   return {
-    ticketNumber:   ticketNumber.trim(),
-    productRef:     null,
-    categoryRef:    null,
-    configSnapshot: configSnapshot || {},
-    warrStartDate:  new Date(warrStartDate),
-    warrEndDate:    new Date(warrEndDate),
+    ticketNumber: product.ticketNumber,
+    customerProductId,
+    configSnapshot: product.configSnapshot || {},
+    warrStartDate: new Date(product.warrStartDate),
+    warrEndDate: new Date(product.warrEndDate),
   };
 };
 
-// ── Main exported service ─────────────────────────────────────────────────────
+// 🔥 MAIN SERVICE
 export const registerCustomerService = async (payload) => {
   const { customerName, email, mobileNum, purchaseType, products } = payload;
 
-  // Validations
   validatePurchaseType(purchaseType, products);
   checkDuplicateTickets(products);
 
-  // Resolve all products
-  const resolvedProducts = products.map(resolveProduct);
+  const resolvedProducts = [];
 
-  // Create and save customer registration
-  const registration = new Customer({
-    customerName: customerName.trim(),
-    email:        email.trim().toLowerCase(),
-    mobileNum:    String(mobileNum).trim(),
+  for (const product of products) {
+    const resolved = await resolveProduct(product);
+    resolvedProducts.push(resolved);
+  }
+
+  const customer = new Customer({
+    customerName,
+    email,
+    mobileNum,
     purchaseType,
-    products:     resolvedProducts,
-    status:       "active",
+    products: resolvedProducts,
   });
 
-  const saved = await registration.save();
+  const saved = await customer.save();
 
-  // Return the saved document
-  return await Customer.findById(saved._id).lean();
+  return saved;
 };

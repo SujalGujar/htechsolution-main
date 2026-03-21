@@ -1,71 +1,52 @@
+import mongoose from "mongoose";
+import {registeredProductSchema}  from "./registerProduct.model.js";
 
-import mongoose, { Schema } from "mongoose";
-import {registeredProductSchema} from "./registerProduct.model.js";
 const customerDetailsSchema = new mongoose.Schema(
   {
-    // ── Customer Info (entered manually in form) ───────────────────────────
     customerName: {
       type: String,
-      required: [true, "Customer name is required"],
-      trim: true,
+      required: true,
     },
 
     email: {
       type: String,
-      required: [true, "Email is required"],
-      trim: true,
+      required: true,
       lowercase: true,
-      // Not unique — same customer can register multiple orders over time
     },
 
     mobileNum: {
-      type: String,             // String to preserve leading 0 / +91 prefix
-      required: [true, "Mobile number is required"],
-      trim: true,
+      type: String,
+      required: true,
     },
 
-    // ── Purchase Type ──────────────────────────────────────────────────────
     purchaseType: {
       type: String,
       enum: ["single", "bulk"],
-      required: [true, "Purchase type is required"],
+      required: true,
     },
 
-    // ── Products ───────────────────────────────────────────────────────────
-    // Each product = one ticketNumber copied from ProductHistory component
-    // single → exactly 1 item
-    // bulk   → 2 or more items
     products: {
       type: [registeredProductSchema],
       validate: {
         validator: function (arr) {
           if (this.purchaseType === "single") return arr.length === 1;
-          if (this.purchaseType === "bulk")   return arr.length >= 2;
+          if (this.purchaseType === "bulk") return arr.length >= 2;
           return arr.length >= 1;
         },
-        message:
-          "Single purchase must have exactly 1 product. Bulk purchase must have 2 or more.",
       },
     },
 
-   
     status: {
       type: String,
       enum: ["active", "cancelled", "pending"],
       default: "active",
     },
   },
-  {
-    timestamps: true,   // createdAt, updatedAt
-  }
+  { timestamps: true }
 );
 
-// ─── Indexes ──────────────────────────────────────────────────────────────────
-customerDetailsSchema.index({ email: 1 });
-customerDetailsSchema.index({ "products.ticketNumber": 1 });   // fast ticket lookup
-customerDetailsSchema.index({ "products.productRef": 1 });
-customerDetailsSchema.index({ purchaseType: 1 });
-customerDetailsSchema.index({ createdAt: -1 });
+// 🔥 INDEX FOR FAST SEARCH
+customerDetailsSchema.index({ "products.customerProductId": 1 },{ unique: true, sparse: true });
 
 const Customer = mongoose.model("customerdetails", customerDetailsSchema);
 export default Customer;

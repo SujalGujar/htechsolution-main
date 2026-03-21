@@ -657,22 +657,20 @@ import { registerCustomerService } from "../../services/customerRegister/registe
 // };
 
 // customerDetails.controller.js
+// import { registerCustomerService } from "../services/customerRegistration.service.js";
+
 export const registerCustomer = async (req, res) => {
   try {
-    const { customerName, email, mobileNum, purchaseType, products } = req.body;
+    const result = await registerCustomerService(req.body);
 
-    // basic validation
-    if (!customerName || !email || !mobileNum || !purchaseType || !products?.length) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
-    }
-
-    const saved = await registerCustomerService({ 
-      customerName, email, mobileNum, purchaseType, products 
+    res.status(201).json({
+      success: true,
+      data: result,
     });
-
-    return res.status(201).json({ success: true, data: saved });
-
-  } catch (err) {
-    return res.status(400).json({ success: false, message: err.message });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

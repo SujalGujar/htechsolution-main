@@ -47,18 +47,13 @@ const styles = `
     padding: 2rem 1.5rem 4rem;
   }
 
-  /* ── Page header ── */
   .ch-page-header {
     display: flex; align-items: flex-end; justify-content: space-between;
-    margin-bottom: 1.75rem;
-    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem; padding-bottom: 1.25rem;
     border-bottom: 2px solid ${C.border};
   }
-  .ch-page-title {
-    font-size: 1.5rem; font-weight: 800;
-    color: ${C.textPrimary}; letter-spacing: -0.02em; margin: 0 0 3px;
-  }
-  .ch-page-sub { font-size: 0.8rem; color: ${C.textSecondary}; font-weight: 500; margin: 0; }
+  .ch-page-title { font-size: 1.5rem; font-weight: 800; color: ${C.textPrimary}; letter-spacing: -0.02em; margin: 0 0 3px; }
+  .ch-page-sub   { font-size: 0.8rem; color: ${C.textSecondary}; font-weight: 500; margin: 0; }
 
   .ch-refresh-btn {
     display: flex; align-items: center; gap: 0.4rem;
@@ -71,18 +66,13 @@ const styles = `
   }
   .ch-refresh-btn:hover { border-color: ${C.primary}; color: ${C.primary}; }
 
-  /* ── Card ── */
   .ch-card {
-    background: ${C.white};
-    border: 1.5px solid ${C.border};
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 1rem;
+    background: ${C.white}; border: 1.5px solid ${C.border};
+    border-radius: 16px; overflow: hidden; margin-bottom: 1rem;
     transition: box-shadow 0.2s, border-color 0.2s;
   }
   .ch-card:hover { box-shadow: 0 4px 20px rgba(46,111,131,0.1); border-color: ${C.primaryMid}; }
 
-  /* ── Card header ── */
   .ch-card-header {
     display: flex; flex-wrap: wrap; align-items: center;
     justify-content: space-between; gap: 0.75rem;
@@ -90,87 +80,46 @@ const styles = `
     background: ${C.primary};
     border-bottom: 1px solid ${C.primaryDark};
   }
-
   .ch-avatar {
     width: 38px; height: 38px; border-radius: 10px;
     background: rgba(255,255,255,0.15);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .ch-customer-name { font-size: 0.88rem; font-weight: 700; color: #fff; line-height: 1.2; margin: 0 0 3px; }
+  .ch-customer-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+  .ch-meta-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: rgba(255,255,255,0.75); font-weight: 500; }
 
-  .ch-customer-name {
-    font-size: 0.88rem; font-weight: 700;
-    color: #fff; line-height: 1.2; margin: 0 0 3px;
-  }
-  .ch-customer-meta {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 0.75rem;
-  }
-  .ch-meta-item {
-    display: flex; align-items: center; gap: 0.3rem;
-    font-size: 0.72rem; color: rgba(255,255,255,0.75);
-    font-weight: 500;
-  }
+  .ch-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 3px 10px; border-radius: 100px; font-size: 0.68rem; font-weight: 700; border: 1px solid transparent; }
+  .ch-badge-active  { background: ${C.successBg}; color: ${C.successText}; border-color: ${C.successBorder}; }
+  .ch-badge-warn    { background: ${C.warnBg};    color: ${C.warnText};    border-color: ${C.warnBorder}; }
+  .ch-badge-error   { background: ${C.errorBg};   color: ${C.errorText};   border-color: ${C.errorBorder}; }
+  .ch-badge-ghost   { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.25); }
+  .ch-badge-accent  { background: ${C.accentLight}; color: #92400E; border-color: ${C.accentBorder}; }
+  .ch-badge-date    { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
+  .ch-badge-neutral { background: ${C.primaryLight}; color: ${C.primary}; border-color: ${C.primaryMid}; }
 
-  /* ── Badges ── */
-  .ch-badge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    padding: 3px 10px; border-radius: 100px;
-    font-size: 0.68rem; font-weight: 700;
-    border: 1px solid transparent;
-  }
-  .ch-badge-active   { background: ${C.successBg}; color: ${C.successText}; border-color: ${C.successBorder}; }
-  .ch-badge-warn     { background: ${C.warnBg};    color: ${C.warnText};    border-color: ${C.warnBorder}; }
-  .ch-badge-error    { background: ${C.errorBg};   color: ${C.errorText};   border-color: ${C.errorBorder}; }
-  .ch-badge-ghost    { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.25); }
-  .ch-badge-accent   { background: ${C.accentLight}; color: #92400E; border-color: ${C.accentBorder}; }
-  .ch-badge-date     { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
-
-  /* ── Delete btn ── */
   .ch-delete-btn {
-    width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    background: rgba(239,68,68,0.18);
-    border: 1px solid rgba(239,68,68,0.3);
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.3);
     cursor: pointer; transition: background 0.2s, border-color 0.2s;
   }
-  .ch-delete-btn:hover:not(:disabled) {
-    background: rgba(239,68,68,0.3);
-    border-color: rgba(239,68,68,0.5);
-  }
+  .ch-delete-btn:hover:not(:disabled) { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.5); }
   .ch-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* ── Products table ── */
   .ch-products-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 0.6rem 1.25rem;
-    background: ${C.primaryLight};
-    border-bottom: 1px solid ${C.primaryMid};
+    background: ${C.primaryLight}; border-bottom: 1px solid ${C.primaryMid};
   }
-  .ch-products-label {
-    font-size: 0.67rem; font-weight: 800;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: ${C.primary};
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .ch-col-headers {
-    display: none;
-    gap: 0.75rem;
-    font-size: 0.62rem; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: ${C.icon};
-  }
-  @media (min-width: 640px) { .ch-col-headers { display: grid; grid-template-columns: 26px 180px 110px 1fr 20px; } }
+  .ch-products-label { font-size: 0.67rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: ${C.primary}; display: flex; align-items: center; gap: 0.4rem; }
+  .ch-col-headers { display: none; gap: 0.75rem; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.icon}; }
+  @media (min-width: 640px) { .ch-col-headers { display: grid; grid-template-columns: 26px 1fr 110px 120px 20px; } }
 
-  /* ── Product row ── */
   .ch-product-row {
     display: grid; align-items: center; gap: 0.75rem;
-    padding: 0.7rem 1.25rem;
-    cursor: pointer;
-    border-bottom: 1px solid ${C.border};
-    transition: background 0.15s;
-    grid-template-columns: 26px 180px 110px 1fr 20px;
+    padding: 0.7rem 1.25rem; cursor: pointer;
+    border-bottom: 1px solid ${C.border}; transition: background 0.15s;
+    grid-template-columns: 26px 1fr 110px 120px 20px;
   }
   .ch-product-row:last-child { border-bottom: none; }
   .ch-product-row:hover { background: ${C.primaryLight}; }
@@ -180,134 +129,59 @@ const styles = `
     width: 22px; height: 22px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 0.65rem; font-weight: 700;
-    background: ${C.primaryMid}; color: ${C.primaryDark};
-    flex-shrink: 0;
+    background: ${C.primaryMid}; color: ${C.primaryDark}; flex-shrink: 0;
   }
-
   .ch-ticket-badge {
-    display: inline-flex; align-items: center;
-    padding: 3px 10px; border-radius: 8px;
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 8px;
     font-size: 0.7rem; font-family: monospace; font-weight: 700;
-    background: ${C.primaryLight}; color: ${C.primary};
-    border: 1px solid ${C.primaryMid};
+    background: ${C.primaryLight}; color: ${C.primary}; border: 1px solid ${C.primaryMid};
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
   }
-
   .ch-config-chip {
     display: inline-flex; align-items: center; gap: 0.25rem;
-    padding: 2px 8px; border-radius: 6px;
-    font-size: 0.65rem;
+    padding: 2px 8px; border-radius: 6px; font-size: 0.65rem;
     background: ${C.background}; border: 1px solid ${C.border};
   }
   .ch-config-key   { color: ${C.icon}; }
   .ch-config-value { color: ${C.textPrimary}; font-weight: 600; }
 
-  /* ── Expanded product detail ── */
   .ch-product-expand {
-    padding: 1rem 1.25rem;
-    background: ${C.primaryLight};
-    border-bottom: 1px solid ${C.primaryMid};
-    border-top: 1px solid ${C.primaryMid};
+    padding: 1rem 1.25rem; background: ${C.primaryLight};
+    border-bottom: 1px solid ${C.primaryMid}; border-top: 1px solid ${C.primaryMid};
   }
-  .ch-expand-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
-  }
+  .ch-expand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   @media (max-width: 540px) { .ch-expand-grid { grid-template-columns: 1fr; } }
 
-  .ch-detail-panel {
-    background: ${C.white}; border: 1.5px solid ${C.border};
-    border-radius: 12px; padding: 0.85rem 1rem;
-  }
-  .ch-detail-panel-title {
-    font-size: 0.62rem; font-weight: 800;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    margin-bottom: 0.6rem;
-  }
+  .ch-detail-panel { background: ${C.white}; border: 1.5px solid ${C.border}; border-radius: 12px; padding: 0.85rem 1rem; }
+  .ch-detail-panel-title { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; }
   .ch-detail-panel-title.primary { color: ${C.primary}; }
   .ch-detail-panel-title.accent  { color: ${C.accent}; }
 
-  .ch-detail-row {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 4px 0;
-    border-bottom: 1px solid ${C.background};
-    font-size: 0.75rem;
-  }
+  .ch-detail-row { display: flex; align-items: center; gap: 0.6rem; padding: 4px 0; border-bottom: 1px solid ${C.background}; font-size: 0.75rem; }
   .ch-detail-row:last-child { border-bottom: none; }
   .ch-detail-label { color: ${C.icon}; min-width: 52px; font-weight: 500; }
   .ch-detail-value { color: ${C.textPrimary}; font-weight: 600; }
 
-  /* ── Password cell ── */
   .ch-pw-cell { display: flex; align-items: center; gap: 0.35rem; }
   .ch-pw-text { font-size: 0.72rem; font-family: monospace; font-weight: 600; color: ${C.textPrimary}; letter-spacing: 0.1em; }
-  .ch-icon-btn {
-    width: 22px; height: 22px; border-radius: 6px; border: none;
-    background: ${C.background}; color: ${C.icon};
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background 0.15s, color 0.15s;
-  }
+  .ch-icon-btn { width: 22px; height: 22px; border-radius: 6px; border: none; background: ${C.background}; color: ${C.icon}; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s; }
   .ch-icon-btn:hover { background: ${C.primaryMid}; color: ${C.primary}; }
 
-  /* ── Empty state ── */
-  .ch-empty {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 5rem 1rem; text-align: center;
-  }
-  .ch-empty-icon {
-    width: 56px; height: 56px; border-radius: 16px;
-    background: ${C.primaryLight}; border: 1.5px solid ${C.primaryMid};
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 1rem;
-  }
+  .ch-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 1rem; text-align: center; }
+  .ch-empty-icon { width: 56px; height: 56px; border-radius: 16px; background: ${C.primaryLight}; border: 1.5px solid ${C.primaryMid}; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
 
-  /* ── Error state ── */
-  .ch-error-wrap {
-    display: flex; align-items: center; justify-content: center;
-    min-height: 400px; padding: 2rem;
-  }
-  .ch-error-card {
-    background: ${C.white}; border: 1.5px solid ${C.border};
-    border-radius: 20px; padding: 2.5rem 2rem;
-    max-width: 380px; width: 100%; text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-  }
-  .ch-error-icon {
-    width: 52px; height: 52px; border-radius: 14px;
-    background: ${C.errorBg}; border: 1.5px solid ${C.errorBorder};
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 1rem;
-  }
+  .ch-error-wrap { display: flex; align-items: center; justify-content: center; min-height: 400px; padding: 2rem; }
+  .ch-error-card { background: ${C.white}; border: 1.5px solid ${C.border}; border-radius: 20px; padding: 2.5rem 2rem; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  .ch-error-icon { width: 52px; height: 52px; border-radius: 14px; background: ${C.errorBg}; border: 1.5px solid ${C.errorBorder}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
 
-  /* ── Loading ── */
-  .ch-loading {
-    display: flex; align-items: center; justify-content: center;
-    min-height: 400px;
-  }
-  .ch-spinner {
-    width: 36px; height: 36px;
-    border: 3px solid ${C.primaryMid};
-    border-top-color: ${C.primary};
-    border-radius: 50%;
-    animation: chSpin 0.7s linear infinite;
-  }
+  .ch-loading { display: flex; align-items: center; justify-content: center; min-height: 400px; }
+  .ch-spinner { width: 36px; height: 36px; border: 3px solid ${C.primaryMid}; border-top-color: ${C.primary}; border-radius: 50%; animation: chSpin 0.7s linear infinite; }
   @keyframes chSpin { to { transform: rotate(360deg); } }
 
-  /* ── Pagination ── */
-  .ch-pagination {
-    display: flex; align-items: center; justify-content: space-between;
-    background: ${C.white}; border: 1.5px solid ${C.border};
-    border-radius: 14px; padding: 0.75rem 1.25rem;
-    margin-top: 1.5rem;
-  }
+  .ch-pagination { display: flex; align-items: center; justify-content: space-between; background: ${C.white}; border: 1.5px solid ${C.border}; border-radius: 14px; padding: 0.75rem 1.25rem; margin-top: 1.5rem; }
   .ch-pagination-text { font-size: 0.78rem; color: ${C.textSecondary}; }
   .ch-pagination-text strong { color: ${C.textPrimary}; font-weight: 700; }
-  .ch-pag-btn {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px; border: 1.5px solid ${C.border};
-    background: ${C.white}; cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-  }
+  .ch-pag-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1.5px solid ${C.border}; background: ${C.white}; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
   .ch-pag-btn:hover:not(:disabled) { border-color: ${C.primary}; background: ${C.primaryLight}; }
   .ch-pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .ch-pag-num { font-size: 0.78rem; font-weight: 700; color: ${C.textPrimary}; padding: 0 0.5rem; }
@@ -330,10 +204,20 @@ const warrantyStatus = (endDate) => {
   return               { label: 'Active',         cls: 'ch-badge ch-badge-active' };
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  toPlainConfig — DEFENSIVE DATA NORMALIZATION
+//
+//  The API can return configurations in 3 different shapes:
+//  1. mongoose Map object  → convert via Object.fromEntries()
+//  2. Plain JS object      → use directly (your current API returns this)
+//  3. null / undefined     → return empty object safely
+//
+//  This function handles ALL 3 cases without crashing.
+// ─────────────────────────────────────────────────────────────────────────────
 const toPlainConfig = (raw) => {
   if (!raw) return {};
   if (raw instanceof Map) return Object.fromEntries(raw);
-  if (typeof raw === 'object') return raw;
+  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;
   return {};
 };
 
@@ -377,10 +261,12 @@ const ConfigChips = ({ config }) => {
 };
 
 const ProductRow = ({ product, index }) => {
-  const [open, setOpen]   = useState(false);
-  const config            = toPlainConfig(product.configSnapshot);
-  const ws                = warrantyStatus(product.warrEndDate);
-  const configEntries     = Object.entries(config);
+  const [open, setOpen] = useState(false);
+
+  // ── FIX 1: read BOTH 'configSnapshot' (registered) and 'configurations' (raw product) ──
+  const config        = toPlainConfig(product.configSnapshot || product.configurations);
+  const ws            = warrantyStatus(product.warrEndDate);
+  const configEntries = Object.entries(config);
 
   return (
     <>
@@ -396,6 +282,7 @@ const ProductRow = ({ product, index }) => {
           <ShieldCheck size={10} />{ws.label}
         </span>
 
+        {/* Config preview chips — max 3 */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', overflow: 'hidden', maxHeight: 22 }}>
           {configEntries.slice(0, 3).map(([k, v]) => (
             <span key={k} className="ch-config-chip">
@@ -411,8 +298,7 @@ const ProductRow = ({ product, index }) => {
         </div>
 
         <ChevronDown
-          size={14}
-          color={C.icon}
+          size={14} color={C.icon}
           style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
         />
       </div>
@@ -420,6 +306,8 @@ const ProductRow = ({ product, index }) => {
       {open && (
         <div className="ch-product-expand">
           <div className="ch-expand-grid">
+
+            {/* Warranty dates panel */}
             <div className="ch-detail-panel">
               <div className="ch-detail-panel-title primary">Warranty Period</div>
               <div className="ch-detail-row">
@@ -434,11 +322,22 @@ const ProductRow = ({ product, index }) => {
                   {fmt(product.warrEndDate)}
                 </span>
               </div>
+              {/* ── FIX 2: show category from 'category.name' not 'categoryRef.name' ── */}
+              {product.categoryName && (
+                <div className="ch-detail-row">
+                  <Package size={12} color={C.primary} />
+                  <span className="ch-detail-label">Category</span>
+                  <span className="ch-detail-value">{product.categoryName}</span>
+                </div>
+              )}
             </div>
+
+            {/* All specs panel */}
             <div className="ch-detail-panel">
               <div className="ch-detail-panel-title accent">All Specifications</div>
               <ConfigChips config={config} />
             </div>
+
           </div>
         </div>
       )}
@@ -446,18 +345,58 @@ const ProductRow = ({ product, index }) => {
   );
 };
 
-/* ─────────────────────────── extractDisplayData ─────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   extractDisplayData — SINGLE SOURCE OF TRUTH FOR DATA MAPPING
+   
+   WHAT CHANGED AND WHY:
+   
+   Before (broken):
+   - configSnapshot: toPlainConfig(p.configSnapshot)
+     → your API returns 'configurations' not 'configSnapshot'
+     → result: all chips showed "No specs"
+   
+   - categoryRef?.name
+     → your API returns category: { name: "Laptop" } not categoryRef
+     → result: category never showed
+
+   After (fixed):
+   - configSnapshot: toPlainConfig(p.configSnapshot || p.configurations)
+     → reads whichever key exists, handles both old and new records
+   
+   - category?.name || categoryRef?.name
+     → tries both keys, works regardless of field name
+   
+   PRODUCTION TECHNIQUE: Defensive normalization with fallback chains.
+   Each field tries the most likely key first, falls back to alternatives,
+   finally falls back to null. The UI never crashes from a missing key.
+─────────────────────────────────────────────────────────────────────────────── */
 const extractDisplayData = (customer) => {
-  const fp  = customer.products?.[0] || {};
-  const cfg = toPlainConfig(fp.configSnapshot);
+  const fp = customer.products?.[0] || {};
+
+  // Read config from whichever key exists on the first product
+  const cfg = toPlainConfig(fp.configSnapshot || fp.configurations);
 
   const products = (customer.products || []).map(p => ({
-    _id:            p._id,
-    ticketNumber:   p.ticketNumber || p.productRef?.ticketNumber || null,
-    categoryName:   p.categoryRef?.name || p.categoryName || null,
-    configSnapshot: toPlainConfig(p.configSnapshot),
-    warrStartDate:  p.warrStartDate,
-    warrEndDate:    p.warrEndDate,
+    _id:          p._id,
+    ticketNumber: p.ticketNumber || null,
+
+    // FIX: API returns 'category.name', component was reading 'categoryRef.name'
+    categoryName: p.category?.name     ||   // raw product API: category.name
+                  p.categoryRef?.name  ||   // registered product: categoryRef.name
+                  p.categoryName       ||   // pre-extracted string
+                  null,
+
+    // FIX: API returns 'configurations', component was reading 'configSnapshot'
+    configSnapshot: toPlainConfig(
+      p.configSnapshot  ||   // registered product schema field
+      p.configurations  ||   // raw product schema field  ← your API uses this
+      {}
+    ),
+
+    // Warranty dates — present on registered products (customerdetails.products[])
+    // NOT present on raw product documents from /category/allproducts
+    warrStartDate: p.warrStartDate || null,
+    warrEndDate:   p.warrEndDate   || null,
   }));
 
   return {
@@ -468,6 +407,7 @@ const extractDisplayData = (customer) => {
     purchaseType: customer.purchaseType || 'single',
     status:       customer.status       || 'active',
     createdAt:    customer.createdAt,
+    // Warranty on header badge comes from first product's warrEndDate
     warrEndDate:  fp.warrEndDate || null,
     products,
     plainPassword: null,
@@ -488,6 +428,7 @@ const CustomerCareCustomerHistory = () => {
     setDeletingId(id);
     try {
       await axiosInstance.delete(`/customerDetails/registrations/${id}`);
+      // Optimistic update — remove from state instantly, no re-fetch needed
       setData(prev => prev.filter(c => c._id !== id));
       setCurrentPage(1);
     } catch (err) {
@@ -502,11 +443,13 @@ const CustomerCareCustomerHistory = () => {
       setLoading(true); setError(null);
       const res = await axiosInstance.get('/customerDetails/registrations');
       const d   = res.data;
+      // Defensive shape handling — API might return data in different wrappers
       if      (Array.isArray(d?.data))      setData(d.data);
       else if (Array.isArray(d?.customers)) setData(d.customers);
       else if (Array.isArray(d))            setData(d);
       else { setError('Invalid data format received from server'); }
     } catch (err) {
+      // Typed error handling — each status code = different message
       if      (err.response?.status === 401) setError('Session expired. Please login again.');
       else if (err.response?.status === 403) setError("You don't have permission to view this data.");
       else if (err.response?.status === 404) setError('Endpoint not found.');
@@ -550,12 +493,7 @@ const CustomerCareCustomerHistory = () => {
             {error}
           </p>
           <button onClick={handleFetchData}
-            style={{
-              width: '100%', height: 44, borderRadius: 10, border: 'none',
-              background: C.primary, color: '#fff',
-              fontFamily: "'Plus Jakarta Sans',sans-serif",
-              fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
-            }}>
+            style={{ width: '100%', height: 44, borderRadius: 10, border: 'none', background: C.primary, color: '#fff', fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
             Try Again
           </button>
         </div>
@@ -594,7 +532,7 @@ const CustomerCareCustomerHistory = () => {
         </div>
       )}
 
-      {/* Cards */}
+      {/* Customer cards */}
       <div>
         {currentItems.map((raw, idx) => {
           const item = extractDisplayData(raw);
@@ -603,7 +541,7 @@ const CustomerCareCustomerHistory = () => {
           return (
             <div key={item._id || idx} className="ch-card">
 
-              {/* ── Header bar ── */}
+              {/* ── Card header ── */}
               <div className="ch-card-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div className="ch-avatar">
@@ -619,30 +557,29 @@ const CustomerCareCustomerHistory = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {/* Warranty */}
+                  {/* Warranty badge */}
                   <span className={ws.cls}>
                     <ShieldCheck size={10} />{ws.label}
                   </span>
 
                   {/* Purchase type */}
                   {item.purchaseType === 'bulk'
-                    ? (
-                      <span className="ch-badge ch-badge-accent">
-                        <Layers size={10} /> Bulk ({item.products.length})
-                      </span>
-                    ) : (
-                      <span className="ch-badge ch-badge-ghost">
-                        <ShoppingBag size={10} /> Single
-                      </span>
-                    )
+                    ? <span className="ch-badge ch-badge-accent"><Layers size={10} /> Bulk ({item.products.length})</span>
+                    : <span className="ch-badge ch-badge-ghost"><ShoppingBag size={10} /> Single</span>
                   }
 
-                  {/* Date */}
+                  {/* Registration date */}
                   <span className="ch-badge ch-badge-date">
                     <Calendar size={10} />{fmt(item.createdAt)}
                   </span>
 
-                  {/* Delete */}
+                  {/* Customer ID badge — useful for complaint lookup */}
+                  <span className="ch-badge ch-badge-neutral" style={{ fontFamily: 'monospace', fontSize: '0.6rem' }}
+                    title="Customer ID — use this for complaint lookup">
+                    ID: {item._id?.slice(-8)}
+                  </span>
+
+                  {/* Delete button */}
                   <button
                     className="ch-delete-btn"
                     onClick={(e) => { e.stopPropagation(); handleDelete(item._id, item.customerName); }}
@@ -660,6 +597,7 @@ const CustomerCareCustomerHistory = () => {
               {/* ── Products table ── */}
               {item.products.length > 0 && (
                 <div>
+                  {/* Table header */}
                   <div className="ch-products-header">
                     <p className="ch-products-label">
                       <Package size={12} />
@@ -674,6 +612,7 @@ const CustomerCareCustomerHistory = () => {
                     </div>
                   </div>
 
+                  {/* One row per product */}
                   {item.products.map((product, pIdx) => (
                     <ProductRow key={product._id || pIdx} product={product} index={pIdx} />
                   ))}

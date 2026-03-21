@@ -61,8 +61,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    // productName removed — fields are managed dynamically via configurations
-    // companyName removed — same reason
+    
 
     configurations: {
       type: Map,

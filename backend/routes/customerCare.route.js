@@ -12,7 +12,7 @@ import { getAllRegistrations, getRegistrationById } from "../controllers/custome
 // import { productHistroy } from "../controllers/customercare.controller.js"  
 // import { registerCustomer } from "../controllers/customerRegister/customerRegistration.controller.js";
 import {  productDeleteController } from "../controllers/customerRegister/productDelete.controller.js";
-
+import {getByCustomerProductId} from "../controllers/customerRegister/search.controller.js"
 const router = express.Router()
 
 // ✅ correct routes
@@ -27,7 +27,7 @@ router.get("/product/lookup", verifyToken,authorizeRoles("admin","manager"),look
 
 // Register a new customer — single or bulk
 router.post("/register",verifyToken,authorizeRoles("admin","manager"), registerCustomer);
-
+router.get("/search/:id",verifyToken,authorizeRoles("admin","manager"), getByCustomerProductId);
 // View all registrations (with optional filters)
 router.get("/registrations",verifyToken,authorizeRoles("admin","manager"), getAllRegistrations);
 

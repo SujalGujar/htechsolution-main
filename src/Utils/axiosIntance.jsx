@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // ✅ Create axios instanceconst baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
-const baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const axiosInstance = axios.create({
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,

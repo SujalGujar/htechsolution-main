@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../Utils/axiosIntance";
 
@@ -47,40 +45,42 @@ export default function CustomerCareRegistration() {
   const [view, setView] = useState("history");
 
   // ── Product History state ─────────────────────────────────────────────────
-  const [products,        setProducts]        = useState([]);
-  const [histLoading,     setHistLoading]      = useState(true);
-  const [histError,       setHistError]        = useState(null);
-  const [searchTerm,      setSearchTerm]       = useState("");
-  const [expandedCats,    setExpandedCats]     = useState({});
-  const [expandedRows,    setExpandedRows]     = useState({});
-  const [copiedId,        setCopiedId]         = useState(null);
-  const [selectedTickets, setSelectedTickets]  = useState([]);
-  const [toast,           setToast]            = useState(null);
-
-  // ── NEW: deletingProductId ────────────────────────────────────────────────
-  // Tracks which product is currently being soft-deleted.
-  // When DELETE is clicked → set to that product._id → button shows spinner.
-  // After API responds → cleared back to null.
-  // Only one product can be deleted at a time (prevents double-clicks).
-  const [deletingProductId, setDeletingProductId] = useState(null);
+  const [products,          setProducts]          = useState([]);
+  const [histLoading,       setHistLoading]        = useState(true);
+  const [histError,         setHistError]          = useState(null);
+  const [searchTerm,        setSearchTerm]         = useState("");
+  const [expandedCats,      setExpandedCats]       = useState({});
+  const [expandedRows,      setExpandedRows]       = useState({});
+  const [copiedId,          setCopiedId]           = useState(null);
+  const [selectedTickets,   setSelectedTickets]    = useState([]);
+  const [toast,             setToast]              = useState(null);
+  const [deletingProductId, setDeletingProductId]  = useState(null);
 
   // ── Registration Form state ───────────────────────────────────────────────
-  const [purchaseType,  setPurchaseType]  = useState("single");
-  const [customer,      setCustomer]      = useState({ customerName: "", email: "", mobileNum: "" });
-  const [warrDates,     setWarrDates]     = useState({ warrStartDate: "", warrEndDate: "" });
-  const [singleTicket,  setSingleTicket]  = useState("");
-  const [singleProduct, setSingleProduct] = useState(null);
-  const [singleState,   setSingleState]   = useState("idle");
-  const [singleErr,     setSingleErr]     = useState("");
-  const [bulkList,      setBulkList]      = useState([]);
-  const [bulkInput,     setBulkInput]     = useState("");
-  const [bulkInputState,setBulkInputState]= useState("idle");
-  const [bulkInputErr,  setBulkInputErr]  = useState("");
-  const [bulkFetched,   setBulkFetched]   = useState(null);
-  const [submitState,   setSubmitState]   = useState("idle");
-  const [submitError,   setSubmitError]   = useState("");
-  const [submitted,     setSubmitted]     = useState(false);
-  const [savedReg,      setSavedReg]      = useState(null);
+  const [purchaseType,   setPurchaseType]   = useState("single");
+  const [customer,       setCustomer]       = useState({ customerName: "", email: "", mobileNum: "" });
+  const [warrDates,      setWarrDates]      = useState({ warrStartDate: "", warrEndDate: "" });
+  const [singleTicket,   setSingleTicket]   = useState("");
+  const [singleProduct,  setSingleProduct]  = useState(null);
+  const [singleState,    setSingleState]    = useState("idle");
+  const [singleErr,      setSingleErr]      = useState("");
+  const [bulkList,       setBulkList]       = useState([]);
+  const [bulkInput,      setBulkInput]      = useState("");
+  const [bulkInputState, setBulkInputState] = useState("idle");
+  const [bulkInputErr,   setBulkInputErr]   = useState("");
+  const [bulkFetched,    setBulkFetched]    = useState(null);
+  const [submitState,    setSubmitState]    = useState("idle");
+  const [submitError,    setSubmitError]    = useState("");
+  const [submitted,      setSubmitted]      = useState(false);
+  const [savedReg,       setSavedReg]       = useState(null);
+
+  // ── NEW: Search by customerProductId state ────────────────────────────────
+  // After registration each product gets a unique customerProductId from backend.
+  // The agent can search GET /customerDetails/search/:id to find any product.
+  const [searchById,      setSearchById]      = useState("");
+  const [searchByIdResult,setSearchByIdResult]= useState(null);
+  const [searchByIdState, setSearchByIdState] = useState("idle"); // idle|loading|found|notfound|error
+  const [copiedProductId, setCopiedProductId] = useState(null);
 
   const singleDebounce = useRef(null);
   const bulkDebounce   = useRef(null);
@@ -130,72 +130,52 @@ export default function CustomerCareRegistration() {
     }
   };
 
-  // ── NEW: handleDeleteProduct ──────────────────────────────────────────────
-  //
-  // HOW IT WORKS — step by step:
-  //
-  // 1. e.stopPropagation()
-  //    The delete button sits inside a row that has onClick={() => toggleRow()}.
-  //    Without this, clicking delete would ALSO expand/collapse the row.
-  //    stopPropagation stops the click from "bubbling up" to the parent div.
-  //
-  // 2. window.confirm()
-  //    Shows a browser confirm dialog before doing anything destructive.
-  //    If the user clicks Cancel → function returns early, nothing happens.
-  //
-  // 3. setDeletingProductId(productId)
-  //    Stores which product is being deleted.
-  //    The JSX checks: isDeleting = deletingProductId === product._id
-  //    When true → button renders a spinner instead of the trash icon.
-  //    Only that one button shows loading; everything else stays normal.
-  //
-  // 4. axiosInstance.delete(`/category/${productId}`)
-  //    Calls:  DELETE https://htechsolution-main.onrender.com/api/category/:id
-  //    Route:  router.delete("/:id", verifyToken, authorizeRoles(...), deleteCategoryProduct)
-  //    Service: Category.findByIdAndUpdate(id, { isActive: false }, { new: true })
-  //    Result: isActive becomes false in MongoDB (soft delete — data stays)
-  //
-  // 5. setProducts(prev => prev.filter(p => p._id !== productId))
-  //    Removes the deleted product from local state INSTANTLY.
-  //    No need to re-fetch the whole list — just filter it out.
-  //    prev = current products array
-  //    .filter() returns a NEW array keeping everything EXCEPT the deleted _id
-  //
-  // 6. Also remove from selectedTickets if the deleted product was selected
-  //    setSelectedTickets(prev => prev.filter(t => t !== ticketNumber))
-  //
-  // 7. showToast() — success message at bottom of screen
-  //
-  // 8. catch block — if API fails, show error toast
-  //
-  // 9. finally block — ALWAYS runs, clears deletingProductId so spinner stops
-  //    This runs whether the API succeeded or failed
-
+  // ── Delete product ────────────────────────────────────────────────────────
   const handleDeleteProduct = async (productId, ticketNumber, e) => {
-    e.stopPropagation(); // prevent row expand/collapse from triggering
-    console.log("Deleting product ID:", productId);           // ← what ID is being sent?
-  console.log("Full URL:", `/customerDetails/products/${productId}`);
+    e.stopPropagation();
     if (!window.confirm(`Deactivate product "${ticketNumber}"?\nIt will be hidden from this list.`)) return;
-
     setDeletingProductId(productId);
     try {
-      // DELETE /api/category/:id → sets isActive: false in DB
-      
       await axiosInstance.delete(`/customerDetails/products/${productId}`);
-
-      // Remove from local state instantly — no full re-fetch needed
       setProducts(prev => prev.filter(p => p._id !== productId));
-
-      // Also deselect it if it was selected
       setSelectedTickets(prev => prev.filter(t => t !== ticketNumber));
-
-      showToast(`✓ Product ${ticketNumber} deactivated`);
+      showToast(`Product ${ticketNumber} deactivated`);
     } catch (err) {
-      const msg = err?.response?.data?.message || "Failed to deactivate product";
-      showToast(`⚠ ${msg}`);
+      showToast(err?.response?.data?.message || "Failed to deactivate product");
     } finally {
-      setDeletingProductId(null); // always clear spinner
+      setDeletingProductId(null);
     }
+  };
+
+  // ── NEW: Search by customerProductId ─────────────────────────────────────
+  //
+  // HOW IT CONNECTS TO BACKEND:
+  // GET /customerDetails/search/:id
+  // → controller: getByCustomerProductId
+  // → queries Customer.findOne({ "products.customerProductId": id })
+  // → returns the full customer document that contains this product
+  //
+  // WHY this is useful:
+  // Each product in a registration gets a unique customerProductId (e.g. "CID-83921-XK2")
+  // The agent can search this ID to instantly find which customer owns a product.
+  const handleSearchById = async () => {
+    const id = searchById.trim();
+    if (!id) return;
+    setSearchByIdState("loading");
+    setSearchByIdResult(null);
+    try {
+      const { data } = await axiosInstance.get(`/customerDetails/search/${encodeURIComponent(id)}`);
+      setSearchByIdResult(data.data);
+      setSearchByIdState("found");
+    } catch (err) {
+      setSearchByIdState(err?.response?.status === 404 ? "notfound" : "error");
+    }
+  };
+
+  const copyProductId = (id) => {
+    navigator.clipboard.writeText(id).catch(() => {});
+    setCopiedProductId(id);
+    setTimeout(() => setCopiedProductId(null), 2000);
   };
 
   // ── Lookup functions ──────────────────────────────────────────────────────
@@ -253,6 +233,20 @@ export default function CustomerCareRegistration() {
     setBulkList(results.filter(r => r.status === "fulfilled").map(r => r.value));
   };
 
+  // ── Submit ────────────────────────────────────────────────────────────────
+  // WHAT WE SEND TO BACKEND:
+  // POST /customerDetails/register
+  // {
+  //   customerName, email, mobileNum, purchaseType,
+  //   products: [
+  //     { ticketNumber, warrStartDate, warrEndDate }
+  //     // NO customerProductId here — backend generates it automatically
+  //   ]
+  // }
+  //
+  // WHAT BACKEND RETURNS:
+  // { success: true, data: { _id, customerName, products: [{ ticketNumber, customerProductId, ... }] } }
+  // The customerProductId per product is now visible in savedReg.products[n].customerProductId
   const handleSubmit = async () => {
     try {
       setSubmitState("loading"); setSubmitError("");
@@ -267,11 +261,13 @@ export default function CustomerCareRegistration() {
         customerName: customer.customerName.trim(),
         email:        customer.email.trim(),
         mobileNum:    customer.mobileNum.trim(),
-        purchaseType, products,
+        purchaseType,
+        products,
       });
-      setSavedReg(data.data); setSubmitState("done"); setSubmitted(true);
+      setSavedReg(data.data);
+      setSubmitState("done");
+      setSubmitted(true);
     } catch (err) {
-      console.log(err.response?.data?.message)
       setSubmitError(err?.response?.data?.message || "Registration failed. Please try again.");
       setSubmitState("err");
     }
@@ -286,6 +282,7 @@ export default function CustomerCareRegistration() {
     setBulkList([]); setBulkInput(""); setBulkInputState("idle");
     setSubmitState("idle"); setSubmitError(""); setSubmitted(false); setSavedReg(null);
     setPurchaseType("single"); setSelectedTickets([]);
+    setSearchById(""); setSearchByIdResult(null); setSearchByIdState("idle");
   };
 
   const custOk      = customer.customerName && customer.email && customer.mobileNum;
@@ -325,6 +322,9 @@ export default function CustomerCareRegistration() {
   };
 
   // ── Success screen ────────────────────────────────────────────────────────
+  // KEY CHANGE: now shows customerProductId for each registered product.
+  // This ID was auto-generated by the backend — the agent uses it for
+  // future lookups via GET /customerDetails/search/:customerProductId
   if (submitted && savedReg) {
     return (
       <div className="cc-root">
@@ -337,6 +337,7 @@ export default function CustomerCareRegistration() {
               {savedReg._id?.slice(-8).toUpperCase() || "—"}
             </strong>
           </p>
+
           <div className="cc-detail-box">
             <DetailRow label="Customer"  value={savedReg.customerName} />
             <DetailRow label="Email"     value={savedReg.email} />
@@ -345,19 +346,46 @@ export default function CustomerCareRegistration() {
               accent={savedReg.purchaseType === "bulk" ? "#d97706" : "#15803d"} />
             <DetailRow label="Products"  value={`${savedReg.products?.length} unit(s) registered`} />
           </div>
+
+          {/* ── PRODUCT IDs TABLE ────────────────────────────────────────────
+            Each product now has a customerProductId generated by the backend.
+            We display it here so the agent can copy and use it for future
+            lookups via GET /customerDetails/search/:customerProductId
+          */}
           {savedReg.products?.length > 0 && (
             <div className="cc-saved-tickets">
-              {savedReg.products.map(p => (
-                <div key={p._id || p.ticketNumber} className="cc-saved-ticket-row">
-                  <span className="cc-mono">{p.ticketNumber}</span>
-                  <span style={{ color: "#6B7C86", fontSize: 12 }}>{p.categoryRef?.name || "—"}</span>
+              <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#6B7C86", margin: "0 0 8px" }}>
+                Product IDs (use these for future lookup)
+              </p>
+              {savedReg.products.map((p, i) => (
+                <div key={p._id || i} className="cc-saved-ticket-row">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1 }}>
+                    <span className="cc-mono">{p.ticketNumber}</span>
+                    {/* customerProductId — the new auto-generated unique ID per product */}
+                    {p.customerProductId && (
+                      <span style={{ fontSize: 11, color: "#2B6F84", fontFamily: "DM Mono, monospace", fontWeight: 600 }}>
+                        ID: {p.customerProductId}
+                      </span>
+                    )}
+                  </div>
                   <span style={{ color: "#6B7C86", fontSize: 11 }}>
-                    Warranty: {p.warrStartDate?.slice(0,10)} → {p.warrEndDate?.slice(0,10)}
+                    {p.warrStartDate?.slice(0, 10)} → {p.warrEndDate?.slice(0, 10)}
                   </span>
+                  {/* Copy button for the customerProductId */}
+                  {p.customerProductId && (
+                    <button
+                      className="cc-act-btn copy"
+                      style={{ fontSize: 10, padding: "3px 8px" }}
+                      onClick={() => copyProductId(p.customerProductId)}
+                    >
+                      {copiedProductId === p.customerProductId ? "✓ Copied" : "Copy ID"}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           )}
+
           <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
             <button className="cc-btn-primary" onClick={() => { resetForm(); setView("history"); }}>← Back to Products</button>
             <button className="cc-btn-outline-dark" onClick={resetForm}>+ New Registration</button>
@@ -373,7 +401,7 @@ export default function CustomerCareRegistration() {
       <style>{CSS}</style>
       {toast && <div className="cc-toast">{toast}</div>}
 
-      {/* Tabs */}
+      {/* Tabs — added "Search by ID" tab */}
       <div className="cc-tabs">
         <button className={`cc-tab${view === "history" ? " active" : ""}`} onClick={() => setView("history")}>
           <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -391,6 +419,13 @@ export default function CustomerCareRegistration() {
           {(singleState === "ok" || bulkList.length > 0) && (
             <span className="cc-tab-badge" style={{ background: "#15803d" }}>●</span>
           )}
+        </button>
+        {/* NEW TAB: Search by customerProductId */}
+        <button className={`cc-tab${view === "search" ? " active" : ""}`} onClick={() => setView("search")}>
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Search by Product ID
         </button>
       </div>
 
@@ -456,7 +491,7 @@ export default function CustomerCareRegistration() {
           {!histLoading && !histError && (
             <div className="cc-groups">
               {catNames.length === 0 ? (
-                <div className="cc-empty">🔍 No products found</div>
+                <div className="cc-empty">No products found</div>
               ) : catNames.map((cat, catIdx) => {
                 const items    = grouped[cat];
                 const color    = getCatColor(catIdx);
@@ -483,7 +518,6 @@ export default function CustomerCareRegistration() {
 
                     {isOpen && (
                       <div className="cc-ticket-rows">
-                        {/* Column headers */}
                         <div className="cc-ticket-thead">
                           <span></span><span>Ticket #</span><span>Date</span>
                           <span>Config Preview</span><span style={{ textAlign: "right" }}>Actions</span>
@@ -495,7 +529,6 @@ export default function CustomerCareRegistration() {
                           const isRowOpen  = !!expandedRows[product._id];
                           const isSel      = selectedTickets.includes(ticket);
                           const isCopied   = copiedId === ticket;
-                          // true while THIS specific product is being deleted
                           const isDeleting = deletingProductId === product._id;
 
                           return (
@@ -504,7 +537,6 @@ export default function CustomerCareRegistration() {
                                 className={`cc-ticket-row${isSel ? " selected" : ""}${isRowOpen ? " row-open" : ""}`}
                                 onClick={() => toggleRow(product._id)}
                               >
-                                {/* Checkbox */}
                                 <div
                                   className={`cc-checkbox${isSel ? " checked" : ""}`}
                                   style={isSel ? { background: color.accent, borderColor: color.accent } : {}}
@@ -512,20 +544,14 @@ export default function CustomerCareRegistration() {
                                 >
                                   {isSel && "✓"}
                                 </div>
-
-                                {/* Ticket badge */}
                                 <span className="cc-ticket-badge" style={{ background: color.bg, border: `1px solid ${color.border}`, color: color.text }}>
                                   {ticket || "—"}
                                 </span>
-
-                                {/* Date */}
                                 <span className="cc-ticket-date">
                                   {product.createdAt
                                     ? new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
                                     : "—"}
                                 </span>
-
-                                {/* Config chips */}
                                 <div className="cc-ticket-configs">
                                   {configs.slice(0, 3).map(([k, v]) => (
                                     <span key={k} className="cc-chip">
@@ -535,47 +561,23 @@ export default function CustomerCareRegistration() {
                                   ))}
                                   {configs.length > 3 && <span className="cc-chip-more">+{configs.length - 3}</span>}
                                 </div>
-
-                                {/* ── Actions: Copy | +Add | Delete ── */}
                                 <div className="cc-ticket-actions" onClick={e => e.stopPropagation()}>
-                                  <button
-                                    className={`cc-act-btn copy${isCopied ? " copied" : ""}`}
-                                    onClick={e => copyTicket(ticket, e)}
-                                  >
+                                  <button className={`cc-act-btn copy${isCopied ? " copied" : ""}`} onClick={e => copyTicket(ticket, e)}>
                                     {isCopied ? "✓ Copied" : "Copy"}
                                   </button>
-                                  <button
-                                    className={`cc-act-btn select${isSel ? " selected" : ""}`}
-                                    onClick={e => toggleTicket(ticket, e)}
-                                  >
+                                  <button className={`cc-act-btn select${isSel ? " selected" : ""}`} onClick={e => toggleTicket(ticket, e)}>
                                     {isSel ? "− Remove" : "+ Add"}
                                   </button>
-
-                                  {/* ── NEW DELETE BUTTON ──────────────────────────────
-                                    isDeleting → shows spinner (this row is being processed)
-                                    disabled={isDeleting} → blocks double-click during API call
-                                    e.stopPropagation() is inside handleDeleteProduct
-                                    so clicking delete never toggles the row expand/collapse
-                                  */}
-                                  <button
-                                    className="cc-act-btn cc-del-btn"
-                                    onClick={e => handleDeleteProduct(product._id, ticket, e)}
-                                    disabled={isDeleting}
-                                    title="Deactivate this product"
-                                  >
+                                  <button className="cc-act-btn cc-del-btn" onClick={e => handleDeleteProduct(product._id, ticket, e)} disabled={isDeleting} title="Deactivate this product">
                                     {isDeleting ? <Spin size={10} /> : "🗑"}
                                   </button>
-
                                   <span className={`cc-chevron${isRowOpen ? " open" : ""}`} style={{ marginLeft: 2, color: "#9fb3be" }}>▸</span>
                                 </div>
                               </div>
 
-                              {/* Expanded detail row */}
                               {isRowOpen && (
                                 <div className="cc-row-detail" style={{ borderLeftColor: color.accent }}>
-                                  <div className="cc-detail-label" style={{ color: color.accent }}>
-                                    Full Configuration — {ticket}
-                                  </div>
+                                  <div className="cc-detail-label" style={{ color: color.accent }}>Full Configuration — {ticket}</div>
                                   <div className="cc-detail-chips">
                                     {configs.map(([k, v]) => (
                                       <span key={k} className="cc-chip large">
@@ -586,21 +588,11 @@ export default function CustomerCareRegistration() {
                                   </div>
                                   <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                                     <button className="cc-act-btn copy" onClick={e => copyTicket(ticket, e)}>Copy Ticket</button>
-                                    <button
-                                      className={`cc-act-btn select${isSel ? " selected" : ""}`}
-                                      onClick={e => toggleTicket(ticket, e)}
-                                    >
+                                    <button className={`cc-act-btn select${isSel ? " selected" : ""}`} onClick={e => toggleTicket(ticket, e)}>
                                       {isSel ? "− Remove from bulk" : "+ Add to form"}
                                     </button>
-                                    {/* Delete button in expanded view too — with full label */}
-                                    <button
-                                      className="cc-act-btn cc-del-btn cc-del-full"
-                                      onClick={e => handleDeleteProduct(product._id, ticket, e)}
-                                      disabled={isDeleting}
-                                    >
-                                      {isDeleting
-                                        ? <><Spin size={11} /> Deactivating…</>
-                                        : "🗑 Deactivate Product"}
+                                    <button className="cc-act-btn cc-del-btn cc-del-full" onClick={e => handleDeleteProduct(product._id, ticket, e)} disabled={isDeleting}>
+                                      {isDeleting ? <><Spin size={11} /> Deactivating…</> : "🗑 Deactivate Product"}
                                     </button>
                                   </div>
                                 </div>
@@ -624,6 +616,103 @@ export default function CustomerCareRegistration() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══════════════ SEARCH BY PRODUCT ID VIEW ═══════════════
+        NEW VIEW — connects to GET /customerDetails/search/:id
+        The agent pastes a customerProductId and gets back the full
+        customer record that owns that product.
+      */}
+      {view === "search" && (
+        <div className="cc-card">
+          <div className="cc-header">
+            <div className="cc-header-row">
+              <div>
+                <h2 className="cc-title">Search by Product ID</h2>
+                <p className="cc-subtitle">Paste a customerProductId to find the registered customer</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="cc-form-body">
+            <div style={{ marginBottom: 16 }}>
+              <label className="cc-field-label" style={{ display: "block", marginBottom: 6 }}>Customer Product ID</label>
+              <p style={{ fontSize: 11, color: "#6B7C86", marginBottom: 8 }}>
+                This ID is shown on the registration success screen next to each product ticket number.
+              </p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div className="cc-ticket-input-wrap" style={{
+                  flex: 1,
+                  borderColor: searchByIdState === "found" ? "#16a34a" : searchByIdState === "notfound" || searchByIdState === "error" ? "#dc2626" : "#D9E6ED"
+                }}>
+                  <span style={{ color: "#9fb3be", fontSize: 16 }}>⌕</span>
+                  <input
+                    value={searchById}
+                    onChange={e => { setSearchById(e.target.value); setSearchByIdState("idle"); setSearchByIdResult(null); }}
+                    onKeyDown={e => e.key === "Enter" && handleSearchById()}
+                    placeholder="e.g. CID-83921-XK2"
+                    className="cc-ticket-input-field"
+                  />
+                  {searchByIdState === "loading" && <Spin size={14} />}
+                  {searchByIdState === "found"   && <span style={{ color: "#16a34a", fontWeight: 700 }}>✓</span>}
+                  {(searchByIdState === "notfound" || searchByIdState === "error") && <span style={{ color: "#dc2626" }}>✕</span>}
+                </div>
+                <button
+                  className="cc-add-btn"
+                  onClick={handleSearchById}
+                  disabled={!searchById.trim() || searchByIdState === "loading"}
+                  style={{ opacity: !searchById.trim() ? 0.4 : 1 }}
+                >
+                  {searchByIdState === "loading" ? <Spin size={13} /> : "Search"}
+                </button>
+              </div>
+              {searchByIdState === "notfound" && (
+                <p className="cc-input-err">⚠ No product found with this ID</p>
+              )}
+              {searchByIdState === "error" && (
+                <p className="cc-input-err">⚠ Something went wrong. Please try again.</p>
+              )}
+            </div>
+
+            {/* Search result */}
+            {searchByIdState === "found" && searchByIdResult && (
+              <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 12, padding: "16px 18px", animation: "cc-fadein .3s ease" }}>
+                <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.4px", textTransform: "uppercase", color: "#16a34a", marginBottom: 12 }}>
+                  Customer Found
+                </p>
+                <div className="cc-detail-box" style={{ marginBottom: 12 }}>
+                  <DetailRow label="Name"   value={searchByIdResult.customerName} />
+                  <DetailRow label="Email"  value={searchByIdResult.email} />
+                  <DetailRow label="Mobile" value={searchByIdResult.mobileNum} />
+                  <DetailRow label="Type"   value={searchByIdResult.purchaseType} />
+                </div>
+                <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#6B7C86", margin: "0 0 8px" }}>
+                  All Registered Products
+                </p>
+                <div className="cc-saved-tickets">
+                  {searchByIdResult.products?.map((p, i) => (
+                    <div key={p._id || i} className="cc-saved-ticket-row"
+                      style={{ borderColor: p.customerProductId === searchById.trim() ? "#2B6F84" : "#e5e7eb",
+                               background: p.customerProductId === searchById.trim() ? "#eff8ff" : "#f9fafb" }}>
+                      <div style={{ flex: 1 }}>
+                        <span className="cc-mono">{p.ticketNumber}</span>
+                        {p.customerProductId && (
+                          <span style={{ display: "block", fontSize: 11, fontFamily: "DM Mono, monospace", color: p.customerProductId === searchById.trim() ? "#2B6F84" : "#9CA3AF", fontWeight: 600, marginTop: 2 }}>
+                            ID: {p.customerProductId}
+                            {p.customerProductId === searchById.trim() && " ← searched"}
+                          </span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 11, color: "#6B7C86" }}>
+                        {p.warrStartDate?.slice(0, 10)} → {p.warrEndDate?.slice(0, 10)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -690,6 +779,11 @@ export default function CustomerCareRegistration() {
             </FormSection>
 
             <FormSection step="04" title={purchaseType === "bulk" ? `Product Ticket Numbers — ${bulkList.length} added` : "Product Ticket Number"}>
+              <div className="cc-info-note">
+                The backend auto-generates a unique <strong>Customer Product ID</strong> per product after registration.
+                You do not need to enter it — it will be shown on the success screen.
+              </div>
+
               {purchaseType === "single" && (
                 <>
                   <TicketInput value={singleTicket} onChange={setSingleTicket} state={singleState}
@@ -905,7 +999,6 @@ const CSS = `
   .cc-act-btn.select { background:#fff; border-color:var(--border); color:var(--muted); }
   .cc-act-btn.select:hover { border-color:#16a34a; color:#16a34a; }
   .cc-act-btn.select.selected { background:#dcfce7; border-color:#6ee7b7; color:#15803d; }
-  /* ── Delete button styles ── */
   .cc-del-btn { background:#fff5f5; border-color:#fca5a5 !important; color:#dc2626; padding:4px 8px; }
   .cc-del-btn:hover:not(:disabled) { background:#fee2e2; border-color:#f87171 !important; color:#b91c1c; }
   .cc-del-btn:disabled { opacity:.4; cursor:not-allowed; }
@@ -939,8 +1032,9 @@ const CSS = `
   .cc-fetched-cat { font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; }
   .cc-fetched-configs { display:flex; flex-wrap:wrap; gap:6px; }
   .cc-bulk-hint { background:#f8fbfc; border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:12px; color:var(--muted); margin-bottom:12px; line-height:1.6; }
+  .cc-info-note { background:#eff8ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 14px; font-size:12px; color:#1d4ed8; margin-bottom:14px; line-height:1.6; }
   .cc-bulk-input-row { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; }
-  .cc-add-btn { background:var(--primary); color:#fff; border:none; border-radius:9px; padding:11px 18px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; font-family:'DM Sans',sans-serif; transition:background .15s; }
+  .cc-add-btn { background:var(--primary); color:#fff; border:none; border-radius:9px; padding:11px 18px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; font-family:'DM Sans',sans-serif; transition:background .15s; display:flex; align-items:center; gap:6px; }
   .cc-add-btn:hover:not(.disabled) { background:var(--primary-dark); }
   .cc-add-btn.disabled { opacity:.3; cursor:not-allowed; }
   .cc-bulk-table { border:1.5px solid var(--border); border-radius:10px; overflow:hidden; margin-top:12px; }
@@ -971,18 +1065,16 @@ const CSS = `
   .cc-error-bar { margin:14px 20px; padding:11px 15px; background:#fff5f5; border:1px solid #fca5a5; border-left:3px solid #e57373; border-radius:9px; color:#b91c1c; font-size:13px; display:flex; align-items:center; gap:8px; }
   .cc-retry-btn { color:var(--primary); font-weight:700; background:none; border:none; cursor:pointer; }
   .cc-empty { text-align:center; padding:48px 24px; color:var(--muted); font-size:14px; }
-  .cc-success-wrap { max-width:560px; margin:48px auto; background:var(--card); border:1.5px solid #86efac; border-radius:18px; padding:40px 36px; text-align:center; animation:cc-fadein .4s ease; }
+  .cc-success-wrap { max-width:580px; margin:48px auto; background:var(--card); border:1.5px solid #86efac; border-radius:18px; padding:40px 36px; text-align:center; animation:cc-fadein .4s ease; }
   .cc-success-icon { width:56px; height:56px; background:#f0fdf4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; color:#16a34a; margin:0 auto 18px; border:2px solid #86efac; }
   .cc-success-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text); margin:0 0 6px; }
   .cc-success-sub { color:var(--muted); font-size:13px; margin:0 0 24px; }
-  .cc-detail-box { background:#f8fbfc; border-radius:10px; padding:16px 18px; margin-bottom:20px; text-align:left; }
+  .cc-detail-box { background:#f8fbfc; border-radius:10px; padding:16px 18px; margin-bottom:16px; text-align:left; }
   .cc-detail-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--muted); }
   .cc-detail-row:last-child { border-bottom:none; }
-  .cc-saved-tickets { display:flex; flex-direction:column; gap:4px; margin-bottom:6px; text-align:left; }
-  .cc-saved-ticket-row { display:flex; justify-content:space-between; align-items:center; background:#f8fbfc; border:1px solid var(--border); border-radius:7px; padding:7px 12px; gap:12px; flex-wrap:wrap; }
+  .cc-saved-tickets { display:flex; flex-direction:column; gap:6px; margin-bottom:6px; text-align:left; }
+  .cc-saved-ticket-row { display:flex; justify-content:space-between; align-items:center; background:#f8fbfc; border:1px solid var(--border); border-radius:8px; padding:8px 12px; gap:12px; flex-wrap:wrap; }
   .cc-mono { font-family:'DM Mono',monospace; font-size:12px; color:var(--primary); }
   .cc-chevron { display:inline-flex; transition:transform .2s; font-size:11px; }
   .cc-chevron.open { transform:rotate(90deg); }
-`; 
-
-
+`;
