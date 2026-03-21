@@ -425,13 +425,13 @@ const CustomerCareComplains = () => {
 
       setForm(prev => ({
         ...prev,
-        customerName:   foundCustomer.customerName  || foundCustomer.name  || '',
-        customerEmail:  foundCustomer.customerEmail || foundCustomer.email || '',
-        customerPhone:  foundCustomer.customerPhone || foundCustomer.phone || foundCustomer.mobileNumber || '',
+        customerName:   foundCustomer.customerName  || '',
+        customerEmail:  foundCustomer.email         || '',
+        customerPhone:  foundCustomer.mobileNum     || foundCustomer.phone || '',
         ticketNumber:   ticket,
-        productName:    snap.companyname || snap.modelname || snap.modelnumber || foundProduct.productName || '',
-        serialNumber:   snap.serialnumber || snap.serialNumber || foundProduct.serialNumber || '',
-        purchaseDate:   foundProduct.warrStartDate  || foundProduct.purchaseDate || '',
+        productName:    snap.companyname  || snap.company_name  || snap.modelnumber || '',
+        serialNumber:   snap.serialnumber || snap.serial_numebr || snap.serialNo    || '',
+        purchaseDate:   foundProduct.warrStartDate  || '',
         warrantyStatus,
         warrEndDate:    foundProduct.warrEndDate || '',
       }));
