@@ -7,8 +7,8 @@ import axios from "axios";
 const axiosInstance = axios.create({
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,
   
-      baseURL: "https://htechsolution-main.onrender.com/api"|| "http://localhost:5000",
-      // baseURL:"http://localhost:5000",
+      // baseURL: "https://htechsolution-main.onrender.com/api"|| "http://localhost:5000",
+      baseURL:"http://localhost:5000",
 
 
   timeout: 1000000,
