@@ -44,7 +44,7 @@ const registeredProductSchema = new mongoose.Schema(
     productRef: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-      required: true,
+      required: null,
     },
     categoryRef: {
       type: mongoose.Schema.Types.ObjectId,
