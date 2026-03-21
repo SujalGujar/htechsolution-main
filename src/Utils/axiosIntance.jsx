@@ -2,15 +2,15 @@
 import axios from "axios";
 
 // ✅ Create axios instanceconst baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
-// const baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
+const baseURL = import.meta.env.VITE_API_URL || "https://htechsolution-main.onrender.com";
 
 const axiosInstance = axios.create({
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,
   
       // baseURL: "https://htechsolution-main.onrender.com/api"|| "http://localhost:5000",
-      baseURL:"http://localhost:5000/api",
+      // baseURL:"http://localhost:5000/api",
 
-
+baseURL,
   timeout: 1000000,
   headers: {
     "Content-Type": "application/json",

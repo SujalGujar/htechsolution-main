@@ -1,3152 +1,321 @@
-
-
-
-
-// import { useState, useEffect } from "react";
-// import axiosInstance from '../../Utils/axiosIntance'; // ← adjust path if needed
-// import {
-//   Table,
-//   TableBody,
-//   TableCaption,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "../ui/table";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import { 
-//   Calendar, 
-//   Phone, 
-//   Mail, 
-//   User, 
-//   Package, 
-//   Hash, 
-//   Tag, 
-//   Barcode,
-//   Building2,
-//   FileText,
-//   Clock,
-//   AlertCircle,
-//   Search,
-//   Filter,
-//   ChevronLeft,
-//   ChevronRight,
-//   Download
-// } from 'lucide-react';
-
-// const CustomerCareProductHistory = () => {
-//   const [data, setData] = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage] = useState(5);
-
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-//       const res = await axiosInstance.get("/customerDetails/customer");
-//       setData(res.data.customers);
-//       setFilteredData(res.data.customers);
-//     } catch (error) {
-//       console.error("error fetching data:", error);
-//       if (error.response?.status === 401) {
-//         setError("Session expired. Please login again.");
-//       } else if (error.response?.status === 403) {
-//         setError("You don't have permission to view this data.");
-//       } else if (error.response?.status === 404) {
-//         setError("No customer data found.");
-//       } else {
-//         setError("Failed to fetch customer details. Please try again.");
-//       }
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     handleFetchData();
-//   }, []);
-
-//   // Search functionality
-//   useEffect(() => {
-//     const filtered = data.filter(item => 
-//       item.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.mobileNum?.includes(searchTerm) ||
-//       item.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.invoiceNum?.toLowerCase().includes(searchTerm.toLowerCase())
-//     );
-//     setFilteredData(filtered);
-//     setCurrentPage(1);
-//   }, [searchTerm, data]);
-
-//   // Pagination
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     return new Date(dateString).toLocaleDateString("en-IN", {
-//       year: "numeric",
-//       month: "short",
-//       day: "numeric",
-//     });
-//   };
-
-//   const checkWarrantyStatus = (endDate) => {
-//     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-//     const today = new Date();
-//     const warrantyEnd = new Date(endDate);
-//     const daysLeft = Math.ceil((warrantyEnd - today) / (1000 * 60 * 60 * 24));
-    
-//     if (daysLeft < 0) {
-//       return { status: 'Expired', color: 'bg-red-100 text-red-800' };
-//     } else if (daysLeft <= 30) {
-//       return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-//     } else {
-//       return { status: 'Active', color: 'bg-green-100 text-green-800' };
-//     }
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="text-center">
-//           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-//           <p className="text-gray-500 text-sm font-figtree">
-//             Loading customer data...
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-//           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-//           <p className="text-red-600 text-sm font-figtree mb-3">
-//             {error}
-//           </p>
-//           <button
-//             onClick={handleFetchData}
-//             className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
-//           >
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       {/* Header Section */}
-//       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-//           </p>
-//         </div>
-        
-//         <div className="flex gap-3 w-full sm:w-auto">
-//           {/* Search Bar */}
-//           <div className="relative flex-1 sm:flex-initial">
-//             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//             <input
-//               type="text"
-//               placeholder="Search customers..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-//             />
-//           </div>
-          
-//           {/* Export Button */}
-//           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-//             <Download className="w-4 h-4" />
-//             <span className="hidden sm:inline">Export</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Cards Grid */}
-//       <div className="grid grid-cols-1 gap-4">
-//         {currentItems.length === 0 ? (
-//           <Card className="bg-white">
-//             <CardContent className="py-12">
-//               <div className="text-center">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-//                 <p className="text-gray-500 text-sm">No customer records found</p>
-//                 {searchTerm && (
-//                   <button
-//                     onClick={() => setSearchTerm('')}
-//                     className="mt-2 text-orange-500 text-sm hover:text-orange-600"
-//                   >
-//                     Clear search
-//                   </button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           currentItems.map((item, index) => {
-//             const warranty = checkWarrantyStatus(item.warrEndDate);
-            
-//             return (
-//               <Card key={item._id || index} className="bg-white overflow-hidden hover:shadow-lg transition-shadow">
-//                 <CardContent className="p-0">
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />
-//                               {item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />
-//                               {item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Product Details Grid */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//                       {/* Product Info */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Serial Numbers */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial No:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model No:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Purchase & Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} - {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       {/* Status Badge */}
-//                       <div className="flex items-start justify-end">
-//                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${warranty.color}`}>
-//                           Warranty {warranty.status}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CustomerCareProductHistory;
-
-
-//   const [toast, setToast] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [cust, setCust] = useState(EMPTY_CUST);
-//   const [prod, setProd] = useState(EMPTY_PROD);
-  
-//   // For modals
-//   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
-//   const [userCredentials, setUserCredentials] = useState({ username: "", password: "" });
-  
-//   // For ticket number display
-//   const [generatedTicketNumber, setGeneratedTicketNumber] = useState("");
-
-//   const show = (type, customMessage = null) => {
-//     setToast({ type, message: customMessage });
-//     setTimeout(() => setToast(null), 3500);
-//   };
-
-//   const onC = (e) => setCust({ ...cust, [e.target.name]: e.target.value });
-//   const onP = (e) => setProd({ ...prod, [e.target.name]: e.target.value });
-
-//   const copyToClipboard = (text) => {
-//     navigator.clipboard.writeText(text);
-//     show("copy", "Copied to clipboard!");
-//   };
-
-//   const submitCust = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       const response = await axiosInstance.post("/customerDetails/newcustomer", cust);
-      
-//       // Check if response contains password and ticket number
-//       if (response.data.password) {
-//         setUserCredentials({
-//           username: cust.email,
-//           password: response.data.password
-//         });
-//         setShowCredentialsModal(true);
-//       }
-      
-//       // If ticket number is returned from backend
-//       if (response.data.ticketNumber) {
-//         setGeneratedTicketNumber(response.data.ticketNumber);
-//       }
-      
-//       show("customer", "Customer registered successfully!");
-//       setCust(EMPTY_CUST);
-//     } catch (err) {
-//       const msg = err.response?.data?.message || "Customer registration failed";
-//       setError(msg);
-//       show("error", msg);
-//       console.error(err);
-//     }
-//     setLoading(false);
-//   };
-
-//   const submitProd = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       const response = await axiosInstance.post("/auth/register", prod);
-      
-//       show("product", "Product registered successfully!");
-//       setProd(EMPTY_PROD);
-//     } catch (err) {
-//       const msg = err.response?.data?.message || "Product registration failed";
-//       setError(msg);
-//       show("error", msg);
-//       console.error(err);
-//     }
-//     setLoading(false);
-//   };
-
-//   const SIDEBAR_ITEMS = [
-//     { id: "customer", icon: "👤", label: "Customer", cls: "is-blue" },
-//     { id: "product", icon: "📦", label: "Product", cls: "is-green" },
-//   ];
-
-//   return (
-//     <>
-//       <style>{STYLES}</style>
-//       <div className="cc-wrap">
-
-//         {/* NAV */}
-//         <nav className="cc-nav">
-//           <div className="cc-nav-brand">
-//             <div className="cc-nav-logo">CC</div>
-//             <div>
-//               <div className="cc-nav-name">ServiceDesk Pro</div>
-//               <div className="cc-nav-sub">Customer Care Management</div>
-//             </div>
-//           </div>
-//           <div className="cc-nav-pill">● Live</div>
-//         </nav>
-
-//         <div className="cc-main">
-
-//           {/* SIDEBAR */}
-//           <aside className="cc-sidebar">
-//             <div className="cc-sb-label">Registrations</div>
-//             {SIDEBAR_ITEMS.map(it => (
-//               <button
-//                 key={it.id}
-//                 className={`cc-nav-item ${view === it.id ? it.cls : ""}`}
-//                 onClick={() => setView(it.id)}
-//               >
-//                 <div className="nav-ico">{it.icon}</div>
-//                 {it.label}
-//               </button>
-//             ))}
-
-//             <div className="cc-sb-label">Management</div>
-//             {[["🔍", "Search"], ["📋", "All Customers"], ["🛠", "Tickets"], ["📊", "Reports"]].map(([ico, lbl]) => (
-//               <button key={lbl} className="cc-nav-item">
-//                 <div className="nav-ico">{ico}</div>{lbl}
-//               </button>
-//             ))}
-//           </aside>
-
-//           {/* CONTENT */}
-//           <main className="cc-content">
-//             {/* Page header */}
-//             <div className="cc-breadcrumb">
-//               Home <span>›</span> Registrations <span>›</span>
-//               <strong style={{ color: "var(--text)" }}>
-//                 {view === "customer" ? "Customer" : "Product"}
-//               </strong>
-//             </div>
-//             <div className="cc-page-title">
-//               {view === "customer" ? "Customer Registration" : "Product Registration"}
-//             </div>
-//             <div className="cc-page-desc">
-//               {view === "customer"
-//                 ? "Add a new customer to the support system for warranty and service access."
-//                 : "Register a purchased product to activate warranty coverage and service tracking."}
-//             </div>
-
-//             {/* Step bar */}
-//             <div className="cc-steps">
-//               <div className={`cc-step ${view === "customer" ? "s-active" : "s-done"}`} onClick={() => setView("customer")}>
-//                 <div className="step-num">{view === "product" ? "✓" : "1"}</div>
-//                 <div><div className="step-lbl">Step 1</div><div className="step-ttl">Customer Info</div></div>
-//               </div>
-//               <div className="step-div" />
-//               <div className={`cc-step ${view === "product" ? "s-active" : ""}`} onClick={() => setView("product")}>
-//                 <div className="step-num">2</div>
-//                 <div><div className="step-lbl">Step 2</div><div className="step-ttl">Product Details</div></div>
-//               </div>
-//             </div>
-
-//             {/* Error Message */}
-//             {error && (
-//               <div style={{
-//                 background: "#fef3f2",
-//                 border: "1px solid #fecdca",
-//                 borderRadius: "var(--r-md)",
-//                 padding: "12px 16px",
-//                 marginBottom: "20px",
-//                 color: "var(--danger)",
-//                 fontSize: "13px"
-//               }}>
-//                 {error}
-//               </div>
-//             )}
-
-//             {/* ── CUSTOMER FORM ── */}
-//             {view === "customer" && (
-//               <div className="cc-card" key="cust">
-//                 <div className="cc-card-top">
-//                   <div className="cti blue">👤</div>
-//                   <div>
-//                     <div className="cth">New Customer</div>
-//                     <div className="ctp">Register a customer to grant access to warranty claims and support history.</div>
-//                   </div>
-//                 </div>
-//                 <form onSubmit={submitCust}>
-//                   <div className="cc-form-body">
-//                     {/* Customer Information */}
-//                     <div>
-//                       <div className="cc-sec-head">
-//                         <div className="sec-ico blue">🪪</div>
-//                         <div>
-//                           <div className="sec-ttl">Personal Information</div>
-//                           <div className="sec-sub">Basic contact details of the customer</div>
-//                         </div>
-//                       </div>
-//                       <div className="cc-grid">
-//                         <div className="cc-field full">
-//                           <label className="cc-label">Full Name <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="customerName"
-//                             value={cust.customerName}
-//                             onChange={onC}
-//                             placeholder="e.g. Rahul Sharma"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Email Address <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             type="email"
-//                             name="email"
-//                             value={cust.email}
-//                             onChange={onC}
-//                             placeholder="rahul@example.com"
-//                             required
-//                           />
-//                           <span className="cc-hint">This will be used as username for login</span>
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Mobile Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             type="tel"
-//                             name="mobileNum"
-//                             value={cust.mobileNum}
-//                             onChange={onC}
-//                             placeholder="+91 98765 43210"
-//                             required
-//                           />
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {/* Product Information */}
-//                     <div>
-//                       <div className="cc-sec-head">
-//                         <div className="sec-ico blue">📦</div>
-//                         <div>
-//                           <div className="sec-ttl">Product Information</div>
-//                           <div className="sec-sub">Product details to link with customer</div>
-//                         </div>
-//                       </div>
-//                       <div className="cc-grid">
-//                         <div className="cc-field">
-//                           <label className="cc-label">Product Name <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proName"
-//                             value={cust.proName}
-//                             onChange={onC}
-//                             placeholder="e.g. Samsung Smart TV"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Product Category <span className="req">*</span></label>
-//                           <select
-//                             className="cc-select"
-//                             name="proCatogory"
-//                             value={cust.proCatogory}
-//                             onChange={onC}
-//                             required
-//                           >
-//                             <option value="">Select category</option>
-//                             {CATS.map(c => <option key={c}>{c}</option>)}
-//                           </select>
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Serial Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proSrNo"
-//                             value={cust.proSrNo}
-//                             onChange={onC}
-//                             placeholder="e.g. SN2024XXXXXX"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Model Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proModNum"
-//                             value={cust.proModNum}
-//                             onChange={onC}
-//                             placeholder="e.g. UA55AU8000"
-//                             required
-//                           />
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {/* Ticket Number Display (appears after registration) */}
-//                     {generatedTicketNumber && (
-//                       <div className="ticket-field">
-//                         <div className="ticket-field-icon">🎫</div>
-//                         <div className="ticket-field-content">
-//                           <div className="ticket-field-label">Generated Ticket Number</div>
-//                           <div className="ticket-field-value">{generatedTicketNumber}</div>
-//                         </div>
-//                         <button
-//                           type="button"
-//                           className="copy-btn"
-//                           onClick={() => copyToClipboard(generatedTicketNumber)}
-//                           style={{ padding: "8px 12px" }}
-//                         >
-//                           Copy
-//                         </button>
-//                       </div>
-//                     )}
-//                   </div>
-
-//                   <div className="cc-form-footer">
-//                     <div className="footer-note"><span style={{ color: "var(--danger)" }}>*</span> Required fields</div>
-//                     <div className="footer-acts">
-//                       <button type="button" className="btn btn-ghost" onClick={() => {
-//                         setCust(EMPTY_CUST);
-//                         setGeneratedTicketNumber("");
-//                       }}>Clear</button>
-//                       <button type="submit" className="btn btn-blue" disabled={loading}>
-//                         {loading ? "Saving…" : <>Register Customer <span>→</span></>}
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </form>
-//               </div>
-//             )}
-
-//             {/* ── PRODUCT FORM ── */}
-//             {view === "product" && (
-//               <div className="cc-card" key="prod">
-//                 <div className="cc-card-top">
-//                   <div className="cti green">📦</div>
-//                   <div>
-//                     <div className="cth">Product Registration</div>
-//                     <div className="ctp">Register a purchased product to activate warranty and service request tracking.</div>
-//                   </div>
-//                 </div>
-//                 <form onSubmit={submitProd}>
-//                   <div className="cc-form-body">
-//                     {/* Product details */}
-//                     <div>
-//                       <div className="cc-sec-head">
-//                         <div className="sec-ico green">🔧</div>
-//                         <div>
-//                           <div className="sec-ttl">Product Details</div>
-//                           <div className="sec-sub">Identify the product being registered</div>
-//                         </div>
-//                       </div>
-//                       <div className="cc-grid">
-//                         <div className="cc-field">
-//                           <label className="cc-label">Product Name <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proName"
-//                             value={prod.proName}
-//                             onChange={onP}
-//                             placeholder='e.g. 55" Smart TV'
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Product Category <span className="req">*</span></label>
-//                           <select
-//                             className="cc-select"
-//                             name="proCatogory"
-//                             value={prod.proCatogory}
-//                             onChange={onP}
-//                             required
-//                           >
-//                             <option value="">Select category</option>
-//                             {CATS.map(c => <option key={c}>{c}</option>)}
-//                           </select>
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Brand Name <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="brandName"
-//                             value={prod.brandName}
-//                             onChange={onP}
-//                             placeholder="e.g. Samsung"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Model Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proModNum"
-//                             value={prod.proModNum}
-//                             onChange={onP}
-//                             placeholder="e.g. UA55AU8000"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field full">
-//                           <label className="cc-label">Serial Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="proSrNo"
-//                             value={prod.proSrNo}
-//                             onChange={onP}
-//                             placeholder="e.g. SN2024XXXXXXXX"
-//                             required
-//                           />
-//                           <span className="cc-hint">Found on the back of the product or inside the packaging</span>
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     <div className="cc-divider" />
-
-//                     {/* Purchase Information */}
-//                     <div>
-//                       <div className="cc-sec-head">
-//                         <div className="sec-ico green">🧾</div>
-//                         <div>
-//                           <div className="sec-ttl">Purchase Information</div>
-//                           <div className="sec-sub">Invoice and purchase details</div>
-//                         </div>
-//                       </div>
-//                       <div className="cc-grid g3">
-//                         <div className="cc-field">
-//                           <label className="cc-label">Purchase Date <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             type="date"
-//                             name="purDate"
-//                             value={prod.purDate}
-//                             onChange={onP}
-//                             required
-//                           />
-//                         </div>
-//                         <div className="cc-field">
-//                           <label className="cc-label">Invoice Number <span className="req">*</span></label>
-//                           <input
-//                             className="cc-input"
-//                             name="invoiceNum"
-//                             value={prod.invoiceNum}
-//                             onChange={onP}
-//                             placeholder="INV-2024-001"
-//                             required
-//                           />
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   <div className="cc-form-footer">
-//                     <div className="footer-note"><span style={{ color: "var(--danger)" }}>*</span> All fields required</div>
-//                     <div className="footer-acts">
-//                       <button type="button" className="btn btn-ghost" onClick={() => setProd(EMPTY_PROD)}>Clear</button>
-//                       <button type="submit" className="btn btn-green" disabled={loading}>
-//                         {loading ? "Saving…" : <>Register Product <span>→</span></>}
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </form>
-//               </div>
-//             )}
-//           </main>
-//         </div>
-//       </div>
-
-//       {/* Credentials Modal - For Customer Registration */}
-//       {showCredentialsModal && (
-//         <div className="cc-modal-overlay" onClick={() => setShowCredentialsModal(false)}>
-//           <div className="cc-modal" onClick={e => e.stopPropagation()}>
-//             <div className="modal-icon">🔐</div>
-//             <div className="modal-title">Registration Successful!</div>
-//             <div className="modal-subtitle">Auto-generated login credentials</div>
-
-//             <div className="credential-item">
-//               <div className="cred-label">Username (Email)</div>
-//               <div className="cred-value">
-//                 {userCredentials.username}
-//                 <button
-//                   className="copy-btn"
-//                   onClick={() => copyToClipboard(userCredentials.username)}
-//                 >
-//                   Copy
-//                 </button>
-//               </div>
-//             </div>
-
-//             <div className="credential-item">
-//               <div className="cred-label">Password</div>
-//               <div className="cred-value">
-//                 {userCredentials.password}
-//                 <button
-//                   className="copy-btn"
-//                   onClick={() => copyToClipboard(userCredentials.password)}
-//                 >
-//                   Copy
-//                 </button>
-//               </div>
-//             </div>
-
-//             {generatedTicketNumber && (
-//               <div className="credential-item">
-//                 <div className="cred-label">Ticket Number</div>
-//                 <div className="cred-value">
-//                   {generatedTicketNumber}
-//                   <button
-//                     className="copy-btn"
-//                     onClick={() => copyToClipboard(generatedTicketNumber)}
-//                   >
-//                     Copy
-//                   </button>
-//                 </div>
-//               </div>
-//             )}
-
-//             <div className="modal-note">
-//               ⚠️ Please save these credentials. They won't be shown again.
-//               <br />
-//               <small>Customer can login with these credentials to raise service requests.</small>
-//             </div>
-
-//             <div className="modal-actions">
-//               <button
-//                 className="btn btn-blue"
-//                 onClick={() => {
-//                   setShowCredentialsModal(false);
-//                   setGeneratedTicketNumber("");
-//                 }}
-//                 style={{ width: "100%" }}
-//               >
-//                 I've Saved Them
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* TOAST */}
-//       {toast && (
-//         <div className="cc-toast">
-//           <div className={`toast-dot ${
-//             toast.type === "customer" ? "blue" :
-//             toast.type === "product" ? "green" :
-//             toast.type === "copy" ? "blue" :
-//             toast.type === "error" ? "red" : "blue"
-//           }`}>
-//             {toast.type === "error" ? "✕" : "✓"}
-//           </div>
-//           <div>
-//             <div className="toast-ttl">
-//               {toast.type === "customer" && "Customer Registered!"}
-//               {toast.type === "product" && "Product Registered!"}
-//               {toast.type === "copy" && "Copied!"}
-//               {toast.type === "error" && "Error"}
-//             </div>
-//             <div className="toast-sub">
-//               {toast.message || (
-//                 toast.type === "customer" ? "Credentials sent to customer" :
-//                 toast.type === "product" ? "Product registered successfully" :
-//                 toast.type === "copy" ? "Text copied to clipboard" :
-//                 "Operation completed"
-//               )}
-//             </div>
-//           </div>
-//           <button className="toast-x" onClick={() => setToast(null)}>✕</button>
-//         </div>
-//       )}
-//     </>
-//   );import { useState, useEffect } from "react";
-// // import axiosInstance from '../../Utils/axiosIntance';
-
-// // import {
-// //   Table,
-// //   TableBody,
-// //   TableCaption,
-// //   TableCell,
-// //   TableHead,
-// //   TableHeader,
-// //   TableRow,
-// // } from "../ui/table";
-// // import {
-// //   Card,
-// //   CardContent,
-// //   CardHeader,
-// //   CardTitle,
-// // } from "../ui/card";
-// // import { Badge } from "../ui/badge";
-// // import { 
-// //   Calendar, 
-// //   Phone, 
-// //   Mail, 
-// //   User, 
-// //   Package, 
-// //   Hash, 
-// //   Tag, 
-// //   Barcode,
-// //   Building2,
-// //   FileText,
-// //   Clock,
-// //   AlertCircle,
-// //   Search,
-// //   Filter,
-// //   ChevronLeft,
-// //   ChevronRight,
-// //   Download
-// // } from 'lucide-react';
-// // import React from "react"
-// // const CustomerCareCustomerHistory = () => {
-// //   const [data, setData] = useState([]);
-// //   const [filteredData, setFilteredData] = useState([]);
-// //   const [loading, setLoading] = useState(false);
-// //   const [error, setError] = useState(null);
-// //   const [searchTerm, setSearchTerm] = useState('');
-// //   const [currentPage, setCurrentPage] = useState(1);
-// //   const [itemsPerPage] = useState(5);
-
-// //   const handleFetchData = async () => {
-// //     try {
-// //       setLoading(true);
-// //       setError(null);
-// //       const res = await axiosInstance.get("/customerDetails/customer");
-// //       setData(res.data.customers);
-// //       setFilteredData(res.data.customers);
-// //     } catch (error) {
-// //       console.error("error fetching data:", error);
-// //       if (error.response?.status === 401) {
-// //         setError("Session expired. Please login again.");
-// //       } else if (error.response?.status === 403) {
-// //         setError("You don't have permission to view this data.");
-// //       } else if (error.response?.status === 404) {
-// //         setError("No customer data found.");
-// //       } else {
-// //         setError("Failed to fetch customer details. Please try again.");
-// //       }
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   };
-
-// //   useEffect(() => {
-// //     handleFetchData();
-// //   }, []);
-
-// //   // Search functionality
-// //   useEffect(() => {
-// //     const filtered = data.filter(item => 
-// //       item.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-// //       item.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-// //       item.mobileNum?.includes(searchTerm) ||
-// //       item.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-// //       item.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-// //       item.invoiceNum?.toLowerCase().includes(searchTerm.toLowerCase())
-// //     );
-// //     setFilteredData(filtered);
-// //     setCurrentPage(1);
-// //   }, [searchTerm, data]);
-
-// //   // Pagination
-// //   const indexOfLastItem = currentPage * itemsPerPage;
-// //   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-// //   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-// //   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-// //   const formatDate = (dateString) => {
-// //     if (!dateString) return 'N/A';
-// //     return new Date(dateString).toLocaleDateString("en-IN", {
-// //       year: "numeric",
-// //       month: "short",
-// //       day: "numeric",
-// //     });
-// //   };
-
-// //   const checkWarrantyStatus = (endDate) => {
-// //     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-// //     const today = new Date();
-// //     const warrantyEnd = new Date(endDate);
-// //     const daysLeft = Math.ceil((warrantyEnd - today) / (1000 * 60 * 60 * 24));
-    
-// //     if (daysLeft < 0) {
-// //       return { status: 'Expired', color: 'bg-red-100 text-red-800' };
-// //     } else if (daysLeft <= 30) {
-// //       return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-// //     } else {
-// //       return { status: 'Active', color: 'bg-green-100 text-green-800' };
-// //     }
-// //   };
-
-// //   // Loading state
-// //   if (loading) {
-// //     return (
-// //       <div className="flex justify-center items-center h-64">
-// //         <div className="text-center">
-// //           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-// //           <p className="text-gray-500 text-sm font-figtree">
-// //             Loading customer data...
-// //           </p>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-// //   // Error state
-// //   if (error) {
-// //     return (
-// //       <div className="flex justify-center items-center h-64">
-// //         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-// //           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-// //           <p className="text-red-600 text-sm font-figtree mb-3">
-// //             {error}
-// //           </p>
-// //           <button
-// //             onClick={handleFetchData}
-// //             className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
-// //           >
-// //             Retry
-// //           </button>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-// //   return (
-// //     <div className="p-6 bg-gray-50 min-h-screen">
-// //       {/* Header Section */}
-// //       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-// //         <div>
-// //           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-// //           <p className="text-sm text-gray-500 mt-1">
-// //             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-// //           </p>
-// //         </div>
-        
-// //         <div className="flex gap-3 w-full sm:w-auto">
-// //           {/* Search Bar */}
-// //           <div className="relative flex-1 sm:flex-initial">
-// //             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-// //             <input
-// //               type="text"
-// //               placeholder="Search customers..."
-// //               value={searchTerm}
-// //               onChange={(e) => setSearchTerm(e.target.value)}
-// //               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-// //             />
-// //           </div>
-          
-// //           {/* Export Button */}
-// //           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-// //             <Download className="w-4 h-4" />
-// //             <span className="hidden sm:inline">Export</span>
-// //           </button>
-// //         </div>
-// //       </div>
-
-// //       {/* Cards Grid */}
-// //       <div className="grid grid-cols-1 gap-4">
-// //         {currentItems.length === 0 ? (
-// //           <Card className="bg-white">
-// //             <CardContent className="py-12">
-// //               <div className="text-center">
-// //                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-// //                 <p className="text-gray-500 text-sm">No customer records found</p>
-// //                 {searchTerm && (
-// //                   <button
-// //                     onClick={() => setSearchTerm('')}
-// //                     className="mt-2 text-orange-500 text-sm hover:text-orange-600"
-// //                   >
-// //                     Clear search
-// //                   </button>
-// //                 )}
-// //               </div>
-// //             </CardContent>
-// //           </Card>
-// //         ) : (
-// //           currentItems.map((item, index) => {
-// //             const warranty = checkWarrantyStatus(item.warrEndDate);
-            
-// //             return (
-// //               <Card key={item._id || index} className="bg-white overflow-hidden hover:shadow-lg transition-shadow">
-// //                 <CardContent className="p-0">
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />
-//                               {item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />
-//                               {item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Product Details Grid */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//                       {/* Product Info */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Serial Numbers */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial No:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model No:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Purchase & Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} - {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       {/* Status Badge */}
-//                       <div className="flex items-start justify-end">
-//                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${warranty.color}`}>
-//                           Warranty {warranty.status}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-// import React, {  useState,useEffect } from 'react';
-// import axiosInstance from '../../Utils/axiosIntance';
-
-// import {
-//   Table,
-//   TableBody,
-//   TableCaption,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "../ui/table";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import { 
-//   Calendar, 
-//   Phone, 
-//   Mail, 
-//   User, 
-//   Package, 
-//   Hash, 
-//   Tag, 
-//   Barcode,
-//   Building2,
-//   FileText,
-//   Clock,
-//   AlertCircle,
-//   Search,
-//   Filter,
-//   ChevronLeft,
-//   ChevronRight,
-//   Download
-// } from 'lucide-react';
-
-// const CustomerCareCustomerHistory = () => {
-//   const [data, setData] = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage] = useState(5);
-
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-//       const res = await axiosInstance.get("/customerDetails/customer");
-//       setData(res.data.customers);
-//       setFilteredData(res.data.customers);
-//     } catch (error) {
-//       console.error("error fetching data:", error);
-//       if (error.response?.status === 401) {
-//         setError("Session expired. Please login again.");
-//       } else if (error.response?.status === 403) {
-//         setError("You don't have permission to view this data.");
-//       } else if (error.response?.status === 404) {
-//         setError("No customer data found.");
-//       } else {
-//         setError("Failed to fetch customer details. Please try again.");
-//       }
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     handleFetchData();
-//   }, []);
-
-//   // Search functionality
-//   useEffect(() => {
-//     const filtered = data.filter(item => 
-//       item.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.mobileNum?.includes(searchTerm) ||
-//       item.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.invoiceNum?.toLowerCase().includes(searchTerm.toLowerCase())
-//     );
-//     setFilteredData(filtered);
-//     setCurrentPage(1);
-//   }, [searchTerm, data]);
-
-//   // Pagination
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     return new Date(dateString).toLocaleDateString("en-IN", {
-//       year: "numeric",
-//       month: "short",
-//       day: "numeric",
-//     });
-//   };
-
-//   const checkWarrantyStatus = (endDate) => {
-//     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-//     const today = new Date();
-//     const warrantyEnd = new Date(endDate);
-//     const daysLeft = Math.ceil((warrantyEnd - today) / (1000 * 60 * 60 * 24));
-    
-//     if (daysLeft < 0) {
-//       return { status: 'Expired', color: 'bg-red-100 text-red-800' };
-//     } else if (daysLeft <= 30) {
-//       return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-//     } else {
-//       return { status: 'Active', color: 'bg-green-100 text-green-800' };
-//     }
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="text-center">
-//           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-//           <p className="text-gray-500 text-sm font-figtree">
-//             Loading customer data...
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-//           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-//           <p className="text-red-600 text-sm font-figtree mb-3">
-//             {error}
-//           </p>
-//           <button
-//             onClick={handleFetchData}
-//             className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
-//           >
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       {/* Header Section */}
-//       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-//           </p>
-//         </div>
-        
-//         <div className="flex gap-3 w-full sm:w-auto">
-//           {/* Search Bar */}
-//           <div className="relative flex-1 sm:flex-initial">
-//             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//             <input
-//               type="text"
-//               placeholder="Search customers..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-//             />
-//           </div>
-          
-//           {/* Export Button */}
-//           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-//             <Download className="w-4 h-4" />
-//             <span className="hidden sm:inline">Export</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Cards Grid */}
-//       <div className="grid grid-cols-1 gap-4">
-//         {currentItems.length === 0 ? (
-//           <Card className="bg-white">
-//             <CardContent className="py-12">
-//               <div className="text-center">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-//                 <p className="text-gray-500 text-sm">No customer records found</p>
-//                 {searchTerm && (
-//                   <button
-//                     onClick={() => setSearchTerm('')}
-//                     className="mt-2 text-orange-500 text-sm hover:text-orange-600"
-//                   >
-//                     Clear search
-//                   </button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           currentItems.map((item, index) => {
-//             const warranty = checkWarrantyStatus(item.warrEndDate);
-            
-//             return (
-//               <Card key={item._id || index} className="bg-white overflow-hidden hover:shadow-lg transition-shadow">
-//                 <CardContent className="p-0">
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />
-//                               {item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />
-//                               {item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Product Details Grid */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//                       {/* Product Info */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Serial Numbers */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial No:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model No:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Purchase & Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} - {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       {/* Status Badge */}
-//                       <div className="flex items-start justify-end">
-//                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${warranty.color}`}>
-//                           Warranty {warranty.status}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-// import React, { useState, useEffect } from 'react';
-// import axiosInstance from '../../Utils/axiosIntance';
-// import { Lock } from 'lucide-react'; // ← missing
-
-// import {
-//   Table,
-//   TableBody,
-//   TableCaption,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "../ui/table";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import { 
-//   Calendar, 
-//   Phone, 
-//   Mail, 
-//   User, 
-//   Package, 
-//   Hash, 
-//   Tag, 
-//   Barcode,
-//   Building2,
-//   FileText,
-//   Clock,
-//   AlertCircle,
-//   Search,
-//   Filter,
-//   ChevronLeft,
-//   ChevronRight,
-//   Download
-// } from 'lucide-react';
-
-// const CustomerCareCustomerHistory = () => {
-//   const [data, setData] = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage] = useState(5);
-
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-      
-//       // ✅ FIXED: Changed from "/customerDetails/customer" to "/customerDetails/customers"
-//       // Based on your routes, the correct endpoint should be plural
-//       const res = await axiosInstance.get("/customerDetails/customer");
-      
-//       console.log("Fetched data:", res.data); // Debug log
-      
-//       // Check the response structure and set data accordingly
-//       if (res.data.customers) {
-//         setData(res.data.customers);
-//         setFilteredData(res.data.customers);
-//       } else if (Array.isArray(res.data)) {
-//         setData(res.data);
-//         setFilteredData(res.data);
-//       } else {
-//         console.error("Unexpected response structure:", res.data);
-//         setError("Invalid data format received from server");
-//       }
-      
-//     } catch (error) {
-//       console.error("error fetching data:", error);
-      
-//       if (error.response?.status === 401) {
-//         setError("Session expired. Please login again.");
-//       } else if (error.response?.status === 403) {
-//         setError("You don't have permission to view this data.");
-//       } else if (error.response?.status === 404) {
-//         // ✅ More helpful error message for 404
-//         setError("Customer data endpoint not found. Please check if the backend route is configured correctly.");
-//       } else {
-//         setError("Failed to fetch customer details. Please try again.");
-//       }
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     handleFetchData();
-//   }, []);
-
-//   // Search functionality
-//   useEffect(() => {
-//     if (data.length > 0) {
-//       const filtered = data.filter(item => 
-//         item.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         item.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         String(item.mobileNum || '').includes(searchTerm) ||
-//         item.proName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         item.proSrNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         item.invoiceNum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         (item.ticketNumber && item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase())),
-//         item.username && item.username.toLowerCase().includes(searchTerm.toLowerCase()),
-//         item.password && item.password.toLowerCase().includes(searchTerm.toLowerCase())
-//          // Added ticket number search
-//       );
-//       setFilteredData(filtered);
-//       setCurrentPage(1);
-//     }
-//   }, [searchTerm, data]);
-
-//   // Pagination
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     try {
-//       return new Date(dateString).toLocaleDateString("en-IN", {
-//         year: "numeric",
-//         month: "short",
-//         day: "numeric",
-//       });
-//     } catch (e) {
-//       return 'Invalid Date';
-//     }
-//   };
-
-//   const checkWarrantyStatus = (endDate) => {
-//     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-//     try {
-//       const today = new Date();
-//       const warrantyEnd = new Date(endDate);
-//       const daysLeft = Math.ceil((warrantyEnd - today) / (1000 * 60 * 60 * 24));
-      
-//       if (daysLeft < 0) {
-//         return { status: 'Expired', color: 'bg-red-100 text-red-800' };
-//       } else if (daysLeft <= 30) {
-//         return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-//       } else {
-//         return { status: 'Active', color: 'bg-green-100 text-green-800' };
-//       }
-//     } catch (e) {
-//       return { status: 'Error', color: 'bg-gray-100 text-gray-800' };
-//     }
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="text-center">
-//           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-//           <p className="text-gray-500 text-sm font-figtree">
-//             Loading customer data...
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center max-w-md">
-//           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-//           <p className="text-red-600 text-sm font-figtree mb-3">
-//             {error}
-//           </p>
-//           <button
-//             onClick={handleFetchData}
-//             className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
-//           >
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       {/* Header Section */}
-//       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-//           </p>
-//         </div>
-        
-//         <div className="flex gap-3 w-full sm:w-auto">
-//           {/* Search Bar */}
-//           <div className="relative flex-1 sm:flex-initial">
-//             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//             <input
-//               type="text"
-//               placeholder="Search customers..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-//             />
-//           </div>
-          
-//           {/* Export Button */}
-//           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-//             <Download className="w-4 h-4" />
-//             <span className="hidden sm:inline">Export</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Cards Grid */}
-//       <div className="grid grid-cols-1 gap-4">
-//         {currentItems.length === 0 ? (
-//           <Card className="bg-white">
-//             <CardContent className="py-12">
-//               <div className="text-center">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-//                 <p className="text-gray-500 text-sm">No customer records found</p>
-//                 {searchTerm && (
-//                   <button
-//                     onClick={() => setSearchTerm('')}
-//                     className="mt-2 text-orange-500 text-sm hover:text-orange-600"
-//                   >
-//                     Clear search
-//                   </button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           currentItems.map((item, index) => {
-//             const warranty = checkWarrantyStatus(item.warrEndDate);
-            
-//             return (
-//               <Card key={item._id || index} className="bg-white overflow-hidden hover:shadow-lg transition-shadow">
-//                 <CardContent className="p-0">
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />
-//                               {item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />
-//                               {item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Product Details Grid */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//                       {/* Product Info */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Serial Numbers */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial No:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model No:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                         {/* ✅ Added Ticket Number Display */}
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Ticket #:</span>
-//                           <span className="font-medium text-gray-900">{item.ticketNumber || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Purchase & Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} - {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                       </div>
-
-
-
-//                       {/* Status Badge */}
-//                       <div className="flex items-start justify-end">
-//                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${warranty.color}`}>
-//                           Warranty {warranty.status}
-//                         </div>
-//                       </div>
-
-//                        <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <User className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">UserName:</span>
-//                           <span className="font-medium text-gray-900">{item.username}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Lock className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Password:</span>
-//                           <span className="font-medium text-gray-900">
-//                              {item.password}
-//                           </span>
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-// import React, { useState, useEffect } from 'react';
-// import axiosInstance from '../../Utils/axiosIntance';
-
-// import { Card, CardContent } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import {
-//   Calendar,
-//   Phone,
-//   Mail,
-//   User,
-//   Package,
-//   Hash,
-//   Tag,
-//   Barcode,
-//   Building2,
-//   FileText,
-//   Clock,
-//   AlertCircle,
-//   Search,
-//   ChevronLeft,
-//   ChevronRight,
-//   Download,
-//   Lock,
-//   Eye,
-//   EyeOff,
-//   Copy,
-//   Check,
-//   ShieldCheck,
-//   KeyRound,
-//   Info,
-// } from 'lucide-react';
-
-// // ─── Check if password is still bcrypt hash ───────────────────────────────────
-// // If it starts with "$2b$" it's still hashed — backend not updated yet
-// const isBcrypt = (pw) => typeof pw === 'string' && pw.startsWith('$2b$');
-
-// // ─── Password Cell ─────────────────────────────────────────────────────────────
-// const PasswordCell = ({ password }) => {
-//   const [visible, setVisible] = useState(false);
-//   const [copied,  setCopied]  = useState(false);
-
-//   const bcrypt = isBcrypt(password);
-
-//   const handleCopy = () => {
-//     if (bcrypt) return; // don't copy hash
-//     navigator.clipboard.writeText(password || '');
-//     setCopied(true);
-//     setTimeout(() => setCopied(false), 1800);
-//   };
-
-//   // ── If still bcrypt — show warning instead ──────────────────────────────
-//   if (bcrypt) {
-//     return (
-//       <span className="inline-flex items-center gap-1 text-xs text-red-500 font-medium">
-//         <Info className="w-3 h-3" />
-//         Hashed — update backend
-//       </span>
-//     );
-//   }
-
-//   // ── Plain text password ─────────────────────────────────────────────────
-//   return (
-//     <div className="flex items-center gap-1">
-//       <span className="font-semibold text-gray-900 text-xs font-mono">
-//         {visible ? (password || 'N/A') : '••••••••'}
-//       </span>
-//       <button
-//         onClick={() => setVisible(v => !v)}
-//         className="p-0.5 rounded hover:bg-blue-100 text-blue-400 transition-colors"
-//         title={visible ? 'Hide' : 'Show'}
-//       >
-//         {visible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-//       </button>
-//       <button
-//         onClick={handleCopy}
-//         className="p-0.5 rounded hover:bg-blue-100 transition-colors"
-//         title="Copy"
-//       >
-//         {copied
-//           ? <Check className="w-3 h-3 text-green-500" />
-//           : <Copy  className="w-3 h-3 text-blue-400"  />
-//         }
-//       </button>
-//     </div>
-//   );
-// };
-
-// // ─── Main Component ────────────────────────────────────────────────────────────
-// const CustomerCareCustomerHistory = () => {
-//   const [data, setData]               = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [loading, setLoading]         = useState(false);
-//   const [error, setError]             = useState(null);
-//   const [searchTerm, setSearchTerm]   = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage]                = useState(5);
-
-//   // ── Fetch ───────────────────────────────────────────────────────────────────
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-//       const res = await axiosInstance.get("/customerDetails/customer");
-
-//       // Handle all response shapes
-//       let customers = [];
-//       if (res.data.customers)           customers = res.data.customers;
-//       else if (Array.isArray(res.data)) customers = res.data;
-//       else {
-//         setError("Invalid data format received from server");
-//         return;
-//       }
-
-//       // ── Debug: log first record's password to console ───────────────────
-//       // Open browser DevTools → Console to see what value comes from DB
-//       if (customers.length > 0) {
-//         console.log("First customer password from DB:", customers[0].password);
-//         console.log("Is bcrypt?", isBcrypt(customers[0].password));
-//       }
-
-//       setData(customers);
-//       setFilteredData(customers);
-//     } catch (error) {
-//       if (error.response?.status === 401)      setError("Session expired. Please login again.");
-//       else if (error.response?.status === 403) setError("You don't have permission to view this data.");
-//       else if (error.response?.status === 404) setError("Customer data endpoint not found.");
-//       else                                     setError("Failed to fetch customer details. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => { handleFetchData(); }, []);
-
-//   // ── Search ──────────────────────────────────────────────────────────────────
-//   useEffect(() => {
-//     if (data.length > 0) {
-//       const q = searchTerm.toLowerCase();
-//       const filtered = data.filter(item =>
-//         item.customerName?.toLowerCase().includes(q)      ||
-//         item.email?.toLowerCase().includes(q)             ||
-//         String(item.mobileNum || '').includes(searchTerm) ||
-//         item.proName?.toLowerCase().includes(q)           ||
-//         item.proSrNo?.toLowerCase().includes(q)           ||
-//         item.invoiceNum?.toLowerCase().includes(q)        ||
-//         item.ticketNumber?.toLowerCase().includes(q)      ||
-//         (!isBcrypt(item.password) && item.password?.toLowerCase().includes(q))
-//       );
-//       setFilteredData(filtered);
-//       setCurrentPage(1);
-//     }
-//   }, [searchTerm, data]);
-
-//   // ── Pagination ──────────────────────────────────────────────────────────────
-//   const indexOfLastItem  = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems     = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages       = Math.ceil(filteredData.length / itemsPerPage);
-
-//   // ── Stats: how many still have bcrypt vs plain ──────────────────────────────
-//   const bcryptCount = data.filter(d => isBcrypt(d.password)).length;
-//   const plainCount  = data.filter(d => !isBcrypt(d.password) && d.password).length;
-
-//   // ── Helpers ─────────────────────────────────────────────────────────────────
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     try {
-//       return new Date(dateString).toLocaleDateString("en-IN", {
-//         year: "numeric", month: "short", day: "numeric",
-//       });
-//     } catch { return 'Invalid Date'; }
-//   };
-
-//   const checkWarrantyStatus = (endDate) => {
-//     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-//     try {
-//       const daysLeft = Math.ceil((new Date(endDate) - new Date()) / (1000 * 60 * 60 * 24));
-//       if (daysLeft < 0)   return { status: 'Expired',       color: 'bg-red-100 text-red-800'       };
-//       if (daysLeft <= 30) return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-//       return { status: 'Active', color: 'bg-green-100 text-green-800' };
-//     } catch { return { status: 'Error', color: 'bg-gray-100 text-gray-800' }; }
-//   };
-
-//   // ── Loading ──────────────────────────────────────────────────────────────────
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="text-center">
-//           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-//           <p className="text-gray-500 text-sm">Loading customer data...</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // ── Error ────────────────────────────────────────────────────────────────────
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center max-w-md">
-//           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-//           <p className="text-red-600 text-sm mb-3">{error}</p>
-//           <button onClick={handleFetchData} className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors">
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // ── Render ───────────────────────────────────────────────────────────────────
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-
-//       {/* Header */}
-//       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-//           </p>
-//         </div>
-//         <div className="flex gap-3 w-full sm:w-auto">
-//           <div className="relative flex-1 sm:flex-initial">
-//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-//             <input
-//               type="text"
-//               placeholder="Search customers..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-//             />
-//           </div>
-//           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-//             <Download className="w-4 h-4" />
-//             <span className="hidden sm:inline">Export</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* ── Debug banner — tells you exactly what's in DB ── */}
-//       {/* Remove this section once everything is working */}
-//       {data.length > 0 && (
-//         <div className={`mb-4 px-4 py-3 rounded-lg text-sm flex items-center gap-2 ${
-//           bcryptCount > 0
-//             ? 'bg-red-50 border border-red-200 text-red-700'
-//             : 'bg-green-50 border border-green-200 text-green-700'
-//         }`}>
-//           <Info className="w-4 h-4 flex-shrink-0" />
-//           {bcryptCount > 0
-//             ? `⚠️ ${bcryptCount} record(s) still have bcrypt hash. ${plainCount} record(s) have plain password. Delete the hashed records and re-register them.`
-//             : `✅ All ${plainCount} record(s) have plain text passwords — working correctly!`
-//           }
-//         </div>
-//       )}
-
-//       {/* Cards */}
-//       <div className="grid grid-cols-1 gap-4">
-//         {currentItems.length === 0 ? (
-//           <Card className="bg-white">
-//             <CardContent className="py-12">
-//               <div className="text-center">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-//                 <p className="text-gray-500 text-sm">No customer records found</p>
-//                 {searchTerm && (
-//                   <button onClick={() => setSearchTerm('')} className="mt-2 text-orange-500 text-sm hover:text-orange-600">
-//                     Clear search
-//                   </button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           currentItems.map((item, index) => {
-//             const warranty = checkWarrantyStatus(item.warrEndDate);
-//             const cardId   = item._id || index;
-//             const hasHash  = isBcrypt(item.password);
-
-//             return (
-//               <Card
-//                 key={cardId}
-//                 className={`bg-white overflow-hidden hover:shadow-lg transition-shadow ${
-//                   hasHash ? 'border-red-100' : ''  // red border if still hashed
-//                 }`}
-//               >
-//                 <CardContent className="p-0">
-
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />
-//                               {item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />
-//                               {item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Card Body */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-//                       {/* Col 1 — Product */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 2 — Serial / Invoice / Ticket */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Ticket #:</span>
-//                           <span className="font-medium text-gray-900">{item.ticketNumber || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 3 — Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-start gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} – {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                         <div>
-//                           <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${warranty.color}`}>
-//                             <ShieldCheck className="w-3 h-3" />
-//                             Warranty {warranty.status}
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 4 — Login Credentials */}
-//                       <div className="space-y-2">
-//                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-1">
-//                           <KeyRound className="w-3.5 h-3.5" /> Login Credentials
-//                         </p>
-
-//                         <div className={`border rounded-xl p-3 space-y-2.5 ${
-//                           hasHash
-//                             ? 'bg-red-50 border-red-100'   // red if bcrypt
-//                             : 'bg-blue-50 border-blue-100' // blue if plain
-//                         }`}>
-
-//                           {/* Username = customerName */}
-//                           <div className="flex items-center gap-2">
-//                             <User className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-//                             <span className="text-xs text-gray-500">Username:</span>
-//                             <span className="text-xs font-semibold text-gray-900 truncate">
-//                               {item.customerName || 'N/A'}
-//                             </span>
-//                           </div>
-
-//                           {/* Password — plain or bcrypt warning */}
-//                           <div className="flex items-center gap-2">
-//                             <Lock className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-//                             <span className="text-xs text-gray-500">Password:</span>
-//                             <PasswordCell password={item.password} />
-//                           </div>
-
-//                         </div>
-//                       </div>
-
-//                     </div>
-//                   </div>
-
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-// import React, { useState, useEffect } from 'react';
-// import axiosInstance from '../../Utils/axiosIntance';
-
-// import { Card, CardContent } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import {
-//   Calendar, Phone, Mail, User, Package, Hash, Tag, Barcode,
-//   Building2, FileText, Clock, AlertCircle, Search,
-//   ChevronLeft, ChevronRight, Download,
-//   Lock, Eye, EyeOff, Copy, Check, ShieldCheck, KeyRound,
-// } from 'lucide-react';
-
-// const PasswordCell = ({ password }) => {
-//   const [visible, setVisible] = useState(false);
-//   const [copied, setCopied]   = useState(false);
-
-//   const handleCopy = () => {
-//     navigator.clipboard.writeText(password || '');
-//     setCopied(true);
-//     setTimeout(() => setCopied(false), 1800);
-//   };
-
-//   if (!password) {
-//     return <span className="text-xs text-gray-400 italic">Not available</span>;
-//   }
-
-//   return (
-//     <div className="flex items-center gap-1">
-//       <span className="font-semibold text-gray-900 text-xs font-mono">
-//         {visible ? password : '••••••••'}
-//       </span>
-//       <button onClick={() => setVisible(v => !v)}
-//         className="p-0.5 rounded hover:bg-blue-100 text-blue-400 transition-colors"
-//         title={visible ? 'Hide' : 'Show'}>
-//         {visible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-//       </button>
-//       <button onClick={handleCopy}
-//         className="p-0.5 rounded hover:bg-blue-100 transition-colors" title="Copy">
-//         {copied
-//           ? <Check className="w-3 h-3 text-green-500" />
-//           : <Copy  className="w-3 h-3 text-blue-400"  />}
-//       </button>
-//     </div>
-//   );
-// };
-
-// // ─── Main Component ───────────────────────────────────────────────────────────
-// const CustomerCareCustomerHistory = () => {
-//   const [data, setData]                 = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [loading, setLoading]           = useState(false);
-//   const [error, setError]               = useState(null);
-//   const [searchTerm, setSearchTerm]     = useState('');
-//   const [currentPage, setCurrentPage]   = useState(1);
-//   const [itemsPerPage]                  = useState(5);
-
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-//       const res = await axiosInstance.get("/customerDetails/customer");
-
-//       if (res.data.customers) {
-//         setData(res.data.customers);
-//         setFilteredData(res.data.customers);
-//       } else if (Array.isArray(res.data)) {
-//         setData(res.data);
-//         setFilteredData(res.data);
-//       } else {
-//         setError("Invalid data format received from server");
-//       }
-//     } catch (error) {
-//       if (error.response?.status === 401)      setError("Session expired. Please login again.");
-//       else if (error.response?.status === 403) setError("You don't have permission to view this data.");
-//       else if (error.response?.status === 404) setError("Customer data endpoint not found.");
-//       else                                     setError("Failed to fetch customer details. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => { handleFetchData(); }, []);
-
-//   useEffect(() => {
-//     if (data.length > 0) {
-//       const q = searchTerm.toLowerCase();
-//       const filtered = data.filter(item =>
-//         item.customerName?.toLowerCase().includes(q)      ||
-//         item.email?.toLowerCase().includes(q)             ||
-//         String(item.mobileNum || '').includes(searchTerm) ||
-//         item.proName?.toLowerCase().includes(q)           ||
-//         item.proSrNo?.toLowerCase().includes(q)           ||
-//         item.invoiceNum?.toLowerCase().includes(q)        ||
-//         item.ticketNumber?.toLowerCase().includes(q)      ||
-//         item.plainPassword?.toLowerCase().includes(q)     // ✅ search by plainPassword
-//       );
-//       setFilteredData(filtered);
-//       setCurrentPage(1);
-//     }
-//   }, [searchTerm, data]);
-
-//   const indexOfLastItem  = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems     = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages       = Math.ceil(filteredData.length / itemsPerPage);
-
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     try {
-//       return new Date(dateString).toLocaleDateString("en-IN", {
-//         year: "numeric", month: "short", day: "numeric",
-//       });
-//     } catch { return 'Invalid Date'; }
-//   };
-
-//   const checkWarrantyStatus = (endDate) => {
-//     if (!endDate) return { status: 'Unknown', color: 'bg-gray-100 text-gray-800' };
-//     try {
-//       const daysLeft = Math.ceil((new Date(endDate) - new Date()) / (1000 * 60 * 60 * 24));
-//       if (daysLeft < 0)   return { status: 'Expired',       color: 'bg-red-100 text-red-800'       };
-//       if (daysLeft <= 30) return { status: 'Expiring Soon', color: 'bg-yellow-100 text-yellow-800' };
-//       return { status: 'Active', color: 'bg-green-100 text-green-800' };
-//     } catch { return { status: 'Error', color: 'bg-gray-100 text-gray-800' }; }
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="text-center">
-//           <div className="w-9 h-9 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3" />
-//           <p className="text-gray-500 text-sm">Loading customer data...</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center max-w-md">
-//           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-//           <p className="text-red-600 text-sm mb-3">{error}</p>
-//           <button onClick={handleFetchData} className="px-5 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors">
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-
-//       {/* Header */}
-//       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-900">Customer Product History</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Total Records: {filteredData.length} {searchTerm && `(Filtered from ${data.length})`}
-//           </p>
-//         </div>
-//         <div className="flex gap-3 w-full sm:w-auto">
-//           <div className="relative flex-1 sm:flex-initial">
-//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-//             <input
-//               type="text"
-//               placeholder="Search customers..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm"
-//             />
-//           </div>
-//           <button className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-600">
-//             <Download className="w-4 h-4" />
-//             <span className="hidden sm:inline">Export</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Cards */}
-//       <div className="grid grid-cols-1 gap-4">
-//         {currentItems.length === 0 ? (
-//           <Card className="bg-white">
-//             <CardContent className="py-12">
-//               <div className="text-center">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-//                 <p className="text-gray-500 text-sm">No customer records found</p>
-//                 {searchTerm && (
-//                   <button onClick={() => setSearchTerm('')} className="mt-2 text-orange-500 text-sm hover:text-orange-600">
-//                     Clear search
-//                   </button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ) : (
-//           currentItems.map((item, index) => {
-//             const warranty = checkWarrantyStatus(item.warrEndDate);
-//             const cardId   = item._id || index;
-
-//             return (
-//               <Card key={cardId} className="bg-white overflow-hidden hover:shadow-lg transition-shadow">
-//                 <CardContent className="p-0">
-
-//                   {/* Customer Header */}
-//                   <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 border-b border-gray-100">
-//                     <div className="flex flex-wrap items-center justify-between gap-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="bg-orange-100 rounded-full p-2">
-//                           <User className="w-5 h-5 text-orange-600" />
-//                         </div>
-//                         <div>
-//                           <h3 className="font-semibold text-gray-900">{item.customerName || 'N/A'}</h3>
-//                           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-1">
-//                             <span className="flex items-center gap-1">
-//                               <Mail className="w-3.5 h-3.5" />{item.email || 'N/A'}
-//                             </span>
-//                             <span className="flex items-center gap-1">
-//                               <Phone className="w-3.5 h-3.5" />{item.mobileNum || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                       <Badge variant="outline" className="bg-white">
-//                         #{item.invoiceNum || 'N/A'}
-//                       </Badge>
-//                     </div>
-//                   </div>
-
-//                   {/* Card Body */}
-//                   <div className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-//                       {/* Col 1 — Product */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Package className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Product:</span>
-//                           <span className="font-medium text-gray-900">{item.proName || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Tag className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Category:</span>
-//                           <span className="font-medium text-gray-900">{item.proCatogory || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Building2 className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Brand:</span>
-//                           <span className="font-medium text-gray-900">{item.brandName || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 2 — Serial / Invoice / Ticket */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Barcode className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Serial:</span>
-//                           <span className="font-medium text-gray-900">{item.proSrNo || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Model:</span>
-//                           <span className="font-medium text-gray-900">{item.proModNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <FileText className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Invoice:</span>
-//                           <span className="font-medium text-gray-900">{item.invoiceNum || 'N/A'}</span>
-//                         </div>
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Hash className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Ticket #:</span>
-//                           <span className="font-medium text-gray-900">{item.ticketNumber || 'N/A'}</span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 3 — Warranty */}
-//                       <div className="space-y-2">
-//                         <div className="flex items-center gap-2 text-sm">
-//                           <Calendar className="w-4 h-4 text-gray-400" />
-//                           <span className="text-gray-600">Purchase:</span>
-//                           <span className="font-medium text-gray-900">{formatDate(item.purDate)}</span>
-//                         </div>
-//                         <div className="flex items-start gap-2 text-sm">
-//                           <Clock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-//                           <span className="text-gray-600">Warranty:</span>
-//                           <span className="font-medium text-gray-900">
-//                             {formatDate(item.warrStartDate)} – {formatDate(item.warrEndDate)}
-//                           </span>
-//                         </div>
-//                         <div>
-//                           <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${warranty.color}`}>
-//                             <ShieldCheck className="w-3 h-3" />
-//                             Warranty {warranty.status}
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       {/* Col 4 — Login Credentials */}
-//                       <div className="space-y-2">
-//                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-1">
-//                           <KeyRound className="w-3.5 h-3.5" /> Login Credentials
-//                         </p>
-
-//                         <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 space-y-2.5">
-
-//                           {/* Username = customerName */}
-//                           <div className="flex items-center gap-2">
-//                             <User className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-//                             <span className="text-xs text-gray-500">Username:</span>
-//                             <span className="text-xs font-semibold text-gray-900 truncate">
-//                               {item.customerName || 'N/A'}
-//                             </span>
-//                           </div>
-
-//                           {/* ✅ Password = plainPassword field (NOT password field which is bcrypt) */}
-//                           <div className="flex items-center gap-2">
-//                             <Lock className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-//                             <span className="text-xs text-gray-500">Password:</span>
-//                             <PasswordCell password={item.plainPassword} />
-//                           </div>
-
-//                         </div>
-//                       </div>
-
-//                     </div>
-//                   </div>
-
-//                 </CardContent>
-//               </Card>
-//             );
-//           })
-//         )}
-//       </div>
-
-//       {/* Pagination */}
-//       {filteredData.length > 0 && (
-//         <div className="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200">
-//           <div className="text-sm text-gray-500">
-//             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} results
-//           </div>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4" />
-//             </button>
-//             <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
-//             <button
-//               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="p-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-
-// import React, { useState, useEffect } from 'react';
-// import axiosInstance from '../../Utils/axiosIntance';
-
-// import { Card, CardContent } from "../ui/card";
-// import { Badge } from "../ui/badge";
-// import {
-//   Calendar, Phone, Mail, User, Package, Hash, Tag, Barcode,
-//   Building2, FileText, Clock, AlertCircle,
-//   ChevronLeft, ChevronRight,
-//   Lock, Eye, EyeOff, Copy, Check, ShieldCheck, KeyRound,
-// } from 'lucide-react';
-
-// // ─── Password Cell ────────────────────────────────────────────────────────────
-// const PasswordCell = ({ password }) => {
-//   const [visible, setVisible] = useState(false);
-//   const [copied, setCopied]   = useState(false);
-
-//   const handleCopy = () => {
-//     navigator.clipboard.writeText(password || '');
-//     setCopied(true);
-//     setTimeout(() => setCopied(false), 1800);
-//   };
-
-//   if (!password) {
-//     return <span className="text-xs text-gray-400 italic">Not available</span>;
-//   }
-
-//   return (
-//     <div className="flex items-center gap-2">
-//       <span className="font-semibold text-gray-900 text-xs font-mono tracking-widest">
-//         {visible ? password : '••••••••'}
-//       </span>
-//       <button
-//         onClick={() => setVisible(v => !v)}
-//         className="p-1 rounded-md hover:bg-blue-100 text-blue-400 transition-colors"
-//         title={visible ? 'Hide' : 'Show'}
-//       >
-//         {visible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-//       </button>
-//       <button
-//         onClick={handleCopy}
-//         className="p-1 rounded-md hover:bg-green-100 transition-colors"
-//         title="Copy"
-//       >
-//         {copied
-//           ? <Check className="w-3 h-3 text-green-500" />
-//           : <Copy  className="w-3 h-3 text-blue-400"  />}
-//       </button>
-//     </div>
-//   );
-// };
-
-// // ─── Info Row ─────────────────────────────────────────────────────────────────
-// const InfoRow = ({ icon: Icon, label, value, iconColor = "text-gray-400" }) => (
-//   <div className="flex items-start gap-2.5 py-1.5">
-//     <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor}`} />
-//     <span className="text-xs text-gray-500 min-w-[64px] flex-shrink-0">{label}</span>
-//     <span className="text-xs font-semibold text-gray-800 leading-relaxed">{value || 'N/A'}</span>
-//   </div>
-// );
-
-// // ─── Section Block ────────────────────────────────────────────────────────────
-// const SectionBlock = ({ title, children }) => (
-//   <div className="bg-gray-50 rounded-2xl p-4 space-y-0.5">
-//     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{title}</p>
-//     {children}
-//   </div>
-// );
-
-// // ─── Main Component ───────────────────────────────────────────────────────────
-// const CustomerCareCustomerHistory = () => {
-//   const [data, setData]               = useState([]);
-//   const [loading, setLoading]         = useState(false);
-//   const [error, setError]             = useState(null);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const itemsPerPage                  = 5;
-
-//   const handleFetchData = async () => {
-//     try {
-//       setLoading(true);
-//       setError(null);
-//       const res = await axiosInstance.get("/customerDetails/customer");
-//       if (res.data.customers) {
-//         setData(res.data.customers);
-//       } else if (Array.isArray(res.data)) {
-//         setData(res.data);
-//       } else {
-//         setError("Invalid data format received from server");
-//       }
-//     } catch (err) {
-//       if (err.response?.status === 401)      setError("Session expired. Please login again.");
-//       else if (err.response?.status === 403) setError("You don't have permission to view this data.");
-//       else if (err.response?.status === 404) setError("Customer data endpoint not found.");
-//       else                                   setError("Failed to fetch customer details. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => { handleFetchData(); }, []);
-
-//   const indexOfLastItem  = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems     = data.slice(indexOfFirstItem, indexOfLastItem);
-//   const totalPages       = Math.ceil(data.length / itemsPerPage);
-
-//   const formatDate = (dateString) => {
-//     if (!dateString) return 'N/A';
-//     try {
-//       return new Date(dateString).toLocaleDateString("en-IN", {
-//         year: "numeric", month: "short", day: "numeric",
-//       });
-//     } catch { return 'Invalid Date'; }
-//   };
-
-//   const warrantyBadge = (endDate) => {
-//     if (!endDate) return { label: 'Unknown', cls: 'bg-gray-100 text-gray-600 border-gray-200' };
-//     try {
-//       const days = Math.ceil((new Date(endDate) - new Date()) / 86400000);
-//       if (days < 0)   return { label: 'Expired',       cls: 'bg-red-50 text-red-700 border-red-200'       };
-//       if (days <= 30) return { label: 'Expiring Soon', cls: 'bg-amber-50 text-amber-700 border-amber-200' };
-//       return              { label: 'Active',         cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
-//     } catch { return { label: 'Error', cls: 'bg-gray-100 text-gray-600 border-gray-200' }; }
-//   };
-
-//   // ── Loading ──────────────────────────────────────────────────────────────
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center min-h-[400px]">
-//         <div className="text-center space-y-3">
-//           <div className="w-10 h-10 border-[3px] border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto" />
-//           <p className="text-sm text-gray-400 font-medium">Loading customer records…</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // ── Error ────────────────────────────────────────────────────────────────
-//   if (error) {
-//     return (
-//       <div className="flex justify-center items-center min-h-[400px] px-6">
-//         <div className="bg-white border border-red-100 rounded-3xl p-8 text-center max-w-sm shadow-sm">
-//           <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-//             <AlertCircle className="w-6 h-6 text-red-500" />
-//           </div>
-//           <p className="text-sm font-semibold text-gray-800 mb-1">Something went wrong</p>
-//           <p className="text-xs text-gray-500 mb-5">{error}</p>
-//           <button
-//             onClick={handleFetchData}
-//             className="px-6 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors"
-//           >
-//             Try Again
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // ── Main ─────────────────────────────────────────────────────────────────
-//   return (
-//     <div className="min-h-screen bg-gray-50/70 px-4 sm:px-8 py-8">
-
-//       {/* ── Page Header ─────────────────────────────────────────────────── */}
-//       <div className="mb-8">
-//         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customer Product History</h1>
-//         <p className="text-sm text-gray-400 mt-1">{data.length} total records</p>
-//       </div>
-
-//       {/* ── Empty State ──────────────────────────────────────────────────── */}
-//       {currentItems.length === 0 && (
-//         <div className="flex flex-col items-center justify-center py-24 text-center">
-//           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-//             <Package className="w-7 h-7 text-gray-400" />
-//           </div>
-//           <p className="text-sm font-semibold text-gray-700">No customer records yet</p>
-//           <p className="text-xs text-gray-400 mt-1">Records will appear here once added.</p>
-//         </div>
-//       )}
-
-//       {/* ── Cards ───────────────────────────────────────────────────────── */}
-//       <div className="space-y-5">
-//         {currentItems.map((item, index) => {
-//           const wStatus = warrantyBadge(item.warrEndDate);
-
-//           return (
-//             <div
-//               key={item._id || index}
-//               className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
-//             >
-
-//               {/* Card Top Bar */}
-//               <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-gradient-to-r from-orange-50/80 to-white border-b border-gray-100">
-//                 <div className="flex items-center gap-4">
-//                   <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-//                     <User className="w-5 h-5 text-orange-600" />
-//                   </div>
-//                   <div>
-//                     <h3 className="font-bold text-gray-900 text-base leading-tight">
-//                       {item.customerName || 'N/A'}
-//                     </h3>
-//                     <div className="flex flex-wrap items-center gap-4 mt-1">
-//                       <span className="flex items-center gap-1.5 text-xs text-gray-500">
-//                         <Mail className="w-3.5 h-3.5" />
-//                         {item.email || 'N/A'}
-//                       </span>
-//                       <span className="flex items-center gap-1.5 text-xs text-gray-500">
-//                         <Phone className="w-3.5 h-3.5" />
-//                         {item.mobileNum || 'N/A'}
-//                       </span>
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex items-center gap-2">
-//                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border ${wStatus.cls}`}>
-//                     <ShieldCheck className="w-3 h-3" />
-//                     {wStatus.label}
-//                   </span>
-//                   <span className="px-3 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full">
-//                     #{item.invoiceNum || '—'}
-//                   </span>
-//                 </div>
-//               </div>
-
-//               {/* Card Body Grid */}
-//               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 p-6">
-
-//                 {/* Col 1 — Product Info */}
-//                 <SectionBlock title="Product">
-//                   <InfoRow icon={Package}   label="Name"     value={item.proName}     iconColor="text-orange-400" />
-//                   <InfoRow icon={Tag}        label="Category" value={item.proCatogory} iconColor="text-orange-400" />
-//                   <InfoRow icon={Building2}  label="Brand"    value={item.brandName}   iconColor="text-orange-400" />
-//                 </SectionBlock>
-
-//                 {/* Col 2 — IDs */}
-//                 <SectionBlock title="Identifiers">
-//                   <InfoRow icon={Barcode}  label="Serial"  value={item.proSrNo}      iconColor="text-blue-400" />
-//                   <InfoRow icon={Hash}     label="Model"   value={item.proModNum}    iconColor="text-blue-400" />
-//                   <InfoRow icon={FileText} label="Invoice" value={item.invoiceNum}   iconColor="text-blue-400" />
-//                   <InfoRow icon={Hash}     label="Ticket"  value={item.ticketNumber} iconColor="text-blue-400" />
-//                 </SectionBlock>
-
-//                 {/* Col 3 — Warranty Dates */}
-//                 <SectionBlock title="Warranty Period">
-//                   <InfoRow icon={Calendar} label="Purchased" value={formatDate(item.purDate)}       iconColor="text-purple-400" />
-//                   <InfoRow icon={Clock}    label="Starts"    value={formatDate(item.warrStartDate)} iconColor="text-purple-400" />
-//                   <InfoRow icon={Clock}    label="Ends"      value={formatDate(item.warrEndDate)}   iconColor="text-purple-400" />
-//                 </SectionBlock>
-
-//                 {/* Col 4 — Login Credentials */}
-//                 <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4">
-//                   <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-//                     <KeyRound className="w-3 h-3" />
-//                     Login Credentials
-//                   </p>
-
-//                   <div className="space-y-3">
-//                     <div>
-//                       <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
-//                         <User className="w-3 h-3" /> Username
-//                       </p>
-//                       <p className="text-xs font-bold text-gray-800 break-all pl-0.5">
-//                         {item.customerName || 'N/A'}
-//                       </p>
-//                     </div>
-
-//                     <div className="w-full h-px bg-blue-100" />
-
-//                     <div>
-//                       <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
-//                         <Lock className="w-3 h-3" /> Password
-//                       </p>
-//                       <PasswordCell password={item.plainPassword} />
-//                     </div>
-//                   </div>
-//                 </div>
-
-//               </div>
-//             </div>
-//           );
-//         })}
-//       </div>
-
-//       {/* ── Pagination ──────────────────────────────────────────────────── */}
-//       {data.length > itemsPerPage && (
-//         <div className="mt-8 flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl border border-gray-100 shadow-sm">
-//           <p className="text-xs text-gray-400">
-//             Showing <span className="font-semibold text-gray-700">{indexOfFirstItem + 1}</span>–<span className="font-semibold text-gray-700">{Math.min(indexOfLastItem, data.length)}</span> of <span className="font-semibold text-gray-700">{data.length}</span>
-//           </p>
-//           <div className="flex items-center gap-2">
-//             <button
-//               onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-//               disabled={currentPage === 1}
-//               className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronLeft className="w-4 h-4 text-gray-600" />
-//             </button>
-//             <span className="text-xs font-semibold text-gray-700 px-2">
-//               {currentPage} / {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-//             >
-//               <ChevronRight className="w-4 h-4 text-gray-600" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-
-//     </div>
-//   );
-// };
-
-// export default CustomerCareCustomerHistory;
-
-
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../Utils/axiosIntance';
 import {
   Calendar, Phone, Mail, User, Package, Clock, AlertCircle,
   ChevronLeft, ChevronRight, ChevronDown,
   Eye, EyeOff, Copy, Check, ShieldCheck,
-  ShoppingBag, Layers, Trash2,
+  ShoppingBag, Layers, Trash2, RefreshCw,
 } from 'lucide-react';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+/* ─────────────────────────── DESIGN TOKENS ─────────────────────────── */
+const C = {
+  primary:       '#2E6F83',
+  primaryDark:   '#2A6577',
+  primaryLight:  '#E8F4F7',
+  primaryMid:    '#C5DDE5',
+  accent:        '#E5A93D',
+  accentLight:   '#FDF3E0',
+  accentBorder:  '#F5D99A',
+  background:    '#F4F6F8',
+  white:         '#FFFFFF',
+  border:        '#E2E8ED',
+  borderHover:   '#C5D5DB',
+  textPrimary:   '#1F2937',
+  textSecondary: '#6B7280',
+  icon:          '#9CA3AF',
+  successBg:     '#ECFDF5',
+  successText:   '#065F46',
+  successBorder: '#A7F3D0',
+  warnBg:        '#FFFBEB',
+  warnText:      '#92400E',
+  warnBorder:    '#FDE68A',
+  errorBg:       '#FEF2F2',
+  errorText:     '#991B1B',
+  errorBorder:   '#FECACA',
+};
+
+/* ─────────────────────────── STYLES ─────────────────────────── */
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; }
+
+  .ch-root {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    background: ${C.background};
+    color: ${C.textPrimary};
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Page header ── */
+  .ch-page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid ${C.border};
+  }
+  .ch-page-title {
+    font-size: 1.5rem; font-weight: 800;
+    color: ${C.textPrimary}; letter-spacing: -0.02em; margin: 0 0 3px;
+  }
+  .ch-page-sub { font-size: 0.8rem; color: ${C.textSecondary}; font-weight: 500; margin: 0; }
+
+  .ch-refresh-btn {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0 1rem; height: 36px;
+    border: 1.5px solid ${C.border}; border-radius: 10px;
+    background: ${C.white}; color: ${C.textSecondary};
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .ch-refresh-btn:hover { border-color: ${C.primary}; color: ${C.primary}; }
+
+  /* ── Card ── */
+  .ch-card {
+    background: ${C.white};
+    border: 1.5px solid ${C.border};
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .ch-card:hover { box-shadow: 0 4px 20px rgba(46,111,131,0.1); border-color: ${C.primaryMid}; }
+
+  /* ── Card header ── */
+  .ch-card-header {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: ${C.primary};
+    border-bottom: 1px solid ${C.primaryDark};
+  }
+
+  .ch-avatar {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ch-customer-name {
+    font-size: 0.88rem; font-weight: 700;
+    color: #fff; line-height: 1.2; margin: 0 0 3px;
+  }
+  .ch-customer-meta {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.75rem;
+  }
+  .ch-meta-item {
+    display: flex; align-items: center; gap: 0.3rem;
+    font-size: 0.72rem; color: rgba(255,255,255,0.75);
+    font-weight: 500;
+  }
+
+  /* ── Badges ── */
+  .ch-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 0.68rem; font-weight: 700;
+    border: 1px solid transparent;
+  }
+  .ch-badge-active   { background: ${C.successBg}; color: ${C.successText}; border-color: ${C.successBorder}; }
+  .ch-badge-warn     { background: ${C.warnBg};    color: ${C.warnText};    border-color: ${C.warnBorder}; }
+  .ch-badge-error    { background: ${C.errorBg};   color: ${C.errorText};   border-color: ${C.errorBorder}; }
+  .ch-badge-ghost    { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.25); }
+  .ch-badge-accent   { background: ${C.accentLight}; color: #92400E; border-color: ${C.accentBorder}; }
+  .ch-badge-date     { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
+
+  /* ── Delete btn ── */
+  .ch-delete-btn {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: rgba(239,68,68,0.18);
+    border: 1px solid rgba(239,68,68,0.3);
+    cursor: pointer; transition: background 0.2s, border-color 0.2s;
+  }
+  .ch-delete-btn:hover:not(:disabled) {
+    background: rgba(239,68,68,0.3);
+    border-color: rgba(239,68,68,0.5);
+  }
+  .ch-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Products table ── */
+  .ch-products-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 1.25rem;
+    background: ${C.primaryLight};
+    border-bottom: 1px solid ${C.primaryMid};
+  }
+  .ch-products-label {
+    font-size: 0.67rem; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: ${C.primary};
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .ch-col-headers {
+    display: none;
+    gap: 0.75rem;
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: ${C.icon};
+  }
+  @media (min-width: 640px) { .ch-col-headers { display: grid; grid-template-columns: 26px 180px 110px 1fr 20px; } }
+
+  /* ── Product row ── */
+  .ch-product-row {
+    display: grid; align-items: center; gap: 0.75rem;
+    padding: 0.7rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 1px solid ${C.border};
+    transition: background 0.15s;
+    grid-template-columns: 26px 180px 110px 1fr 20px;
+  }
+  .ch-product-row:last-child { border-bottom: none; }
+  .ch-product-row:hover { background: ${C.primaryLight}; }
+  .ch-product-row.open  { background: ${C.primaryLight}; }
+
+  .ch-product-index {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700;
+    background: ${C.primaryMid}; color: ${C.primaryDark};
+    flex-shrink: 0;
+  }
+
+  .ch-ticket-badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 8px;
+    font-size: 0.7rem; font-family: monospace; font-weight: 700;
+    background: ${C.primaryLight}; color: ${C.primary};
+    border: 1px solid ${C.primaryMid};
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  }
+
+  .ch-config-chip {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 2px 8px; border-radius: 6px;
+    font-size: 0.65rem;
+    background: ${C.background}; border: 1px solid ${C.border};
+  }
+  .ch-config-key   { color: ${C.icon}; }
+  .ch-config-value { color: ${C.textPrimary}; font-weight: 600; }
+
+  /* ── Expanded product detail ── */
+  .ch-product-expand {
+    padding: 1rem 1.25rem;
+    background: ${C.primaryLight};
+    border-bottom: 1px solid ${C.primaryMid};
+    border-top: 1px solid ${C.primaryMid};
+  }
+  .ch-expand-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+  }
+  @media (max-width: 540px) { .ch-expand-grid { grid-template-columns: 1fr; } }
+
+  .ch-detail-panel {
+    background: ${C.white}; border: 1.5px solid ${C.border};
+    border-radius: 12px; padding: 0.85rem 1rem;
+  }
+  .ch-detail-panel-title {
+    font-size: 0.62rem; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .ch-detail-panel-title.primary { color: ${C.primary}; }
+  .ch-detail-panel-title.accent  { color: ${C.accent}; }
+
+  .ch-detail-row {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 4px 0;
+    border-bottom: 1px solid ${C.background};
+    font-size: 0.75rem;
+  }
+  .ch-detail-row:last-child { border-bottom: none; }
+  .ch-detail-label { color: ${C.icon}; min-width: 52px; font-weight: 500; }
+  .ch-detail-value { color: ${C.textPrimary}; font-weight: 600; }
+
+  /* ── Password cell ── */
+  .ch-pw-cell { display: flex; align-items: center; gap: 0.35rem; }
+  .ch-pw-text { font-size: 0.72rem; font-family: monospace; font-weight: 600; color: ${C.textPrimary}; letter-spacing: 0.1em; }
+  .ch-icon-btn {
+    width: 22px; height: 22px; border-radius: 6px; border: none;
+    background: ${C.background}; color: ${C.icon};
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s, color 0.15s;
+  }
+  .ch-icon-btn:hover { background: ${C.primaryMid}; color: ${C.primary}; }
+
+  /* ── Empty state ── */
+  .ch-empty {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 5rem 1rem; text-align: center;
+  }
+  .ch-empty-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: ${C.primaryLight}; border: 1.5px solid ${C.primaryMid};
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  /* ── Error state ── */
+  .ch-error-wrap {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 400px; padding: 2rem;
+  }
+  .ch-error-card {
+    background: ${C.white}; border: 1.5px solid ${C.border};
+    border-radius: 20px; padding: 2.5rem 2rem;
+    max-width: 380px; width: 100%; text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+  .ch-error-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: ${C.errorBg}; border: 1.5px solid ${C.errorBorder};
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  /* ── Loading ── */
+  .ch-loading {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 400px;
+  }
+  .ch-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid ${C.primaryMid};
+    border-top-color: ${C.primary};
+    border-radius: 50%;
+    animation: chSpin 0.7s linear infinite;
+  }
+  @keyframes chSpin { to { transform: rotate(360deg); } }
+
+  /* ── Pagination ── */
+  .ch-pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    background: ${C.white}; border: 1.5px solid ${C.border};
+    border-radius: 14px; padding: 0.75rem 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .ch-pagination-text { font-size: 0.78rem; color: ${C.textSecondary}; }
+  .ch-pagination-text strong { color: ${C.textPrimary}; font-weight: 700; }
+  .ch-pag-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; border: 1.5px solid ${C.border};
+    background: ${C.white}; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .ch-pag-btn:hover:not(:disabled) { border-color: ${C.primary}; background: ${C.primaryLight}; }
+  .ch-pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .ch-pag-num { font-size: 0.78rem; font-weight: 700; color: ${C.textPrimary}; padding: 0 0.5rem; }
+
+  .spin-slow { animation: chSpin 1s linear infinite; }
+`;
+
+/* ─────────────────────────── HELPERS ─────────────────────────── */
 const fmt = (d) => {
   if (!d) return 'N/A';
   try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
@@ -3154,11 +323,11 @@ const fmt = (d) => {
 };
 
 const warrantyStatus = (endDate) => {
-  if (!endDate) return { label: 'Unknown',       cls: 'bg-gray-100 text-gray-500 border-gray-200' };
+  if (!endDate) return { label: 'Unknown',       cls: 'ch-badge ch-badge-ghost' };
   const days = Math.ceil((new Date(endDate) - new Date()) / 86400000);
-  if (days < 0)   return { label: 'Expired',       cls: 'bg-red-50 text-red-600 border-red-200' };
-  if (days <= 30) return { label: 'Expiring Soon', cls: 'bg-amber-50 text-amber-600 border-amber-200' };
-  return               { label: 'Active',         cls: 'bg-emerald-50 text-emerald-600 border-emerald-200' };
+  if (days < 0)   return { label: 'Expired',       cls: 'ch-badge ch-badge-error' };
+  if (days <= 30) return { label: 'Expiring Soon', cls: 'ch-badge ch-badge-warn' };
+  return               { label: 'Active',         cls: 'ch-badge ch-badge-active' };
 };
 
 const toPlainConfig = (raw) => {
@@ -3168,125 +337,108 @@ const toPlainConfig = (raw) => {
   return {};
 };
 
-// ─── PasswordCell ─────────────────────────────────────────────────────────────
+/* ─────────────────────────── SUB-COMPONENTS ─────────────────────────── */
+const StyleTag = () => <style>{styles}</style>;
+
 const PasswordCell = ({ password }) => {
-  const [vis, setVis]     = useState(false);
+  const [vis, setVis]       = useState(false);
   const [copied, setCopied] = useState(false);
   const copy = () => {
     navigator.clipboard.writeText(password || '');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    setCopied(true); setTimeout(() => setCopied(false), 1800);
   };
-  if (!password) return <span className="text-xs text-gray-400 italic">Not available</span>;
+  if (!password) return <span style={{ fontSize: '0.72rem', color: C.icon, fontStyle: 'italic' }}>Not available</span>;
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs font-mono font-semibold text-gray-800 tracking-widest">
-        {vis ? password : '••••••••'}
-      </span>
-      <button onClick={() => setVis(v => !v)} className="p-1 rounded hover:bg-white/60 text-slate-400 transition-colors">
-        {vis ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+    <div className="ch-pw-cell">
+      <span className="ch-pw-text">{vis ? password : '••••••••'}</span>
+      <button className="ch-icon-btn" onClick={() => setVis(v => !v)}>
+        {vis ? <EyeOff size={11} /> : <Eye size={11} />}
       </button>
-      <button onClick={copy} className="p-1 rounded hover:bg-white/60 transition-colors">
-        {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-slate-400" />}
+      <button className="ch-icon-btn" onClick={copy}>
+        {copied ? <Check size={11} color={C.primary} /> : <Copy size={11} />}
       </button>
     </div>
   );
 };
 
-// ─── InfoRow ─────────────────────────────────────────────────────────────────
-const InfoRow = ({ icon: Icon, label, value, iconCls = 'text-gray-400' }) => (
-  <div className="flex items-center gap-2.5 py-[5px]">
-    <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${iconCls}`} />
-    <span className="text-[11px] text-gray-400 w-16 flex-shrink-0">{label}</span>
-    <span className="text-[11px] font-semibold text-gray-800 leading-snug truncate">{value || 'N/A'}</span>
-  </div>
-);
-
-// ─── SectionPanel ─────────────────────────────────────────────────────────────
-const SectionPanel = ({ title, titleCls = 'text-gray-400', borderCls = 'border-gray-100', bg = 'bg-gray-50', children }) => (
-  <div className={`${bg} rounded-xl p-3.5 border ${borderCls}`}>
-    <p className={`text-[9px] font-black uppercase tracking-[1.4px] mb-2.5 ${titleCls}`}>{title}</p>
-    {children}
-  </div>
-);
-
-// ─── ConfigChips ─────────────────────────────────────────────────────────────
 const ConfigChips = ({ config }) => {
   const entries = Object.entries(config || {});
-  if (!entries.length) return <span className="text-[11px] text-gray-400 italic">No specs</span>;
+  if (!entries.length) return <span style={{ fontSize: '0.72rem', color: C.icon, fontStyle: 'italic' }}>No specs</span>;
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
       {entries.map(([k, v]) => (
-        <span key={k} className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-200 rounded-full text-[10px]">
-          <span className="text-gray-400">{k}:</span>
-          <span className="font-semibold text-gray-700">{String(v)}</span>
+        <span key={k} className="ch-config-chip">
+          <span className="ch-config-key">{k}:</span>
+          <span className="ch-config-value">{String(v)}</span>
         </span>
       ))}
     </div>
   );
 };
 
-// ─── ProductRow ───────────────────────────────────────────────────────────────
-// One row per registered product — collapsible for full spec detail
 const ProductRow = ({ product, index }) => {
-  const [open, setOpen] = useState(false);
-  const config = toPlainConfig(product.configSnapshot);
-  const ws     = warrantyStatus(product.warrEndDate);
-  const configEntries = Object.entries(config);
+  const [open, setOpen]   = useState(false);
+  const config            = toPlainConfig(product.configSnapshot);
+  const ws                = warrantyStatus(product.warrEndDate);
+  const configEntries     = Object.entries(config);
 
   return (
     <>
-      {/* Collapsed row */}
       <div
+        className={`ch-product-row ${open ? 'open' : ''}`}
         onClick={() => setOpen(o => !o)}
-        className={`grid items-center gap-3 px-5 py-3 cursor-pointer transition-colors border-b border-gray-100 last:border-0 ${open ? 'bg-teal-50/40' : 'hover:bg-gray-50/80'}`}
-        style={{ gridTemplateColumns: '26px 180px 110px 1fr 20px' }}
       >
-        {/* Index bubble */}
-        <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0"
-          style={{ background: '#e0f2f7', color: '#1F5668' }}>
-          {index + 1}
+        <span className="ch-product-index">{index + 1}</span>
+
+        <span className="ch-ticket-badge">{product.ticketNumber || '—'}</span>
+
+        <span className={ws.cls}>
+          <ShieldCheck size={10} />{ws.label}
         </span>
 
-        {/* Ticket badge */}
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold w-fit"
-          style={{ background: '#e0f2f7', color: '#1F5668', border: '1px solid #b2dce8' }}>
-          {product.ticketNumber || '—'}
-        </span>
-
-        {/* Warranty badge */}
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border w-fit ${ws.cls}`}>
-          <ShieldCheck className="w-2.5 h-2.5" />{ws.label}
-        </span>
-
-        {/* Config preview — 3 chips max */}
-        <div className="flex flex-wrap gap-1 overflow-hidden" style={{ maxHeight: 22 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', overflow: 'hidden', maxHeight: 22 }}>
           {configEntries.slice(0, 3).map(([k, v]) => (
-            <span key={k} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">
-              <span className="text-gray-400">{k}:</span>
-              <span className="font-semibold text-gray-600">{String(v)}</span>
+            <span key={k} className="ch-config-chip">
+              <span className="ch-config-key">{k}:</span>
+              <span className="ch-config-value">{String(v)}</span>
             </span>
           ))}
           {configEntries.length > 3 && (
-            <span className="text-[10px] text-gray-400 self-center pl-0.5">+{configEntries.length - 3} more</span>
+            <span style={{ fontSize: '0.65rem', color: C.icon, alignSelf: 'center' }}>
+              +{configEntries.length - 3} more
+            </span>
           )}
         </div>
 
-        {/* Chevron */}
-        <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          size={14}
+          color={C.icon}
+          style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
+        />
       </div>
 
-      {/* Expanded spec detail */}
       {open && (
-        <div className="px-5 py-4 bg-gradient-to-br from-teal-50/30 to-white border-b border-gray-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <SectionPanel title="Warranty Period" titleCls="text-purple-500" borderCls="border-purple-100" bg="bg-purple-50/40">
-              <InfoRow icon={Clock} label="Starts" value={fmt(product.warrStartDate)} iconCls="text-purple-400" />
-              <InfoRow icon={Clock} label="Ends"   value={fmt(product.warrEndDate)}   iconCls="text-purple-400" />
-            </SectionPanel>
-            <SectionPanel title="All Specifications" titleCls="text-teal-600" borderCls="border-teal-100" bg="bg-teal-50/40">
+        <div className="ch-product-expand">
+          <div className="ch-expand-grid">
+            <div className="ch-detail-panel">
+              <div className="ch-detail-panel-title primary">Warranty Period</div>
+              <div className="ch-detail-row">
+                <Clock size={12} color={C.primary} />
+                <span className="ch-detail-label">Starts</span>
+                <span className="ch-detail-value">{fmt(product.warrStartDate)}</span>
+              </div>
+              <div className="ch-detail-row">
+                <Clock size={12} color={C.primary} />
+                <span className="ch-detail-label">Ends</span>
+                <span className="ch-detail-value" style={{ color: ws.label === 'Expired' ? '#DC2626' : C.textPrimary }}>
+                  {fmt(product.warrEndDate)}
+                </span>
+              </div>
+            </div>
+            <div className="ch-detail-panel">
+              <div className="ch-detail-panel-title accent">All Specifications</div>
               <ConfigChips config={config} />
-            </SectionPanel>
+            </div>
           </div>
         </div>
       )}
@@ -3294,19 +446,18 @@ const ProductRow = ({ product, index }) => {
   );
 };
 
-// ─── extractDisplayData ───────────────────────────────────────────────────────
+/* ─────────────────────────── extractDisplayData ─────────────────────────── */
 const extractDisplayData = (customer) => {
   const fp  = customer.products?.[0] || {};
   const cfg = toPlainConfig(fp.configSnapshot);
-  const categoryName = fp.categoryRef?.name || fp.categoryName || 'N/A';
 
   const products = (customer.products || []).map(p => ({
-    _id:           p._id,
-    ticketNumber:  p.ticketNumber || p.productRef?.ticketNumber || null,
-    categoryName:  p.categoryRef?.name || p.categoryName || null,
+    _id:            p._id,
+    ticketNumber:   p.ticketNumber || p.productRef?.ticketNumber || null,
+    categoryName:   p.categoryRef?.name || p.categoryName || null,
     configSnapshot: toPlainConfig(p.configSnapshot),
-    warrStartDate: p.warrStartDate,
-    warrEndDate:   p.warrEndDate,
+    warrStartDate:  p.warrStartDate,
+    warrEndDate:    p.warrEndDate,
   }));
 
   return {
@@ -3317,68 +468,32 @@ const extractDisplayData = (customer) => {
     purchaseType: customer.purchaseType || 'single',
     status:       customer.status       || 'active',
     createdAt:    customer.createdAt,
-    proName:     cfg.Name      || cfg.name      || 'N/A',
-    proCatogory: categoryName,
-    brandName:   cfg.Brand     || cfg.brand     || 'N/A',
-    proSrNo:     cfg.SerialNo  || cfg.serialNo  || cfg.Serial || 'N/A',
-    proModNum:   cfg.ModelNo   || cfg.modelNo   || cfg.Model  || 'N/A',
-    ticketNumber: fp.ticketNumber || 'N/A',
-    warrStartDate: fp.warrStartDate || null,
-    warrEndDate:   fp.warrEndDate   || null,
-    purDate:    cfg.PurchaseDate || cfg.purchaseDate || null,
-    invoiceNum: cfg.InvoiceNo   || cfg.invoiceNo    || cfg.Invoice || null,
+    warrEndDate:  fp.warrEndDate || null,
     products,
     plainPassword: null,
   };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
 const CustomerCareCustomerHistory = () => {
   const [data,        setData]        = useState([]);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [deletingId,  setDeletingId]  = useState(null); // tracks which card is being deleted
+  const [deletingId,  setDeletingId]  = useState(null);
   const itemsPerPage = 5;
-
-  // ── handleDelete ────────────────────────────────────────────────────────────
-  //
-  // WHAT IT DOES:
-  // 1. Shows a confirm dialog — prevents accidental deletes
-  // 2. Sets deletingId = customer._id → makes that card's button show a spinner
-  // 3. Calls DELETE /customerDetails/registrations/:id
-  // 4. On success → removes that customer from local state immediately
-  //    (no need to re-fetch the whole list — just filter it out)
-  // 5. On error → shows alert with the error message
-  // 6. Always clears deletingId when done (spinner goes away)
-  //
-  // WHY remove from state instead of re-fetching?
-  // Re-fetching makes the whole list reload (loading spinner, flicker).
-  // Removing from state is instant and feels smoother.
-  // setData(prev => prev.filter(c => c._id !== id))
-  //   prev = current data array
-  //   .filter() returns new array keeping everything EXCEPT the deleted id
 
   const handleDelete = async (id, customerName) => {
     if (!window.confirm(`Deactivate "${customerName}"? This will hide them from the list.`)) return;
-
-    setDeletingId(id); // show spinner on this specific card
+    setDeletingId(id);
     try {
       await axiosInstance.delete(`/customerDetails/registrations/${id}`);
-
-      // Remove from local state instantly — no full re-fetch needed
       setData(prev => prev.filter(c => c._id !== id));
-
-      // Reset to page 1 if current page becomes empty after deletion
       setCurrentPage(1);
-
     } catch (err) {
-      const msg = err.response?.data?.message || "Failed to deactivate customer";
-      alert(msg);
+      alert(err.response?.data?.message || 'Failed to deactivate customer');
     } finally {
-      setDeletingId(null); // always clear spinner
+      setDeletingId(null);
     }
   };
 
@@ -3390,7 +505,7 @@ const CustomerCareCustomerHistory = () => {
       if      (Array.isArray(d?.data))      setData(d.data);
       else if (Array.isArray(d?.customers)) setData(d.customers);
       else if (Array.isArray(d))            setData(d);
-      else { console.error('Unexpected shape:', d); setError('Invalid data format received from server'); }
+      else { setError('Invalid data format received from server'); }
     } catch (err) {
       if      (err.response?.status === 401) setError('Session expired. Please login again.');
       else if (err.response?.status === 403) setError("You don't have permission to view this data.");
@@ -3406,146 +521,151 @@ const CustomerCareCustomerHistory = () => {
   const currentItems = data.slice(indexOfFirst, indexOfLast);
   const totalPages   = Math.ceil(data.length / itemsPerPage);
 
-  // Loading
+  /* ── Loading ── */
   if (loading) return (
-    <div className="flex justify-center items-center min-h-[400px]">
-      <div className="text-center space-y-3">
-        <div className="w-10 h-10 border-[3px] border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-gray-400 font-medium">Loading customer records…</p>
-      </div>
-    </div>
-  );
-
-  // Error
-  if (error) return (
-    <div className="flex justify-center items-center min-h-[400px] px-6">
-      <div className="bg-white border border-red-100 rounded-3xl p-8 text-center max-w-sm shadow-sm">
-        <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <AlertCircle className="w-6 h-6 text-red-400" />
+    <>
+      <StyleTag />
+      <div className="ch-loading">
+        <div style={{ textAlign: 'center' }}>
+          <div className="ch-spinner" style={{ margin: '0 auto 0.75rem' }} />
+          <p style={{ fontSize: '0.82rem', color: C.textSecondary, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+            Loading customer records…
+          </p>
         </div>
-        <p className="text-sm font-semibold text-gray-800 mb-1">Something went wrong</p>
-        <p className="text-xs text-gray-500 mb-5">{error}</p>
-        <button onClick={handleFetchData}
-          className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
-          style={{ background: '#2B6F84' }}>
-          Try Again
-        </button>
       </div>
-    </div>
+    </>
   );
 
+  /* ── Error ── */
+  if (error) return (
+    <>
+      <StyleTag />
+      <div className="ch-error-wrap">
+        <div className="ch-error-card">
+          <div className="ch-error-icon"><AlertCircle size={22} color="#DC2626" /></div>
+          <p style={{ fontSize: '0.9rem', fontWeight: 700, color: C.textPrimary, margin: '0 0 0.4rem', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+            Something went wrong
+          </p>
+          <p style={{ fontSize: '0.8rem', color: C.textSecondary, margin: '0 0 1.5rem', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+            {error}
+          </p>
+          <button onClick={handleFetchData}
+            style={{
+              width: '100%', height: 44, borderRadius: 10, border: 'none',
+              background: C.primary, color: '#fff',
+              fontFamily: "'Plus Jakarta Sans',sans-serif",
+              fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
+            }}>
+            Try Again
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  /* ── Main ── */
   return (
-    <div className="min-h-screen bg-gray-50/70 px-4 sm:px-8 py-8">
+    <div className="ch-root">
+      <StyleTag />
 
       {/* Page Header */}
-      <div className="mb-7">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customer Product History</h1>
-        <p className="text-sm text-gray-400 mt-1">{data.length} total records</p>
+      <div className="ch-page-header">
+        <div>
+          <h1 className="ch-page-title">Customer Product History</h1>
+          <p className="ch-page-sub">{data.length} total records</p>
+        </div>
+        <button className="ch-refresh-btn" onClick={handleFetchData}>
+          <RefreshCw size={13} /> Refresh
+        </button>
       </div>
 
-      {/* Empty */}
+      {/* Empty state */}
       {currentItems.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-            <Package className="w-7 h-7 text-gray-400" />
+        <div className="ch-empty">
+          <div className="ch-empty-icon">
+            <Package size={26} color={C.primary} />
           </div>
-          <p className="text-sm font-semibold text-gray-700">No customer records yet</p>
-          <p className="text-xs text-gray-400 mt-1">Records will appear here once added.</p>
+          <p style={{ fontSize: '0.88rem', fontWeight: 700, color: C.textPrimary, margin: '0 0 4px' }}>
+            No customer records yet
+          </p>
+          <p style={{ fontSize: '0.78rem', color: C.textSecondary, margin: 0 }}>
+            Records will appear here once added.
+          </p>
         </div>
       )}
 
-      <div className="space-y-5">
+      {/* Cards */}
+      <div>
         {currentItems.map((raw, idx) => {
           const item = extractDisplayData(raw);
           const ws   = warrantyStatus(item.warrEndDate);
 
           return (
-            <div key={item._id || idx}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <div key={item._id || idx} className="ch-card">
 
-              {/* ── TEAL HEADER BAR ─────────────────────────────────────── */}
-              <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-b border-teal-700/20"
-                style={{ background: 'linear-gradient(135deg, #1F5668 0%, #2B6F84 100%)' }}>
-
-                <div className="flex items-center gap-3">
-                  {/* Avatar circle */}
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(255,255,255,0.16)' }}>
-                    <User className="w-[18px] h-[18px] text-white" />
+              {/* ── Header bar ── */}
+              <div className="ch-card-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div className="ch-avatar">
+                    <User size={17} color="#fff" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-[13px] leading-tight tracking-tight">
-                      {item.customerName}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-3 mt-0.5">
-                      <span className="flex items-center gap-1 text-[11px] text-teal-200">
-                        <Mail className="w-3 h-3" />{item.email}
-                      </span>
-                      <span className="flex items-center gap-1 text-[11px] text-teal-200">
-                        <Phone className="w-3 h-3" />{item.mobileNum}
-                      </span>
+                    <p className="ch-customer-name">{item.customerName}</p>
+                    <div className="ch-customer-meta">
+                      <span className="ch-meta-item"><Mail size={11} />{item.email}</span>
+                      <span className="ch-meta-item"><Phone size={11} />{item.mobileNum}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                  {/* Warranty status */}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${ws.cls}`}>
-                    <ShieldCheck className="w-3 h-3" />{ws.label}
-                  </span>
-                  {/* Purchase type */}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${
-                    item.purchaseType === 'bulk'
-                      ? 'bg-amber-50 text-amber-700 border-amber-200'
-                      : 'bg-white/20 text-white border-white/30'
-                  }`}>
-                    {item.purchaseType === 'bulk'
-                      ? <><Layers className="w-3 h-3" /> Bulk ({item.products.length})</>
-                      : <><ShoppingBag className="w-3 h-3" /> Single</>}
-                  </span>
-                  {/* Registered date */}
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium border"
-                    style={{ background: 'rgba(255,255,255,0.12)', color: '#b2dce8', borderColor: 'rgba(255,255,255,0.2)' }}>
-                    <Calendar className="w-3 h-3" />{fmt(item.createdAt)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {/* Warranty */}
+                  <span className={ws.cls}>
+                    <ShieldCheck size={10} />{ws.label}
                   </span>
 
-                  {/* ── Delete button ─────────────────────────────────────────
-                    Calls handleDelete(id, name) on click.
-                    While this specific card is being deleted (deletingId === item._id),
-                    shows a spinning circle instead of the trash icon.
-                    e.stopPropagation() prevents any parent onClick from firing.
-                  */}
+                  {/* Purchase type */}
+                  {item.purchaseType === 'bulk'
+                    ? (
+                      <span className="ch-badge ch-badge-accent">
+                        <Layers size={10} /> Bulk ({item.products.length})
+                      </span>
+                    ) : (
+                      <span className="ch-badge ch-badge-ghost">
+                        <ShoppingBag size={10} /> Single
+                      </span>
+                    )
+                  }
+
+                  {/* Date */}
+                  <span className="ch-badge ch-badge-date">
+                    <Calendar size={10} />{fmt(item.createdAt)}
+                  </span>
+
+                  {/* Delete */}
                   <button
+                    className="ch-delete-btn"
                     onClick={(e) => { e.stopPropagation(); handleDelete(item._id, item.customerName); }}
                     disabled={deletingId === item._id}
-                    className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ background: 'rgba(239,68,68,0.18)', border: '1px solid rgba(239,68,68,0.35)' }}
                     title="Deactivate customer"
                   >
                     {deletingId === item._id
-                      ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                      : <Trash2 className="w-3.5 h-3.5 text-red-300" />
+                      ? <div style={{ width: 12, height: 12, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'chSpin 0.7s linear infinite' }} />
+                      : <Trash2 size={13} color="#FCA5A5" />
                     }
                   </button>
                 </div>
               </div>
 
-
-
-              {/* ── REGISTERED PRODUCTS TABLE ────────────────────────────── */}
-              {/* Shown BELOW the 4-col grid. Each product = one clickable row. */}
-              {/* Click to expand that product's full warranty + specs detail.  */}
+              {/* ── Products table ── */}
               {item.products.length > 0 && (
-                <div className="border-t border-gray-100">
-                  {/* Section label + column headers */}
-                  <div className="flex items-center justify-between px-5 py-2.5 bg-gray-50/80 border-b border-gray-100">
-                    <p className="text-[9px] font-black uppercase tracking-[1.4px] text-gray-400 flex items-center gap-1.5">
-                      <Package className="w-3 h-3" />
+                <div>
+                  <div className="ch-products-header">
+                    <p className="ch-products-label">
+                      <Package size={12} />
                       Registered Products ({item.products.length})
                     </p>
-                    {/* Column labels - hidden on mobile */}
-                    <div className="hidden sm:grid gap-3 text-[9px] font-bold uppercase tracking-widest text-gray-400 pr-5"
-                      style={{ gridTemplateColumns: '26px 180px 110px 1fr 20px' }}>
+                    <div className="ch-col-headers" style={{ paddingRight: '1.25rem' }}>
                       <span />
                       <span>Ticket #</span>
                       <span>Warranty</span>
@@ -3554,13 +674,8 @@ const CustomerCareCustomerHistory = () => {
                     </div>
                   </div>
 
-                  {/* One ProductRow per product */}
                   {item.products.map((product, pIdx) => (
-                    <ProductRow
-                      key={product._id || pIdx}
-                      product={product}
-                      index={pIdx}
-                    />
+                    <ProductRow key={product._id || pIdx} product={product} index={pIdx} />
                   ))}
                 </div>
               )}
@@ -3570,29 +685,23 @@ const CustomerCareCustomerHistory = () => {
         })}
       </div>
 
-      {/* ── Pagination ── */}
+      {/* Pagination */}
       {data.length > itemsPerPage && (
-        <div className="mt-8 flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs text-gray-400">
-            Showing{' '}
-            <span className="font-semibold text-gray-700">{indexOfFirst + 1}</span>–
-            <span className="font-semibold text-gray-700">{Math.min(indexOfLast, data.length)}</span>
-            {' '}of <span className="font-semibold text-gray-700">{data.length}</span>
+        <div className="ch-pagination">
+          <p className="ch-pagination-text">
+            Showing <strong>{indexOfFirst + 1}</strong>–<strong>{Math.min(indexOfLast, data.length)}</strong> of <strong>{data.length}</strong>
           </p>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="ch-pag-btn" onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
+              <ChevronLeft size={15} color={C.textSecondary} />
             </button>
-            <span className="text-xs font-semibold text-gray-700 px-2">{currentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+            <span className="ch-pag-num">{currentPage} / {totalPages}</span>
+            <button className="ch-pag-btn" onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
+              <ChevronRight size={15} color={C.textSecondary} />
             </button>
           </div>
         </div>
       )}
-
     </div>
   );
 };
